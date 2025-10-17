@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 
 // project-imports
-import DashboardLayout from 'layout/Dashboard';
+import AdminLayout from '../layout/AdminLayout/AdminLayout'
 import Loadable from 'components/Loadable';
 
 // render - basic component pages
@@ -19,7 +19,7 @@ const ComponentsRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardLayout />,
+      element: <AdminLayout />,
       children: [
         {
           path: 'basic',

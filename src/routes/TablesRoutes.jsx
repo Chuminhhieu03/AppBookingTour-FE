@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 
 // project-imports
-import DashboardLayout from 'layout/Dashboard';
+import AdminLayout from '../layout/AdminLayout/AdminLayout'
 import Loadable from 'components/Loadable';
 
 // render - bootstrap table pages
@@ -14,7 +14,7 @@ const TablesRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardLayout />,
+      element: <AdminLayout />,
       children: [
         {
           path: 'tables/bootstrap-table',

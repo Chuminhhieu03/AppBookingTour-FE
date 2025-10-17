@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 // project-imports
 import Loadable from 'components/Loadable';
-import DashboardLayout from 'layout/Dashboard';
+import AdminLayout from '../layout/AdminLayout/AdminLayout'
 
 // render - dashboard pages
 const DefaultPages = Loadable(lazy(() => import('views/navigation/dashboard/Default')));
@@ -14,7 +14,7 @@ const NavigationRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardLayout />,
+      element: <AdminLayout />,
       children: [
         {
           path: '/',

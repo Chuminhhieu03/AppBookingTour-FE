@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 
 // project-imports
-import DashboardLayout from 'layout/Dashboard';
+import AdminLayout from '../layout/AdminLayout/AdminLayout'
 import Loadable from 'components/Loadable';
 
 // render - forms element pages
@@ -14,7 +14,7 @@ const FormsRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardLayout />,
+      element: <AdminLayout />,
       children: [
         {
           path: 'forms',

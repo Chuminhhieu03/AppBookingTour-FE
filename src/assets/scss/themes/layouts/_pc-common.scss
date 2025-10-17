@@ -10,9 +10,7 @@
   min-height: calc(100vh - #{$temp});
 
   .pc-content {
-    padding-left: 40px;
-    padding-right: 40px;
-    padding-top: 20px;
+    padding-top: 10px;
     @include media-breakpoint-down(xl) {
       &.container {
         max-width: 100%;

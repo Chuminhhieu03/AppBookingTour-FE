@@ -6,11 +6,10 @@ import other from './other';
 import pages from './pages';
 import tableComponents from './tables';
 import uiComponents from './ui-components';
+import discount from './Sale';
 
-// ==============================|| MENU ITEMS ||============================== //
-
-const menuItems = {
-  items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other]
+const drawerItems = {
+    items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount]
 };
 
-export default menuItems;
+export default drawerItems; 

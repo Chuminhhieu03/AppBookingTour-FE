@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 // project-imports
 import Loadable from 'components/Loadable';
-import DashboardLayout from 'layout/Dashboard';
+import AdminLayout from '../layout/AdminLayout/AdminLayout'
 
 // render - other pages
 const OtherSamplePage = Loadable(lazy(() => import('views/SamplePage')));
@@ -14,7 +14,7 @@ const OtherRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardLayout />,
+      element: <AdminLayout />,
       children: [
         {
           path: 'other',

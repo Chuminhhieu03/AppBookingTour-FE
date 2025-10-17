@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-
-// react-bootstrap
 import Image from 'react-bootstrap/Image';
-
-// third-party
-
-// project-imports
-import DrawerContent from './DrawerContent';
+import DrawerContent from './DrawerContent/DrawerContent';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
-
-// assets
 import logo from 'assets/images/logo-white.svg';
 
-// ==============================|| MAIN LAYOUT - DRAWER ||============================== //
-
-export default function MainDrawer() {
+export default function Drawer() {
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster?.isDashboardDrawerOpened;
   const [selectedItems, setSelectedItems] = useState();
