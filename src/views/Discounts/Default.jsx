@@ -6,6 +6,7 @@ import MainCard from 'components/MainCard';
 import SearchDiscountQuery from '../../DTO/Discounts/SearchDiscounts/SearchDiscountQuery';
 import Constants from '../../Constants/Constants';
 import Utility from '../../utils/Utility';
+import LoadingModal from '../../components/LoadingModal';
 
 export default function Default() {
     const [filter, setFilter] = React.useState(new SearchDiscountQuery());
@@ -71,6 +72,7 @@ export default function Default() {
 
     const searchData = async (pageIndex = 0) => {
         try {
+            LoadingModal.showLoading();
             const request = { ...filter };
             request.PageIndex = pageIndex;
             request.PageSize = Constants.DEFAULT_PAGE_SIZE;
@@ -86,6 +88,8 @@ export default function Default() {
             setListDiscount(res.listDiscount);
         } catch (error) {
             console.error('Error fetching discounts:', error);
+        } finally {
+            LoadingModal.hideLoading();
         }
     };
 
@@ -97,7 +101,7 @@ export default function Default() {
                         dataSource={listDiscount}
                         columns={columns}
                         rowKey={(record) => record.code || record.id}
-                        pagination={{ pageSize: 10 }}
+                        pagination={{ pageSize: Constants.DEFAULT_PAGE_SIZE }}
                         bordered
                     />
                 </MainCard>

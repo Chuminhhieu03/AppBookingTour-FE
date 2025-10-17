@@ -20,3 +20,35 @@
   top: 16px;
   height: 0;
 }
+
+.loading-popup {
+  display: flex;
+  z-index: 999999999;
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+}
+
+.loading-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 5px solid #00388d;
+  border-left-color: #068adc;
+  background: white;
+  animation: rotate-s-loader 1s linear infinite;
+}
+
+@keyframes rotate-s-loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
