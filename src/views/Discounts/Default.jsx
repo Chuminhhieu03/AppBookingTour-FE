@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select } from 'antd';
-import { SearchOutlined, DownOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import SearchDiscountQuery from '../../DTO/Discounts/SearchDiscounts/SearchDiscountQuery';
 import DiscountFilter from '../../DTO/Discounts/SearchDiscounts/SearchDiscountFilter';
 import Constants from '../../Constants/Constants';
 import Utility from '../../utils/Utility';
 import LoadingModal from '../../components/LoadingModal';
-import { set } from 'react-hook-form';
 
 export default function Default() {
     const [query, setQuery] = React.useState(new SearchDiscountQuery());
@@ -26,7 +26,8 @@ export default function Default() {
             title: 'Mã',
             dataIndex: 'code',
             key: 'code',
-            align: 'center'
+            align: 'center',
+            render: (text, record) => <Link to={`/admin/sale/discount/display/${record.id}`}>{text}</Link>
         },
         {
             title: 'Tên mã giảm giá',
@@ -54,9 +55,8 @@ export default function Default() {
         },
         {
             title: 'Dịch vụ áp dụng',
-            dataIndex: 'appliedServices',
-            key: 'appliedServices',
-            render: (services) => services?.join(', ') || ''
+            dataIndex: 'serviceTypeName',
+            key: 'serviceTypeName'
         },
         {
             title: 'Trạng thái',
@@ -89,7 +89,7 @@ export default function Default() {
             body: JSON.stringify({})
         });
         const res = await response.json();
-        setListStatus(res);
+        setListStatus(res.listStatus);
     };
 
     const searchData = async (pageIndex = 0) => {
@@ -127,7 +127,7 @@ export default function Default() {
     return (
         <Row>
             <Col span={24}>
-                <MainCard 
+                <MainCard
                     title="Danh sách mã giảm giá"
                     secondary={
                         <Button type="primary" href="/admin/sale/discount/addnew" shape="round" icon={<PlusOutlined />}>
@@ -138,7 +138,7 @@ export default function Default() {
                     <Row gutter={[24, 24]} className="mb-5">
                         <Col span={6}>
                             <Flex gap="small" align="center">
-                                <span>Mã: </span>
+                                <span>Mã</span>
                                 <Input
                                     value={filter.Code}
                                     onChange={(e) => {
@@ -150,7 +150,7 @@ export default function Default() {
                         </Col>
                         <Col span={6}>
                             <Flex gap="small" align="center">
-                                <span>Tên mã: </span>
+                                <span>Tên mã</span>
                                 <Input
                                     style={{ flex: 1 }}
                                     value={filter.Name}
@@ -163,12 +163,12 @@ export default function Default() {
                         </Col>
                         <Col span={6}>
                             <Flex gap="small" align="center">
-                                <span>Trạng thái: </span>
+                                <span>Trạng thái</span>
                                 <Select
                                     value={filter.Status}
                                     allowClear
                                     style={{ flex: 1 }}
-                                    options={listStatus.map((item) => ({
+                                    options={listStatus?.map((item) => ({
                                         label: item.value,
                                         value: item.key
                                     }))}
@@ -192,7 +192,7 @@ export default function Default() {
                             </Row>
                         </Col>
                     </Row>
-                    <h6 className="mb-3">Tổng số bản ghi: {listDiscount.length}</h6>
+                    <h6 className="mb-3">Tổng số bản ghi: {listDiscount?.length}</h6>
                     <Table
                         dataSource={listDiscount}
                         columns={columns}

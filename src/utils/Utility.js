@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export default class Utility {
     static formatDate(dateString) {
         const date = new Date(dateString);
@@ -9,5 +11,9 @@ export default class Utility {
         const ss = String(date.getSeconds()).padStart(2, '0');
         const formatted = `${dd}/${mm}/${yyyy} ${hh}:${mi}:${ss}`;
         return formatted;
+    }
+
+    static convertStringToDate(dateString) {
+        return dayjs(dateString);
     }
 }
