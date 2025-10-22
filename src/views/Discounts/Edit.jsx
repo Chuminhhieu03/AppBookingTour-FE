@@ -51,9 +51,7 @@ export default function Edit() {
         if (res.success) {
             window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
         } else {
-            const errorData = res.data || [];
-            const listErrorMessage = errorData?.map(e => e.errorMessage);
-            alert(`Lỗi khi thêm mới mã giảm giá:\n${listErrorMessage.join('\n')}`);
+            alert(`Lỗi khi chỉnh sửa mã giảm giá:\n${res.message}`);
         }
         LoadingModal.hideLoading();
     };
