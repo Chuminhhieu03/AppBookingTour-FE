@@ -1,10 +1,11 @@
-import { Col, Row, Button, Space, Input, InputNumber } from 'antd';
+import { Col, Row, Button, Space, Input } from 'antd';
 import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
-import Utility from '../../utils/Utility';
+import ImagesUC from '../components/basic/ImagesUC';
+import RoomTypeTable from './RoomTypes/RoomTypeTable';
 
 const { TextArea } = Input;
 
@@ -52,20 +53,14 @@ export default function Display() {
                 >
                     <Row gutter={[24, 24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
-                            <span>Loại</span>
-                            <Upload
-                                listType="picture-card"
-                                className="avatar-uploader"
-                                showUploadList={false}
-                                action=""
-                                beforeUpload={() => false}
-                            >
-                                {imageUrl ? (
-                                <img draggable={false} src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-                                ) : (
-                                uploadButton
-                                )}
-                            </Upload>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+                                <ImagesUC
+                                    viewOnly
+                                    single
+                                    entityId={id}
+                                />
+                            </div>
+                            <span>Hình ảnh đại diện của cơ sở lưu trú</span>
                         </Col>
                         <Col span={8}>
                             <span>Tên</span>
@@ -87,6 +82,13 @@ export default function Display() {
                             <span>Hạng sao</span>
                             <Rate value={accommodation.starRating} readOnly />
                         </Col>
+                        <Col span={24}>
+                            <span>Hình ảnh minh họa về cơ sở lưu trú</span>
+                            <ImagesUC
+                                viewOnly
+                                entityId={id}
+                            />
+                        </Col>
                         <Col span={12}>
                             <span>Tiện ích</span>
                             <TextArea value={accommodation.amenities} readOnly />
@@ -101,6 +103,17 @@ export default function Display() {
                                 value={accommodation.description}
                                 readOnly
                             />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={12}>
+                            <span>Danh sách các loại phòng</span>
+                        </Col>
+                        <Col span={12} style={{ textAlign: 'right' }}>
+                            <Button type="primary">Thêm loại phòng</Button>
+                        </Col>
+                        <Col span={24}>
+                            <RoomTypeTable listRoomType={accommodation.listRoomType} />
                         </Col>
                     </Row>
                 </MainCard>
