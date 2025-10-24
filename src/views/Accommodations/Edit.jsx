@@ -4,16 +4,16 @@ import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
+import RoomTypeTable from './RoomTypes/RoomTypeTable';
+import ImagesUC from '../components/basic/ImagesUC';
 
 const { TextArea } = Input;
 
 export default function Edit() {
     const [accommodation, setAccommodation] = useState({});
     const [listStatus, setListStatus] = useState([]);
-    const [listServiceType, setListServiceType] = useState([]);
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
-    const [imageUrl, setImageUrl] = useState(null);
     const { id } = useParams();
 
     useEffect(() => {
@@ -30,43 +30,47 @@ export default function Edit() {
         });
         const res = await response.json();
         setListStatus(res.listStatus ?? []);
-        setListServiceType(res.listServiceType ?? []);
         setListType(res.listType ?? []);
         setListCity(res.listCity ?? []);
-        setAccommodation(res.accommodation ?? {});
-        setImageUrl(res.accommodation?.ImageUrl || null);
+        const accommodationRes = res.accommodation;
+        accommodationRes.isActive = Number(accommodationRes.isActive);
+        setAccommodation(accommodationRes ?? {});
         LoadingModal.hideLoading();
     };
 
     const onEditAccommodation = async (accommodation) => {
         LoadingModal.showLoading();
-        // Add logic for uploading an image if needed here as well
-        // ...
-        const request = { ...accommodation };
-        const response = await fetch(`https://localhost:44331/api/Accommodation/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request)
-        });
-        const res = await response.json();
-        if (res.success) {
-            window.location.href = `/admin/sale/accommodation/display/${id}`;
-        } else {
-            const errorData = res.data || [];
-            const listErrorMessage = errorData?.map((e) => e.errorMessage);
-            alert(`Lỗi khi chỉnh sửa cơ sở lưu trú:\n${listErrorMessage.join('\n')}`);
+        try {
+            const formData = new FormData();
+            const accommodationRequest = { ...accommodation };
+            accommodationRequest.isActive = Boolean(accommodation.isActive);
+            formData.append('CityId', accommodationRequest.cityId);
+            formData.append('Type', accommodationRequest.type);
+            formData.append('Name', accommodationRequest.name);
+            formData.append('Address', accommodationRequest.address);
+            formData.append('StarRating', accommodationRequest.starRating);
+            formData.append('Description', accommodationRequest.description ?? '');
+            formData.append('Regulation', accommodationRequest.regulation ?? '');
+            formData.append('Amenities', accommodationRequest.amenities ?? '');
+            formData.append('IsActive', accommodationRequest.isActive);
+            formData.append('CoverImgFile', accommodationRequest.coverImgFile);
+            const response = await fetch(`https://localhost:44331/api/Accommodation/${id}`, {
+                method: 'PUT',
+                body: formData
+            });
+            const res = await response.json();
+            if (res.success) {
+                window.location.href = `/admin/service/accommodation/display/${id}`;
+            } else {
+                const errorData = res.data || [];
+                const listErrorMessage = errorData?.map((e) => e.errorMessage);
+                alert(`Lỗi khi chỉnh sửa cơ sở lưu trú:\n${listErrorMessage.join('\n')}`);
+            }
+        } catch (error) {
+            console.error('Error editing accommodation:', error);
         }
         LoadingModal.hideLoading();
     };
-
-    const uploadButton = (
-        <div>
-            <UploadOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-    );
 
     return (
         <Row>
@@ -83,7 +87,12 @@ export default function Edit() {
                             >
                                 Lưu
                             </Button>
-                            <Button type="primary" href={`/admin/sale/accommodation/display/${id}`} shape="round" icon={<CloseOutlined />}>
+                            <Button
+                                type="primary"
+                                href={`/admin/service/accommodation/display/${id}`}
+                                shape="round"
+                                icon={<CloseOutlined />}
+                            >
                                 Thoát
                             </Button>
                         </Space>
@@ -91,79 +100,93 @@ export default function Edit() {
                 >
                     <Row gutter={[24, 24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
-                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-                                <ImagesUC fileList={fileList} />
+                            <div className="mb-3 d-flex justify-content-center">
+                                <ImagesUC imageUrl={accommodation.coverImgUrl}
+                                    onChange={(file) => setAccommodation({ ...accommodation, coverImgFile: file })} />
                             </div>
-                            <span>Hình ảnh đại diện của cơ sở lưu trú</span>
+                            <span>Hình đại diện</span>
                         </Col>
                         <Col span={8}>
                             <span>Tên</span>
                             <Input
-                                value={accommodation.Name}
-                                onChange={(e) => setAccommodation({ ...accommodation, Name: e.target.value })}
+                                value={accommodation.name}
+                                onChange={(e) => setAccommodation({ ...accommodation, name: e.target.value })}
                             />
                         </Col>
                         <Col span={8}>
                             <span>Loại</span>
                             <Select
-                                value={accommodation.Type}
+                                value={accommodation.type}
                                 allowClear
                                 className="w-100"
                                 options={listType?.map((item) => ({
-                                    label: item.name,
-                                    value: item.id
+                                    label: item.value,
+                                    value: item.key
                                 }))}
-                                onChange={(val) => setAccommodation({ ...accommodation, Type: val })}
+                                onChange={(val) => setAccommodation({ ...accommodation, type: val })}
                             />
                         </Col>
                         <Col span={8}>
                             <span>Thành phố</span>
                             <Select
-                                value={accommodation.CityId}
+                                value={accommodation.cityId}
                                 allowClear
                                 className="w-100"
                                 options={listCity?.map((item) => ({
                                     label: item.name,
                                     value: item.id
                                 }))}
-                                onChange={(val) => setAccommodation({ ...accommodation, CityId: val })}
+                                onChange={(val) => setAccommodation({ ...accommodation, cityId: val })}
                             />
                         </Col>
                         <Col span={8}>
                             <span>Địa chỉ chi tiết</span>
                             <Input
-                                value={accommodation.Address}
-                                onChange={(e) => setAccommodation({ ...accommodation, Address: e.target.value })}
+                                value={accommodation.address}
+                                onChange={(e) => setAccommodation({ ...accommodation, address: e.target.value })}
                             />
                         </Col>
                         <Col span={8}>
+                            <span>Trạng thái</span>
+                            <Select
+                                value={accommodation.isActive}
+                                allowClear
+                                className="w-100"
+                                options={listStatus?.map((item) => ({
+                                    label: item.value,
+                                    value: item.key
+                                }))}
+                                onChange={(val) => setAccommodation({ ...accommodation, isActive: val })}
+                            />
+                        </Col>
+                        <Col span={8} className="d-flex align-items-center gap-2">
                             <span>Hạng sao</span>
                             <Rate
-                                value={accommodation.StarRating}
-                                onChange={(val) => setAccommodation({ ...accommodation, StarRating: val })}
+                                value={accommodation.starRating}
+                                onChange={(val) => setAccommodation({ ...accommodation, starRating: val })}
                             />
                         </Col>
                         <Col span={12}>
                             <span>Tiện ích</span>
                             <TextArea
-                                value={accommodation.Amenities}
-                                onChange={(e) => setAccommodation({ ...accommodation, Amenities: e.target.value })}
+                                value={accommodation.amenities}
+                                onChange={(e) => setAccommodation({ ...accommodation, amenities: e.target.value })}
                             />
                         </Col>
                         <Col span={8}>
                             <span>Quy định</span>
                             <TextArea
-                                value={accommodation.Rules}
-                                onChange={(e) => setAccommodation({ ...accommodation, Rules: e.target.value })}
+                                value={accommodation.regulation}
+                                onChange={(e) => setAccommodation({ ...accommodation, regulation: e.target.value })}
                             />
                         </Col>
                         <Col span={24}>
                             <span>Mô tả</span>
                             <TextArea
-                                value={accommodation.Description}
+                                value={accommodation.description}
                                 allowClear
                                 className="w-100"
-                                onChange={(e) => setAccommodation({ ...accommodation, Description: e.target.value })}
+                                onChange={(e) => setAccommodation({ ...accommodation, description: e.target.value })}
                             />
                         </Col>
                     </Row>

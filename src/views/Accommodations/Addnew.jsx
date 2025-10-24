@@ -3,7 +3,7 @@ import { CloseOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
-import RoomTypeTable from './RoomTypes/RoomTypeTable';
+import ImagesUC from '../components/basic/ImagesUC';
 
 const { TextArea } = Input;
 
@@ -35,21 +35,32 @@ export default function Addnew() {
 
     const onAddnewAccommodation = async (accommodation) => {
         LoadingModal.showLoading();
-        const request = {};
-        request.Accommodation = { ...accommodation };
-        request.Accommodation.isActive = Boolean(accommodation.isActive);
-        console.log(request);
-        const response = await fetch('https://localhost:44331/api/Accommodation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request)
-        });
-        const res = await response.json();
-        const accommodationRes = res.accommodation;
-        window.location.href = `/admin/service/accommodation/display/${accommodationRes.id}`;
-        LoadingModal.hideLoading();
+        try {
+            const accommodationRequest = { ...accommodation };
+            accommodationRequest.isActive = Boolean(accommodation.isActive);
+            const formData = new FormData();
+            formData.append('CityId', accommodationRequest.CityId);
+            formData.append('Type', accommodationRequest.Type);
+            formData.append('Name', accommodationRequest.Name);
+            formData.append('Address', accommodationRequest.Address);
+            formData.append('StarRating', accommodationRequest.starRating);
+            formData.append('Description', accommodationRequest.Description ?? '');
+            formData.append('Regulation', accommodationRequest.Regulation ?? '');
+            formData.append('Amenities', accommodationRequest.Amenities ?? '');
+            formData.append('IsActive', accommodationRequest.isActive);
+            formData.append('CoverImgFile', accommodationRequest.CoverImgFile);
+            const response = await fetch('https://localhost:44331/api/Accommodation', {
+                method: 'POST',
+                body: formData
+            });
+            const res = await response.json();
+            const accommodationRes = res.accommodation;
+            window.location.href = `/admin/service/accommodation/display/${accommodationRes.id}`;
+        } catch (error) {
+            console.error('Error adding new accommodation:', error);
+        } finally {
+            LoadingModal.hideLoading();
+        }
     };
 
     return (
@@ -74,6 +85,12 @@ export default function Addnew() {
                     }
                 >
                     <Row gutter={[24, 24]}>
+                        <Col span={24} style={{ textAlign: 'center' }}>
+                            <div className="mb-3 d-flex justify-content-center">
+                                <ImagesUC onChange={(file) => setAccommodation({ ...accommodation, CoverImgFile: file })} />
+                            </div>
+                            <span>Hình đại diện</span>
+                        </Col>
                         <Col span={8}>
                             <span>Tên</span>
                             <Input
@@ -132,8 +149,8 @@ export default function Addnew() {
                         <Col span={8} className="d-flex align-items-center gap-2">
                             <span>Hạng sao</span>
                             <Rate
-                                value={accommodation.StarRating}
-                                onChange={(val) => setAccommodation({ ...accommodation, StarRating: val })}
+                                value={accommodation.starRating}
+                                onChange={(val) => setAccommodation({ ...accommodation, starRating: val })}
                             />
                         </Col>
                         <Col span={12}>
@@ -146,8 +163,8 @@ export default function Addnew() {
                         <Col span={12}>
                             <span>Quy định</span>
                             <TextArea
-                                value={accommodation.Rules}
-                                onChange={(e) => setAccommodation({ ...accommodation, Rules: e.target.value })}
+                                value={accommodation.Regulation}
+                                onChange={(e) => setAccommodation({ ...accommodation, Regulation: e.target.value })}
                             />
                         </Col>
                         <Col span={24}>
