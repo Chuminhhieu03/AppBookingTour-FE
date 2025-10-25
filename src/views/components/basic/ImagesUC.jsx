@@ -2,9 +2,9 @@ import React from 'react';
 import { Upload, Button, Image } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
-export default function ImagesUC({ imageUrl, onChange }) {
+export default function ImagesUC({ imageUrl, onChange, viewOnly = false }) {
     const [fileList, setFileList] = React.useState([]);
-    const [previewUrl, setPreviewUrl] = React.useState(imageUrl || null);
+    const [previewUrl, setPreviewUrl] = React.useState(imageUrl || "");
 
     React.useEffect(() => {
         if (imageUrl) {
@@ -17,27 +17,37 @@ export default function ImagesUC({ imageUrl, onChange }) {
                     url: imageUrl
                 }
             ]);
+        } else {
+            setPreviewUrl("");
+            setFileList([]);
         }
     }, [imageUrl]);
 
     const handleChange = ({ fileList: newFileList }) => {
         setFileList(newFileList);
 
-        // Nếu có file mới
         if (newFileList.length > 0) {
             const file = newFileList[0].originFileObj;
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
-
-            if (onChange) onChange(file);
+            if (file) {
+                const url = URL.createObjectURL(file);
+                setPreviewUrl(url);
+                if (onChange) onChange(url, file);
+            }
         } else {
-            setPreviewUrl(null);
-            if (onChange) onChange(null);
+            setPreviewUrl("");
+            if (onChange) onChange("", "");
         }
     };
 
-    return (
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    const renderEdit = () => (
+        <div
+            style={{
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}
+        >
             {previewUrl ? (
                 <>
                     <Image
@@ -57,8 +67,8 @@ export default function ImagesUC({ imageUrl, onChange }) {
                         danger
                         onClick={() => {
                             setFileList([]);
-                            setPreviewUrl(null);
-                            if (onChange) onChange(null);
+                            setPreviewUrl("");
+                            if (onChange) onChange("", "");
                         }}
                         style={{ marginTop: 8 }}
                     >
@@ -68,7 +78,7 @@ export default function ImagesUC({ imageUrl, onChange }) {
             ) : (
                 <Upload
                     listType="picture-card"
-                    fileList={fileList}
+                    showUploadList={false}
                     onChange={handleChange}
                     beforeUpload={() => false}
                     maxCount={1}
@@ -82,4 +92,27 @@ export default function ImagesUC({ imageUrl, onChange }) {
             )}
         </div>
     );
+
+    const renderDisplay = () => (
+        <div style={{ textAlign: 'center' }}>
+            {previewUrl ? (
+                <Image
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{
+                        width: 150,
+                        height: 150,
+                        objectFit: 'cover',
+                        borderRadius: 8,
+                        display: 'block'
+                    }}
+                    preview={true}
+                />
+            ) : (
+                <p>Không có ảnh</p>
+            )}
+        </div>
+    );
+
+    return viewOnly ? renderDisplay() : renderEdit();
 }

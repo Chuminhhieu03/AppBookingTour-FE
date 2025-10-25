@@ -4,6 +4,7 @@ import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import ImagesUC from '../components/basic/ImagesUC';
+import Gallery from '../components/basic/Gallery';
 
 const { TextArea } = Input;
 
@@ -49,6 +50,10 @@ export default function Addnew() {
             formData.append('Amenities', accommodationRequest.Amenities ?? '');
             formData.append('IsActive', accommodationRequest.isActive);
             formData.append('CoverImgFile', accommodationRequest.CoverImgFile);
+            accommodation.InfoImgFile?.forEach((file) => {
+                formData.append('InfoImgFile', file); 
+            });
+
             const response = await fetch('https://localhost:44331/api/Accommodation', {
                 method: 'POST',
                 body: formData
@@ -87,7 +92,7 @@ export default function Addnew() {
                     <Row gutter={[24, 24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
-                                <ImagesUC onChange={(file) => setAccommodation({ ...accommodation, CoverImgFile: file })} />
+                                <ImagesUC onChange={(_, file) => setAccommodation({ ...accommodation, CoverImgFile: file })} />
                             </div>
                             <span>Hình đại diện</span>
                         </Col>
@@ -152,6 +157,20 @@ export default function Addnew() {
                                 value={accommodation.starRating}
                                 onChange={(val) => setAccommodation({ ...accommodation, starRating: val })}
                             />
+                        </Col>
+                        <Col span={24}>
+                            <span>Hình ảnh khác</span>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                                <Gallery
+                                    onChange={(_, files) =>{
+                                        console.log(files.length);
+                                        setAccommodation({
+                                            ...accommodation,
+                                            InfoImgFile: files
+                                        })
+                                    }}
+                                />
+                            </div>
                         </Col>
                         <Col span={12}>
                             <span>Tiện ích</span>

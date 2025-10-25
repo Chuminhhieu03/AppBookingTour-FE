@@ -6,6 +6,7 @@ import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
 import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
+import Gallery from '../components/basic/Gallery';
 
 const { TextArea } = Input;
 
@@ -44,6 +45,7 @@ export default function Edit() {
             const formData = new FormData();
             const accommodationRequest = { ...accommodation };
             accommodationRequest.isActive = Boolean(accommodation.isActive);
+            formData.append('Code', accommodationRequest.code);
             formData.append('CityId', accommodationRequest.cityId);
             formData.append('Type', accommodationRequest.type);
             formData.append('Name', accommodationRequest.name);
@@ -53,7 +55,14 @@ export default function Edit() {
             formData.append('Regulation', accommodationRequest.regulation ?? '');
             formData.append('Amenities', accommodationRequest.amenities ?? '');
             formData.append('IsActive', accommodationRequest.isActive);
+            formData.append('CoverImgUrl', accommodationRequest.coverImgUrl);
             formData.append('CoverImgFile', accommodationRequest.coverImgFile);
+            accommodationRequest.listInfoImage?.forEach((file) => {
+                formData.append('ListInfoImageId', file.id);
+            });
+            accommodationRequest.ListNewInfoImage?.forEach((file) => {
+                formData.append('ListNewInfoImage', file);
+            });
             const response = await fetch(`https://localhost:44331/api/Accommodation/${id}`, {
                 method: 'PUT',
                 body: formData
@@ -101,8 +110,10 @@ export default function Edit() {
                     <Row gutter={[24, 24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
-                                <ImagesUC imageUrl={accommodation.coverImgUrl}
-                                    onChange={(file) => setAccommodation({ ...accommodation, coverImgFile: file })} />
+                                <ImagesUC
+                                    imageUrl={accommodation.coverImgUrl}
+                                    onChange={(imgUrl, file) => setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl })}
+                                />
                             </div>
                             <span>Hình đại diện</span>
                         </Col>
@@ -165,6 +176,21 @@ export default function Edit() {
                                 value={accommodation.starRating}
                                 onChange={(val) => setAccommodation({ ...accommodation, starRating: val })}
                             />
+                        </Col>
+                        <Col span={24}>
+                            <span>Hình ảnh khác</span>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                                <Gallery
+                                    listImage={accommodation.listInfoImage}
+                                    onChange={(listOldImage, listNewImage) =>
+                                        setAccommodation({
+                                            ...accommodation,
+                                            listInfoImage: listOldImage,
+                                            ListNewInfoImage: listNewImage
+                                        })
+                                    }
+                                />
+                            </div>
                         </Col>
                         <Col span={12}>
                             <span>Tiện ích</span>

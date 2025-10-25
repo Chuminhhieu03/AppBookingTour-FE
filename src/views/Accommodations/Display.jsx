@@ -6,6 +6,7 @@ import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
 import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
+import Gallery from '../components/basic/Gallery';
 
 const { TextArea } = Input;
 
@@ -54,8 +55,8 @@ export default function Display() {
                     <Row gutter={[24, 24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
-                                <ImagesUC imageUrl={accommodation.coverImgUrl} />
-                            </ div>                        
+                                <ImagesUC imageUrl={accommodation.coverImgUrl} viewOnly />
+                            </div>
                             <span>Hình đại diện</span>
                         </Col>
                         <Col span={8}>
@@ -82,6 +83,15 @@ export default function Display() {
                             <span>Hạng sao</span>
                             <Rate value={accommodation.starRating} readOnly />
                         </Col>
+                        <Col span={24}>
+                            <span>Hình ảnh khác</span>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                                <Gallery
+                                    listImage={accommodation.listInfoImage}
+                                    viewOnly
+                                />
+                            </div>
+                        </Col>
                         <Col span={12}>
                             <span>Tiện ích</span>
                             <TextArea value={accommodation.amenities} readOnly />
@@ -95,7 +105,7 @@ export default function Display() {
                             <TextArea value={accommodation.description} readOnly />
                         </Col>
                     </Row>
-                     <Row className="mt-5">
+                    <Row className="mt-5">
                         <Col span={12}>
                             <span>Danh sách các loại phòng</span>
                         </Col>
