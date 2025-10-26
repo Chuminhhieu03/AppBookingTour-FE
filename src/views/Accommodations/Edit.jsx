@@ -8,6 +8,8 @@ import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
 import AddNewRoomType from './RoomTypes/Addnew';
+import RoomTypeDisplay from './RoomTypes/Display';
+import RoomTypeEdit from './RoomTypes/Edit';
 
 const { TextArea } = Input;
 
@@ -21,6 +23,9 @@ export default function Edit() {
 
     const [isRoomTypeDisplayModalOpen, setIsRoomTypeDisplayModalOpen] = useState(false);
     const [selectedRoomType, setSelectedRoomType] = useState(null);
+
+    const [isRoomTypeEditModalOpen, setIsRoomTypeEditModalOpen] = useState(false);
+    const [selectedRoomTypeForEdit, setSelectedRoomTypeForEdit] = useState(null);
 
     useEffect(() => {
         setupEditForm();
@@ -91,14 +96,27 @@ export default function Edit() {
     };
 
     const handleOk = (success) => {
-        setIsOpenModal(false);
+        setIsOpenModalAddnew(false);
         if (success) {
             setupEditForm(); // Refresh the form data after successful room type addition
         }
     };
 
+    const handleEditOk = (success) => {
+        setIsRoomTypeEditModalOpen(false);
+        setSelectedRoomTypeForEdit(null);
+        if (success) {
+            setupEditForm(); // Refresh the form data after successful room type edit
+        }
+    };
+
     const handleCancel = () => {
-        setIsOpenModal(false);
+        setIsOpenModalAddnew(false);
+    };
+
+    const handleEditCancel = () => {
+        setIsRoomTypeEditModalOpen(false);
+        setSelectedRoomTypeForEdit(null);
     };
 
     const handleRoomTypeDisplayClick = (roomType) => {
@@ -109,6 +127,11 @@ export default function Edit() {
     const handleRoomTypeDisplayModalClose = () => {
         setIsRoomTypeDisplayModalOpen(false);
         setSelectedRoomType(null);
+    };
+
+    const handleRoomTypeEditClick = (roomType) => {
+        setSelectedRoomTypeForEdit(roomType);
+        setIsRoomTypeEditModalOpen(true);
     };
 
     return (
@@ -253,7 +276,7 @@ export default function Edit() {
                             <span>Danh sách các loại phòng</span>
                         </Col>
                         <Col span={12} style={{ textAlign: 'right' }}>
-                            <Button type="primary" onClick={() => setIsOpenModal(true)}>
+                            <Button type="primary" onClick={() => setIsOpenModalAddnew(true)}>
                                 Thêm loại phòng
                             </Button>
                         </Col>
@@ -263,6 +286,7 @@ export default function Edit() {
                             <RoomTypeTable 
                                 listRoomType={accommodation.listRoomType} 
                                 onRoomTypeClick={handleRoomTypeDisplayClick} 
+                                onRoomTypeEditClick={handleRoomTypeEditClick}
                             />
                         </Col>
                     </Row>
@@ -279,6 +303,15 @@ export default function Edit() {
                             isOpen={isRoomTypeDisplayModalOpen}
                             onCancel={handleRoomTypeDisplayModalClose}
                             roomType={selectedRoomType}
+                        />
+                    )}
+                    {isRoomTypeEditModalOpen && selectedRoomTypeForEdit && (
+                        <RoomTypeEdit
+                            accommodationId={accommodation.id}
+                            isOpen={isRoomTypeEditModalOpen}
+                            onOk={handleEditOk}
+                            onCancel={handleEditCancel}
+                            roomType={selectedRoomTypeForEdit}
                         />
                     )}
                 </MainCard>

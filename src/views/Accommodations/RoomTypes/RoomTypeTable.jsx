@@ -1,10 +1,11 @@
-import { Button, Table } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Button, Space, Table, Tag } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { render } from 'sass';
 
 const PAGE_SIZE = 5;
 
-export default function RoomTypeTable({ listRoomType, onRoomTypeClick }) {
+export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTypeEditClick, viewOnly = false }) {
     const [page, setPage] = useState(1);
 
     const columns = [
@@ -24,7 +25,7 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick }) {
                 <Button type="link" onClick={() => onRoomTypeClick(record)} style={{ padding: 0 }}>
                     {name}
                 </Button>
-            ),
+            )
         },
         {
             title: 'Số lượng người lớn',
@@ -55,16 +56,23 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick }) {
             title: 'Trạng thái',
             dataIndex: 'statusName',
             align: 'center',
-            key: 'statusName'
+            key: 'statusName',
+            render: (_, record) => <Tag color={record.statusColor}>{record.statusName}</Tag>
         },
-        {
+        !viewOnly && {
             title: 'Chức năng',
             key: 'actions',
             align: 'center',
             width: 100,
-            render: (_, record) => <Button type="link" icon={<DeleteOutlined />} />
+            render: (_, record) => <>
+                <Space>
+                    <Button type="link" icon={<EditOutlined />} onClick={() => onRoomTypeEditClick(record)} />
+                    <Button type="link" icon={<DeleteOutlined />} />
+                </Space>
+            </>
         }
-    ];
+    ].filter(Boolean);
+
     return (
         <Table
             columns={columns}

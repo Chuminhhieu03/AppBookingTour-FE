@@ -32,7 +32,7 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                 <Col span={24} style={{ textAlign: 'center' }}>
                     <div className="mb-3 d-flex justify-content-center">
                         <ImagesUC 
-                            imageUrl={roomType.coverImgUrl}
+                            imageUrl={roomType.coverImageUrl}
                             viewOnly
                         />
                     </div>
