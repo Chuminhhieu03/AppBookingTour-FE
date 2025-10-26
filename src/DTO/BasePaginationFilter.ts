@@ -1,4 +1,4 @@
 export default class BasePaginationFilter {
-    public PageIndex?: number;
-    public PageSize?: number;
+  public PageIndex?: number;
+  public PageSize?: number;
 }

@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 // project-imports
 import Loadable from 'components/Loadable';
-import AdminLayout from '../layout/AdminLayout/AdminLayout'
+import AdminLayout from '../layout/AdminLayout/AdminLayout';
 
 // render - other pages
 const OtherSamplePage = Loadable(lazy(() => import('views/SamplePage')));

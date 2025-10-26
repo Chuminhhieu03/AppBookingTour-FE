@@ -1,8 +1,9 @@
 import { lazy } from 'react';
 
 // project-imports
-import AdminLayout from '../layout/AdminLayout/AdminLayout'
+import AdminLayout from '../layout/AdminLayout/AdminLayout';
 import Loadable from 'components/Loadable';
+import ProtectedRoute from 'components/auth/ProtectedRoute';
 
 // render - basic component pages
 const BasicButton = Loadable(lazy(() => import('views/components/basic/Button')));
@@ -19,7 +20,11 @@ const ComponentsRoutes = {
   children: [
     {
       path: '/',
-      element: <AdminLayout />,
+      element: (
+        <ProtectedRoute>
+          <AdminLayout />
+        </ProtectedRoute>
+      ),
       children: [
         {
           path: 'basic',

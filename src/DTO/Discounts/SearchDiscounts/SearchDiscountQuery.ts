@@ -1,6 +1,6 @@
-import BasePaginationFilter from "DTO/BasePaginationFilter";
-import DiscountFilter from "./SearchDiscountFilter";
+import BasePaginationFilter from 'DTO/BasePaginationFilter';
+import DiscountFilter from './SearchDiscountFilter';
 
- export default class SearchDiscountQuery extends BasePaginationFilter {
-    public DiscountFilter?: DiscountFilter;
+export default class SearchDiscountQuery extends BasePaginationFilter {
+  public DiscountFilter?: DiscountFilter;
 }

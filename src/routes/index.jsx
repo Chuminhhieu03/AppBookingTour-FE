@@ -10,10 +10,20 @@ import ChartMapRoutes from './ChartMapRoutes';
 import OtherRoutes from './OtherRoutes';
 import DiscountRoute from './DiscountRoute';
 import AccommodationRoute from './AccommodationRoute';
+import ChangePasswordRoute from './ChangePasswordRoute';
 
 const router = createBrowserRouter(
-  [NavigationRoutes, ComponentsRoutes, FormsRoutes, TablesRoutes, ChartMapRoutes, PagesRoutes, OtherRoutes,
-    DiscountRoute, AccommodationRoute
+  [
+    NavigationRoutes,
+    ComponentsRoutes,
+    FormsRoutes,
+    TablesRoutes,
+    ChartMapRoutes,
+    PagesRoutes,
+    OtherRoutes,
+    DiscountRoute,
+    AccommodationRoute,
+    ChangePasswordRoute
   ],
   {
     basename: import.meta.env.VITE_APP_BASE_NAME

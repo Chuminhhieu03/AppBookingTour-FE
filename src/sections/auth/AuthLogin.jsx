@@ -1,105 +1,84 @@
-import PropTypes from 'prop-types';
 import { useState } from 'react';
-
-// react-bootstrap
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Image from 'react-bootstrap/Image';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Stack from 'react-bootstrap/Stack';
-
-// third-party
-import { useForm } from 'react-hook-form';
-
-// project-imports
-import MainCard from 'components/MainCard';
-import { emailSchema, passwordSchema } from 'utils/validationSchema';
-
-// assets
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import { Form, Input, Button, Checkbox, Typography, Space, Card } from 'antd';
+import { UserOutlined, LockOutlined, EyeTwoTone, EyeInvisibleOutlined } from '@ant-design/icons';
+import { loginAsync } from '../../features/auth/authSlice';
 import DarkLogo from 'assets/images/logo-dark.svg';
 
-// ==============================|| AUTH LOGIN FORM ||============================== //
+const { Title, Text } = Typography;
 
-export default function AuthLoginForm({ className, link }) {
-  const [showPassword, setShowPassword] = useState(false);
+export default function AuthLoginForm() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.auth);
+  const [form] = Form.useForm();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm();
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prevState) => !prevState);
-  };
-
-  const onSubmit = () => {
-    reset();
+  const onFinish = async (values) => {
+    try {
+      const result = await dispatch(loginAsync({ email: values.email, password: values.password })).unwrap();
+      if (result) {
+        navigate('/admin/service/accommodation');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   return (
-    <MainCard className="mb-0">
-      <div className="text-center">
-        <a>
-          <Image src={DarkLogo} alt="img" />
-        </a>
+    <Card style={{ maxWidth: 450, width: '100%', margin: '0 auto', borderRadius: 8 }}>
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <img src={DarkLogo} alt="Logo" style={{ height: 40, marginBottom: 16 }} />
+        <Title level={3} style={{ marginBottom: 8 }}>
+          Đăng nhập
+        </Title>
+        <Text type="secondary">Chào mừng bạn quay trở lại!</Text>
       </div>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <h4 className={`text-center f-w-500 mt-4 mb-3 ${className}`}>Login</h4>
-        <Form.Group className="mb-3" controlId="formEmail">
-          <Form.Control
-            type="email"
-            placeholder="Email Address"
-            {...register('email', emailSchema)}
-            isInvalid={!!errors.email}
-            className={className && 'bg-transparent border-white text-white border-opacity-25 '}
-          />
-          <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formPassword">
-          <InputGroup>
-            <Form.Control
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              {...register('password', passwordSchema)}
-              isInvalid={!!errors.password}
-              className={className && 'bg-transparent border-white text-white border-opacity-25 '}
-            />
-            <Button onClick={togglePasswordVisibility}>
-              {showPassword ? <i className="ti ti-eye" /> : <i className="ti ti-eye-off" />}
-            </Button>
-          </InputGroup>
-          <Form.Control.Feedback type="invalid">{errors.password?.message}</Form.Control.Feedback>
-        </Form.Group>
 
-        <Stack direction="horizontal" className="mt-1 justify-content-between align-items-center">
-          <Form.Group controlId="customCheckc1">
-            <Form.Check
-              type="checkbox"
-              label="Remember me?"
-              defaultChecked
-              className={`input-primary ${className ? className : 'text-muted'} `}
-            />
-          </Form.Group>
-          <a href="#!" className={`text-secondary f-w-400 mb-0  ${className}`}>
-            Forgot Password?
-          </a>
-        </Stack>
-        <div className="text-center mt-4">
-          <Button type="submit" className="shadow px-sm-4">
-            Login
+      <Form form={form} name="login" onFinish={onFinish} layout="vertical" autoComplete="off">
+        <Form.Item
+          name="email"
+          rules={[
+            { required: true, message: 'Vui lòng nhập email!' },
+            { type: 'email', message: 'Email không hợp lệ!' }
+          ]}
+        >
+          <Input prefix={<UserOutlined />} placeholder="Email" size="large" />
+        </Form.Item>
+
+        <Form.Item name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Mật khẩu"
+            size="large"
+            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+            </Form.Item>
+            <Link to="/forgot-password" style={{ color: '#1890ff' }}>
+              Quên mật khẩu?
+            </Link>
+          </Space>
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" size="large" loading={loading} block>
+            Đăng nhập
           </Button>
+        </Form.Item>
+
+        <div style={{ textAlign: 'center' }}>
+          <Text type="secondary">Chưa có tài khoản? </Text>
+          <Link to="/register" style={{ color: '#1890ff', fontWeight: 500 }}>
+            Đăng ký ngay
+          </Link>
         </div>
-        <Stack direction="horizontal" className="justify-content-between align-items-end mt-4">
-          <h6 className={`f-w-500 mb-0 ${className}`}>Don't have an Account?</h6>
-          <a href={link} className="link-primary">
-            Create Account
-          </a>
-        </Stack>
       </Form>
-    </MainCard>
+    </Card>
   );
 }
-
-AuthLoginForm.propTypes = { className: PropTypes.string, link: PropTypes.string, resetLink: PropTypes.string };
