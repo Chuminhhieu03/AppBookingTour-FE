@@ -1,14 +1,20 @@
 import { Upload, Button, Image } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+import { set } from 'react-hook-form';
+import { useMemo } from 'react';
 
 export default function Gallery({ listImage = [], onChange, viewOnly = false }) {
     const [listNewImage, setListNewImage] = useState([]); // ListNewImage: Những file đc tải lên bởi nút upload
-    const [listOldImage, setListOldImage] = useState(listImage); // ListOldImage: Những file đã có từ trước (đc truyền vào qua props)
+    const [listOldImage, setListOldImage] = useState(); // ListOldImage: Những file đã có từ trước (đc truyền vào qua props)
+
+    const stableListImage = useMemo(() => listImage || [], [listImage]);
 
     useEffect(() => {
-        setListOldImage(listImage);
-    }, [listImage]);
+        if (JSON.stringify(stableListImage) !== JSON.stringify(listOldImage)) {
+            setListOldImage(stableListImage);
+        }
+    }, [stableListImage, listOldImage]);
 
     const handleChange = ({ fileList: newFileList }) => {
         setListNewImage(newFileList);
@@ -73,7 +79,7 @@ export default function Gallery({ listImage = [], onChange, viewOnly = false }) 
                     );
                 })}
                 {listNewImage?.map((file, index) => {
-                    const src = (file.originFileObj ? URL.createObjectURL(file.originFileObj) : '');
+                    const src = file.originFileObj ? URL.createObjectURL(file.originFileObj) : '';
                     return (
                         <div
                             key={index}

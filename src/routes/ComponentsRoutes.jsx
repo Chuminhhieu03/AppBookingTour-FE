@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 
 // project-imports
-import AdminLayout from '../layout/AdminLayout/AdminLayout'
+import AdminLayout from '../layout/AdminLayout/AdminLayout';
 import Loadable from 'components/Loadable';
 
 // render - basic component pages
@@ -15,44 +15,44 @@ const BasicTypography = Loadable(lazy(() => import('views/components/basic/Typog
 // ==============================|| COMPONENT ROUTING ||============================== //
 
 const ComponentsRoutes = {
-  path: '/',
-  children: [
-    {
-      path: '/',
-      element: <AdminLayout />,
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'basic',
-          children: [
-            {
-              path: 'buttons',
-              element: <BasicButton />
-            },
-            {
-              path: 'badges',
-              element: <BasicBadges />
-            },
-            {
-              path: 'breadcrumb',
-              element: <BasicBreadcrumb />
-            },
-            {
-              path: 'collapse',
-              element: <BasicCollapse />
-            },
-            {
-              path: 'tabs-pills',
-              element: <BasicTabsPills />
-            },
-            {
-              path: 'typography',
-              element: <BasicTypography />
-            }
-          ]
+            path: '/',
+            element: <AdminLayout />,
+            children: [
+                {
+                    path: 'basic',
+                    children: [
+                        {
+                            path: 'buttons',
+                            element: <BasicButton />
+                        },
+                        {
+                            path: 'badges',
+                            element: <BasicBadges />
+                        },
+                        {
+                            path: 'breadcrumb',
+                            element: <BasicBreadcrumb />
+                        },
+                        {
+                            path: 'collapse',
+                            element: <BasicCollapse />
+                        },
+                        {
+                            path: 'tabs-pills',
+                            element: <BasicTabsPills />
+                        },
+                        {
+                            path: 'typography',
+                            element: <BasicTypography />
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default ComponentsRoutes;

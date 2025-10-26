@@ -1,4 +1,4 @@
-import BaseEntity from "./BaseEntity";
+import BaseEntity from './BaseEntity';
 
 export default class Discount extends BaseEntity {
     public Code?: string;

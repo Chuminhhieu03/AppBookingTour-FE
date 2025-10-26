@@ -7,12 +7,15 @@ import { useParams } from 'react-router-dom';
 import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
+import RoomTypeDisplay from './RoomTypes/Display';
 
 const { TextArea } = Input;
 
 export default function Display() {
     const [accommodation, setAccommodation] = useState({});
     const { id } = useParams();
+    const [isRoomTypeDisplayModalOpen, setIsRoomTypeDisplayModalOpen] = useState(false);
+    const [selectedRoomType, setSelectedRoomType] = useState(null);
 
     useEffect(() => {
         setupDisplayForm();
@@ -34,6 +37,16 @@ export default function Display() {
         } finally {
             LoadingModal.hideLoading();
         }
+    };
+
+    const handleRoomTypeDisplayClick = (roomType) => {
+        setSelectedRoomType(roomType);
+        setIsRoomTypeDisplayModalOpen(true);
+    };
+
+    const handleRoomTypeDisplayModalClose = () => {
+        setIsRoomTypeDisplayModalOpen(false);
+        setSelectedRoomType(null);
     };
 
     return (
@@ -86,10 +99,7 @@ export default function Display() {
                         <Col span={24}>
                             <span>Hình ảnh khác</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                                <Gallery
-                                    listImage={accommodation.listInfoImage}
-                                    viewOnly
-                                />
+                                <Gallery listImage={accommodation.listInfoImage} viewOnly />
                             </div>
                         </Col>
                         <Col span={12}>
@@ -112,9 +122,16 @@ export default function Display() {
                     </Row>
                     <Row className="mt-2">
                         <Col span={24}>
-                            <RoomTypeTable listRoomType={accommodation.listRoomType} />
+                            <RoomTypeTable listRoomType={accommodation.listRoomType} onRoomTypeClick={handleRoomTypeDisplayClick} />
                         </Col>
                     </Row>
+                    {isRoomTypeDisplayModalOpen && selectedRoomType && (
+                        <RoomTypeDisplay
+                            isOpen={isRoomTypeDisplayModalOpen}
+                            onCancel={handleRoomTypeDisplayModalClose}
+                            roomType={selectedRoomType}
+                        />
+                    )}
                 </MainCard>
             </Col>
         </Row>

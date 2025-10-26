@@ -1,18 +1,30 @@
-import { Button, Table } from 'antd';   
+import { Button, Table } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 
-export default function RoomTypeTable({ listRoomType }) {
+const PAGE_SIZE = 5;
+
+export default function RoomTypeTable({ listRoomType, onRoomTypeClick }) {
+    const [page, setPage] = useState(1);
+
     const columns = [
         {
             title: 'STT',
             dataIndex: 'index',
             key: 'index',
-            render: (_, index) => index + 1
+            render: (_, __, index) => {
+                return (page - 1) * PAGE_SIZE + index + 1;
+            }
         },
         {
             title: 'Tên loại phòng',
             dataIndex: 'name',
-            key: 'name'
+            key: 'name',
+            render: (name, record) => (
+                <Button type="link" onClick={() => onRoomTypeClick(record)} style={{ padding: 0 }}>
+                    {name}
+                </Button>
+            ),
         },
         {
             title: 'Số lượng người lớn',
@@ -21,13 +33,8 @@ export default function RoomTypeTable({ listRoomType }) {
         },
         {
             title: 'Số lượng trẻ em',
-            dataIndex: 'maxChild',
-            key: 'maxChild'
-        },
-        {
-            title: 'Giá phòng',
-            dataIndex: 'price',
-            key: 'price'
+            dataIndex: 'maxChildren',
+            key: 'maxChildren'
         },
         {
             title: 'Số lượng phòng',
@@ -35,9 +42,20 @@ export default function RoomTypeTable({ listRoomType }) {
             key: 'quantity'
         },
         {
+            title: 'Giá phòng',
+            dataIndex: 'price',
+            key: 'price',
+            render: (value) => (
+                <span style={{ display: 'block', textAlign: 'right' }}>
+                    {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
+                </span>
+            )
+        },
+        {
             title: 'Trạng thái',
-            dataIndex: 'isActive',
-            key: 'isActive',
+            dataIndex: 'statusName',
+            align: 'center',
+            key: 'statusName'
         },
         {
             title: 'Chức năng',
@@ -47,5 +65,18 @@ export default function RoomTypeTable({ listRoomType }) {
             render: (_, record) => <Button type="link" icon={<DeleteOutlined />} />
         }
     ];
-    return <Table columns={columns} dataSource={listRoomType} rowKey="id" pagination={{ pageSize: 5 }} />;
+    return (
+        <Table
+            columns={columns}
+            dataSource={listRoomType}
+            rowKey="id"
+            pagination={{
+                pageSize: PAGE_SIZE,
+                onChange: (page) => {
+                    setPage(page);
+                },
+                current: page
+            }}
+        />
+    );
 }

@@ -47,7 +47,7 @@ export default function Addnew() {
             window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
         } else {
             const errorData = res.data || [];
-            const listErrorMessage = errorData?.map(e => e.errorMessage);
+            const listErrorMessage = errorData?.map((e) => e.errorMessage);
             alert(`Lỗi khi thêm mới mã giảm giá:\n${listErrorMessage.join('\n')}`);
         }
         LoadingModal.hideLoading();

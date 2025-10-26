@@ -4,7 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 
 export default function ImagesUC({ imageUrl, onChange, viewOnly = false }) {
     const [fileList, setFileList] = React.useState([]);
-    const [previewUrl, setPreviewUrl] = React.useState(imageUrl || "");
+    const [previewUrl, setPreviewUrl] = React.useState(imageUrl || '');
 
     React.useEffect(() => {
         if (imageUrl) {
@@ -18,7 +18,7 @@ export default function ImagesUC({ imageUrl, onChange, viewOnly = false }) {
                 }
             ]);
         } else {
-            setPreviewUrl("");
+            setPreviewUrl('');
             setFileList([]);
         }
     }, [imageUrl]);
@@ -34,8 +34,8 @@ export default function ImagesUC({ imageUrl, onChange, viewOnly = false }) {
                 if (onChange) onChange(url, file);
             }
         } else {
-            setPreviewUrl("");
-            if (onChange) onChange("", "");
+            setPreviewUrl('');
+            if (onChange) onChange('', '');
         }
     };
 
@@ -67,8 +67,8 @@ export default function ImagesUC({ imageUrl, onChange, viewOnly = false }) {
                         danger
                         onClick={() => {
                             setFileList([]);
-                            setPreviewUrl("");
-                            if (onChange) onChange("", "");
+                            setPreviewUrl('');
+                            if (onChange) onChange('', '');
                         }}
                         style={{ marginTop: 8 }}
                     >

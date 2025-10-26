@@ -10,7 +10,7 @@ import LoadingModal from '../../components/LoadingModal';
 
 export default function AdminLayout() {
     return (
-        <div> 
+        <div>
             <Drawer />
             <Header />
             <LoadingModal />

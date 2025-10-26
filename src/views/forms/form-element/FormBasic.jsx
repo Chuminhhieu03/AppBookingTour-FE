@@ -19,24 +19,24 @@ import Tooltips from 'sections/form-element/Tooltips';
 import ValidationForm from 'sections/form-element/ValidationForm';
 
 export default function FormBasic() {
-  return (
-    <Row>
-      <Col xs={12}>
-        <FormControls />
-        <Sizeing />
-        <Picker />
-        <DataList />
-        <FormControlState />
-        <InlineForm />
-        <FormGrid />
-        <HorizontalForm />
-        <ValidationForm />
-        <SupportedElements />
-        <Tooltips />
-        <ChecksandRadios />
-        <InputGroup />
-        <CustomForms />
-      </Col>
-    </Row>
-  );
+    return (
+        <Row>
+            <Col xs={12}>
+                <FormControls />
+                <Sizeing />
+                <Picker />
+                <DataList />
+                <FormControlState />
+                <InlineForm />
+                <FormGrid />
+                <HorizontalForm />
+                <ValidationForm />
+                <SupportedElements />
+                <Tooltips />
+                <ChecksandRadios />
+                <InputGroup />
+                <CustomForms />
+            </Col>
+        </Row>
+    );
 }

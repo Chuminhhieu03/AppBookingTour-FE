@@ -36,7 +36,7 @@ export default function Edit() {
 
     const onEditDiscount = async (discount) => {
         LoadingModal.showLoading();
-        const request = { ...discount};
+        const request = { ...discount };
         request.startEffectedDtg = discount.startEffectedDtg?.toDate().toISOString();
         request.endEffectedDtg = discount.endEffectedDtg?.toDate().toISOString();
         const response = await fetch(`https://localhost:44331/api/Discount/${id}`, {

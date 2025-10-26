@@ -35,7 +35,7 @@ const AccommodationRoute = {
                                 {
                                     path: 'edit/:id',
                                     element: <AccommodationEdit />
-                                },
+                                }
                             ]
                         }
                     ]

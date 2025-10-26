@@ -11,13 +11,13 @@ export default function Navigation({ selectedItems, setSelectedItems, setSelectT
     let lastItemIndex = DrawerItems.items.length - 1;
     let remItems = [];
     let lastItemId;
-    
+
     if (lastItem && lastItem < DrawerItems.items.length) {
         lastItemId = DrawerItems.items[lastItem - 1].id;
         lastItemIndex = lastItem - 1;
         remItems = DrawerItems.items.slice(lastItem - 1, DrawerItems.items.length).map((item) => ({
-            id: item.id, 
-            type: item.type, 
+            id: item.id,
+            type: item.type,
             title: item.title,
             elements: item.children,
             icon: item.icon,
@@ -69,9 +69,5 @@ export default function Navigation({ selectedItems, setSelectedItems, setSelectT
                 );
         }
     });
-    return (
-        <ul className={`pc-navbar 'd-block'`}>
-            {navGroups}
-        </ul>
-    );
+    return <ul className={`pc-navbar 'd-block'`}>{navGroups}</ul>;
 }

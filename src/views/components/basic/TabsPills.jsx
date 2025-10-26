@@ -7,15 +7,15 @@ import ReferenceHeader from 'components/ReferenceHeader';
 // ==============================|| BASIC - TABS & PILLS ||============================== //
 
 export default function TabsPillsPage() {
-  return (
-    <>
-      <ReferenceHeader
-        caption="Takes the basic nav from above and adds the .nav-tabs class to generate a tabbed interface."
-        link="https://react-bootstrap.netlify.app/docs/components/navs/#tabs"
-      />
-      <BasicTabs />
-      <Pills />
-      <VerticalPills />
-    </>
-  );
+    return (
+        <>
+            <ReferenceHeader
+                caption="Takes the basic nav from above and adds the .nav-tabs class to generate a tabbed interface."
+                link="https://react-bootstrap.netlify.app/docs/components/navs/#tabs"
+            />
+            <BasicTabs />
+            <Pills />
+            <VerticalPills />
+        </>
+    );
 }

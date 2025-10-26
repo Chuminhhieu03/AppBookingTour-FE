@@ -59,7 +59,11 @@ export default function Default() {
             key: 'statusName',
             align: 'center',
             render: (value, record) => {
-                return Number(record.isActive) === Constants.Status.Active ? <Tag color="green">{value}</Tag> : <Tag color="red">{value}</Tag>;
+                return Number(record.isActive) === Constants.Status.Active ? (
+                    <Tag color="green">{value}</Tag>
+                ) : (
+                    <Tag color="red">{value}</Tag>
+                );
             }
         },
         {
@@ -102,7 +106,7 @@ export default function Default() {
             const request = { ...query };
             request.PageIndex = pageIndex;
             request.searchAccommodationFilter = { ...filter };
-            if (request.searchAccommodationFilter.IsActive){
+            if (request.searchAccommodationFilter.IsActive) {
                 request.searchAccommodationFilter.IsActive = Boolean(request.searchAccommodationFilter.IsActive);
             }
             const response = await fetch('https://localhost:44331/api/Accommodation/search', {

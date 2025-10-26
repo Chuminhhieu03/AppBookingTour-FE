@@ -3,7 +3,17 @@ import { matchPath, useLocation } from 'react-router-dom';
 import NavItem from './NavItem';
 import NavCollapse from './NavCollapse';
 
-export default function NavGroup({ item, lastItem, remItems, lastItemId, setSelectedID, setSelectedItems, selectedItems, setSelectedLevel, selectedLevel }) {
+export default function NavGroup({
+    item,
+    lastItem,
+    remItems,
+    lastItemId,
+    setSelectedID,
+    setSelectedItems,
+    selectedItems,
+    setSelectedLevel,
+    selectedLevel
+}) {
     const [anchorEl, setAnchorEl] = useState(null);
     const [currentItem, setCurrentItem] = useState(item);
     const { pathname } = useLocation();
@@ -25,10 +35,8 @@ export default function NavGroup({ item, lastItem, remItems, lastItemId, setSele
     const checkOpenForParent = useCallback(
         (child, id) => {
             child.forEach((ele) => {
-                if (ele.children?.length)
-                    checkOpenForParent(ele.children, currentItem.id)
-                if (ele.url && !!matchPath({ path: ele?.link ? ele.link : ele.url, end: true }, pathname)) 
-                    setSelectedID(id)
+                if (ele.children?.length) checkOpenForParent(ele.children, currentItem.id);
+                if (ele.url && !!matchPath({ path: ele?.link ? ele.link : ele.url, end: true }, pathname)) setSelectedID(id);
             });
         },
         [currentItem.id, pathname, setSelectedID]
@@ -46,7 +54,8 @@ export default function NavGroup({ item, lastItem, remItems, lastItemId, setSele
                     setSelectedID(currentItem.id);
                 }
             });
-        }, [pathname, currentItem, checkOpenForParent, setSelectedID]
+        },
+        [pathname, currentItem, checkOpenForParent, setSelectedID]
     );
 
     useEffect(() => {

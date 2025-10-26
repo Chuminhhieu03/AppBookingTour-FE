@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
+import AddNewRoomType from './RoomTypes/Addnew';
 
 const { TextArea } = Input;
 
@@ -16,6 +17,10 @@ export default function Edit() {
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
     const { id } = useParams();
+    const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false); 
+
+    const [isRoomTypeDisplayModalOpen, setIsRoomTypeDisplayModalOpen] = useState(false);
+    const [selectedRoomType, setSelectedRoomType] = useState(null);
 
     useEffect(() => {
         setupEditForm();
@@ -23,19 +28,23 @@ export default function Edit() {
 
     const setupEditForm = async () => {
         LoadingModal.showLoading();
-        const response = await fetch(`https://localhost:44331/api/Accommodation/setup-edit/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const res = await response.json();
-        setListStatus(res.listStatus ?? []);
-        setListType(res.listType ?? []);
-        setListCity(res.listCity ?? []);
-        const accommodationRes = res.accommodation;
-        accommodationRes.isActive = Number(accommodationRes.isActive);
-        setAccommodation(accommodationRes ?? {});
+        try {
+            const response = await fetch(`https://localhost:44331/api/Accommodation/setup-edit/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const res = await response.json();
+            setListStatus(res.listStatus ?? []);
+            setListType(res.listType ?? []);
+            setListCity(res.listCity ?? []);
+            const accommodationRes = res.accommodation;
+            accommodationRes.isActive = Number(accommodationRes.isActive);
+            setAccommodation(accommodationRes ?? {});
+        } catch (error) {
+            console.error('Error fetching accommodation details for edit:', error);
+        }
         LoadingModal.hideLoading();
     };
 
@@ -81,6 +90,27 @@ export default function Edit() {
         LoadingModal.hideLoading();
     };
 
+    const handleOk = (success) => {
+        setIsOpenModal(false);
+        if (success) {
+            setupEditForm(); // Refresh the form data after successful room type addition
+        }
+    };
+
+    const handleCancel = () => {
+        setIsOpenModal(false);
+    };
+
+    const handleRoomTypeDisplayClick = (roomType) => {
+        setSelectedRoomType(roomType);
+        setIsRoomTypeDisplayModalOpen(true);
+    };
+
+    const handleRoomTypeDisplayModalClose = () => {
+        setIsRoomTypeDisplayModalOpen(false);
+        setSelectedRoomType(null);
+    };
+
     return (
         <Row>
             <Col span={24}>
@@ -112,7 +142,9 @@ export default function Edit() {
                             <div className="mb-3 d-flex justify-content-center">
                                 <ImagesUC
                                     imageUrl={accommodation.coverImgUrl}
-                                    onChange={(imgUrl, file) => setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl })}
+                                    onChange={(imgUrl, file) =>
+                                        setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl })
+                                    }
                                 />
                             </div>
                             <span>Hình đại diện</span>
@@ -199,7 +231,7 @@ export default function Edit() {
                                 onChange={(e) => setAccommodation({ ...accommodation, amenities: e.target.value })}
                             />
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                             <span>Quy định</span>
                             <TextArea
                                 value={accommodation.regulation}
@@ -221,14 +253,34 @@ export default function Edit() {
                             <span>Danh sách các loại phòng</span>
                         </Col>
                         <Col span={12} style={{ textAlign: 'right' }}>
-                            <Button type="primary">Thêm loại phòng</Button>
+                            <Button type="primary" onClick={() => setIsOpenModal(true)}>
+                                Thêm loại phòng
+                            </Button>
                         </Col>
                     </Row>
                     <Row className="mt-2">
                         <Col span={24}>
-                            <RoomTypeTable listRoomType={accommodation.listRoomType} />
+                            <RoomTypeTable 
+                                listRoomType={accommodation.listRoomType} 
+                                onRoomTypeClick={handleRoomTypeDisplayClick} 
+                            />
                         </Col>
                     </Row>
+                    {isOpenModalAddnew && 
+                        <AddNewRoomType 
+                            accommodationId={accommodation.id}
+                            isOpen={isOpenModalAddnew} 
+                            onOk={handleOk} 
+                            onCancel={handleCancel} 
+                        />
+                    }
+                    {isRoomTypeDisplayModalOpen && selectedRoomType && (
+                        <RoomTypeDisplay
+                            isOpen={isRoomTypeDisplayModalOpen}
+                            onCancel={handleRoomTypeDisplayModalClose}
+                            roomType={selectedRoomType}
+                        />
+                    )}
                 </MainCard>
             </Col>
         </Row>

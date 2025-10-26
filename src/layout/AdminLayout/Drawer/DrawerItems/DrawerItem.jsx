@@ -13,4 +13,4 @@ const drawerItems = {
     items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount, service]
 };
 
-export default drawerItems; 
+export default drawerItems;

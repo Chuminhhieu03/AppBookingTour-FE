@@ -67,8 +67,10 @@ export default function DrawerContent({ selectedItems, setSelectedItems }) {
                     <SimpleBarScroll style={{ height: 'calc(100vh - 74px)' }}>
                         <ul className="pc-navbar">
                             {selectTab?.children?.map((item) => (
-                                <ListGroup key={item.id}
-                                    className={`pc-item pc-hasmenu ${open[item.id] ? 'pc-trigger' : ''} ${isActive(item) ? 'active' : ''}`}>
+                                <ListGroup
+                                    key={item.id}
+                                    className={`pc-item pc-hasmenu ${open[item.id] ? 'pc-trigger' : ''} ${isActive(item) ? 'active' : ''}`}
+                                >
                                     <Link to={item.url || '#'} className="pc-link" onClick={() => handleClick(item)}>
                                         {item.icon && (
                                             <span className="pc-micon">
@@ -85,12 +87,20 @@ export default function DrawerContent({ selectedItems, setSelectedItems }) {
                                     {open[item.id] && item.children && (
                                         <ul className="pc-submenu">
                                             {item.children.map((child) => (
-                                                <li key={child.id}
-                                                    className={`pc-item ${open[child.id] ? 'pc-trigger' : ''} ${isActive(child) ? 'active' : ''}`}>
+                                                <li
+                                                    key={child.id}
+                                                    className={`pc-item ${open[child.id] ? 'pc-trigger' : ''} ${isActive(child) ? 'active' : ''}`}
+                                                >
                                                     <Link to={child.url || '#'} className="pc-link" onClick={() => handleClick(child)}>
                                                         {child.icon && (
                                                             <span className="pc-micon">
-                                                                <i className={ typeof child.icon === 'string' ? child.icon : child.icon?.props.className} />
+                                                                <i
+                                                                    className={
+                                                                        typeof child.icon === 'string'
+                                                                            ? child.icon
+                                                                            : child.icon?.props.className
+                                                                    }
+                                                                />
                                                             </span>
                                                         )}
                                                         {child.title}
@@ -107,7 +117,13 @@ export default function DrawerContent({ selectedItems, setSelectedItems }) {
                                                                     <Link className="pc-link" to={value.url || ''}>
                                                                         {value.icon && (
                                                                             <span className="pc-micon">
-                                                                                <i className={typeof value.icon === 'string' ? value.icon : value.icon?.props.className} />
+                                                                                <i
+                                                                                    className={
+                                                                                        typeof value.icon === 'string'
+                                                                                            ? value.icon
+                                                                                            : value.icon?.props.className
+                                                                                    }
+                                                                                />
                                                                             </span>
                                                                         )}
                                                                         {value.title}

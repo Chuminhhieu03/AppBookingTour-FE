@@ -13,7 +13,8 @@ export default function Addnew() {
     const [listStatus, setListStatus] = useState([]);
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
-    const [fileList, setFileList] = useState([]);
+    const [listInfoImage, setListInfoImage] = useState([]);
+
     const { TextArea } = Input;
 
     useEffect(() => {
@@ -50,8 +51,8 @@ export default function Addnew() {
             formData.append('Amenities', accommodationRequest.Amenities ?? '');
             formData.append('IsActive', accommodationRequest.isActive);
             formData.append('CoverImgFile', accommodationRequest.CoverImgFile);
-            accommodation.InfoImgFile?.forEach((file) => {
-                formData.append('InfoImgFile', file); 
+            listInfoImage?.forEach((file) => {
+                formData.append('InfoImgFile', file);
             });
 
             const response = await fetch('https://localhost:44331/api/Accommodation', {
@@ -162,12 +163,8 @@ export default function Addnew() {
                             <span>Hình ảnh khác</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
                                 <Gallery
-                                    onChange={(_, files) =>{
-                                        console.log(files.length);
-                                        setAccommodation({
-                                            ...accommodation,
-                                            InfoImgFile: files
-                                        })
+                                    onChange={(_, files) => {
+                                        setListInfoImage(files);
                                     }}
                                 />
                             </div>

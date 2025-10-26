@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-interface iProps { }
+interface iProps {}
 
 interface iStates {
     IsLoading: boolean;
@@ -13,7 +13,7 @@ export default class LoadingModal extends React.Component<iProps, iStates> {
         super(props);
         this.state = {
             IsLoading: false
-        }
+        };
         LoadingModal.instance = this;
     }
 
@@ -32,17 +32,18 @@ export default class LoadingModal extends React.Component<iProps, iStates> {
     _hideLoading() {
         this.setState({ IsLoading: false });
     }
-    
+
     _isLoading() {
-        return this.state.IsLoading
+        return this.state.IsLoading;
     }
 
     render() {
         return (
-            this.state.IsLoading &&
-            <div className="loading-popup">
-                <div className="loading-icon" style={{  }} />
-            </div>
+            this.state.IsLoading && (
+                <div className="loading-popup">
+                    <div className="loading-icon" style={{}} />
+                </div>
+            )
         );
     }
 }

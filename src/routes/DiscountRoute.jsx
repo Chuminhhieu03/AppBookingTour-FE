@@ -35,7 +35,7 @@ const DiscountRoute = {
                                 {
                                     path: 'edit/:id',
                                     element: <DiscountEdit />
-                                },
+                                }
                             ]
                         }
                     ]

@@ -13,21 +13,21 @@ import ReferenceHeader from 'components/ReferenceHeader';
 // ==============================|| BASIC - BADGES ||============================== //
 
 export default function BadgesPage() {
-  return (
-    <>
-      <ReferenceHeader
-        caption="Documentation and examples for badges, our small count and labeling component."
-        link="https://react-bootstrap.netlify.app/docs/components/badge/"
-      />
-      <Row>
-        <Col sm={12}>
-          <BasicBadge />
-          <ButtonBadge />
-          <ContextualBadge />
-          <PillBadge />
-          <LightBadge />
-        </Col>
-      </Row>
-    </>
-  );
+    return (
+        <>
+            <ReferenceHeader
+                caption="Documentation and examples for badges, our small count and labeling component."
+                link="https://react-bootstrap.netlify.app/docs/components/badge/"
+            />
+            <Row>
+                <Col sm={12}>
+                    <BasicBadge />
+                    <ButtonBadge />
+                    <ContextualBadge />
+                    <PillBadge />
+                    <LightBadge />
+                </Col>
+            </Row>
+        </>
+    );
 }
