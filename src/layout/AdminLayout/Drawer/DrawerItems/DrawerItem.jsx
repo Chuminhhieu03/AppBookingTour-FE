@@ -8,9 +8,10 @@ import tableComponents from './tables';
 import uiComponents from './ui-components';
 import discount from './Sale';
 import service from './Service';
+import blog from './Blog';
 
 const drawerItems = {
-  items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount, service]
+  items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount, service, blog]
 };
 
 export default drawerItems;
