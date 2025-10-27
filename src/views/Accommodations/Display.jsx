@@ -92,6 +92,10 @@ export default function Display() {
                             <span>Trạng thái</span>
                             <Input value={accommodation.statusName} readOnly />
                         </Col>
+                        <Col span={8}>
+                            <span>Tiện ích</span>
+                            <Input value={accommodation.amenityName} readOnly />
+                        </Col>
                         <Col span={8} className="d-flex align-items-center gap-2">
                             <span>Hạng sao</span>
                             <Rate value={accommodation.starRating} readOnly />
@@ -102,11 +106,7 @@ export default function Display() {
                                 <Gallery listImage={accommodation.listInfoImage} viewOnly />
                             </div>
                         </Col>
-                        <Col span={12}>
-                            <span>Tiện ích</span>
-                            <TextArea value={accommodation.amenities} readOnly />
-                        </Col>
-                        <Col span={12}>
+                        <Col span={24}>
                             <span>Quy định</span>
                             <TextArea value={accommodation.rules} readOnly />
                         </Col>

@@ -11,6 +11,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
     const [roomType, setRoomType] = useState({});
     const [listStatus, setListStatus] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
+    const [listAmenity, setListAmenity] = useState([]);
 
     useEffect(() => {
         setupAddnewForm();
@@ -26,12 +27,14 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
         });
         const res = await response.json();
         setListStatus(res.listStatus);
+        setListAmenity(res.listAmenity);
     };
 
     const onAddnewRoomType = async (roomType) => {
         LoadingModal.showLoading();
         try {
             const roomTypeRequest = { ...roomType };
+            const amenities = roomTypeRequest.Amenity?.join(', ') || '';
             const formData = new FormData();
             formData.append('Name', roomTypeRequest.Name);
             formData.append('MaxAdult', roomTypeRequest.MaxAdult);
@@ -42,6 +45,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             formData.append('ExtraChildrenPrice', roomTypeRequest.ExtraChildrenPrice);
             formData.append('Status', roomTypeRequest.Status);
             formData.append('CoverImgFile', roomTypeRequest.CoverImgFile);
+            formData.append('Amenities', amenities);
             formData.append('AccommodationId', accommodationId);
             listInfoImage?.forEach((file) => {
                 formData.append('InfoImgFile', file);
@@ -159,6 +163,22 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                     />
                 </Col>
                 <Col span={8}>
+                    <span>Tiện ích</span>
+                    <Select
+                        mode="multiple"
+                        value={roomType.Amenity}
+                        allowClear
+                        className="w-100"
+                        options={listAmenity?.map((item) => ({
+                            label: item.name,
+                            value: item.id
+                        }))}
+                        onChange={(val) => {
+                            setRoomType({ ...roomType, Amenity: val });
+                        }}
+                    />
+                </Col>
+                <Col span={8}>
                     <span>Trạng thái</span>
                     <Select
                         value={roomType.Status}
@@ -169,19 +189,6 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                             value: item.key
                         }))}
                         onChange={(val) => setRoomType({ ...roomType, Status: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Tiện ích</span>
-                    <Select
-                        value={roomType.isActive}
-                        allowClear
-                        className="w-100"
-                        options={listStatus?.map((item) => ({
-                            label: item.value,
-                            value: item.key
-                        }))}
-                        onChange={(val) => setRoomType({ ...roomType, isActive: val })}
                     />
                 </Col>
                 <Col span={24}>
