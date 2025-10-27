@@ -7,6 +7,9 @@ import { useParams } from 'react-router-dom';
 import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
+import AddNewRoomType from './RoomTypes/Addnew';
+import RoomTypeDisplay from './RoomTypes/Display';
+import RoomTypeEdit from './RoomTypes/Edit';
 
 const { TextArea } = Input;
 
@@ -16,6 +19,13 @@ export default function Edit() {
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
     const { id } = useParams();
+    const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false);
+
+    const [isRoomTypeDisplayModalOpen, setIsRoomTypeDisplayModalOpen] = useState(false);
+    const [selectedRoomType, setSelectedRoomType] = useState(null);
+
+    const [isRoomTypeEditModalOpen, setIsRoomTypeEditModalOpen] = useState(false);
+    const [selectedRoomTypeForEdit, setSelectedRoomTypeForEdit] = useState(null);
 
     useEffect(() => {
         setupEditForm();
@@ -23,19 +33,23 @@ export default function Edit() {
 
     const setupEditForm = async () => {
         LoadingModal.showLoading();
-        const response = await fetch(`https://localhost:44331/api/Accommodation/setup-edit/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const res = await response.json();
-        setListStatus(res.listStatus ?? []);
-        setListType(res.listType ?? []);
-        setListCity(res.listCity ?? []);
-        const accommodationRes = res.accommodation;
-        accommodationRes.isActive = Number(accommodationRes.isActive);
-        setAccommodation(accommodationRes ?? {});
+        try {
+            const response = await fetch(`https://localhost:44331/api/Accommodation/setup-edit/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const res = await response.json();
+            setListStatus(res.listStatus ?? []);
+            setListType(res.listType ?? []);
+            setListCity(res.listCity ?? []);
+            const accommodationRes = res.accommodation;
+            accommodationRes.isActive = Number(accommodationRes.isActive);
+            setAccommodation(accommodationRes ?? {});
+        } catch (error) {
+            console.error('Error fetching accommodation details for edit:', error);
+        }
         LoadingModal.hideLoading();
     };
 
@@ -79,6 +93,45 @@ export default function Edit() {
             console.error('Error editing accommodation:', error);
         }
         LoadingModal.hideLoading();
+    };
+
+    const handleOk = (success) => {
+        setIsOpenModalAddnew(false);
+        if (success) {
+            setupEditForm(); // Refresh the form data after successful room type addition
+        }
+    };
+
+    const handleEditOk = (success) => {
+        setIsRoomTypeEditModalOpen(false);
+        setSelectedRoomTypeForEdit(null);
+        if (success) {
+            setupEditForm(); // Refresh the form data after successful room type edit
+        }
+    };
+
+    const handleCancel = () => {
+        setIsOpenModalAddnew(false);
+    };
+
+    const handleEditCancel = () => {
+        setIsRoomTypeEditModalOpen(false);
+        setSelectedRoomTypeForEdit(null);
+    };
+
+    const handleRoomTypeDisplayClick = (roomType) => {
+        setSelectedRoomType(roomType);
+        setIsRoomTypeDisplayModalOpen(true);
+    };
+
+    const handleRoomTypeDisplayModalClose = () => {
+        setIsRoomTypeDisplayModalOpen(false);
+        setSelectedRoomType(null);
+    };
+
+    const handleRoomTypeEditClick = (roomType) => {
+        setSelectedRoomTypeForEdit(roomType);
+        setIsRoomTypeEditModalOpen(true);
     };
 
     return (
@@ -201,7 +254,7 @@ export default function Edit() {
                                 onChange={(e) => setAccommodation({ ...accommodation, amenities: e.target.value })}
                             />
                         </Col>
-                        <Col span={8}>
+                        <Col span={12}>
                             <span>Quy định</span>
                             <TextArea
                                 value={accommodation.regulation}
@@ -223,14 +276,44 @@ export default function Edit() {
                             <span>Danh sách các loại phòng</span>
                         </Col>
                         <Col span={12} style={{ textAlign: 'right' }}>
-                            <Button type="primary">Thêm loại phòng</Button>
+                            <Button type="primary" onClick={() => setIsOpenModalAddnew(true)}>
+                                Thêm loại phòng
+                            </Button>
                         </Col>
                     </Row>
                     <Row className="mt-2">
                         <Col span={24}>
-                            <RoomTypeTable listRoomType={accommodation.listRoomType} />
+                            <RoomTypeTable
+                                listRoomType={accommodation.listRoomType}
+                                onRoomTypeClick={handleRoomTypeDisplayClick}
+                                onRoomTypeEditClick={handleRoomTypeEditClick}
+                            />
                         </Col>
                     </Row>
+                    {isOpenModalAddnew && (
+                        <AddNewRoomType
+                            accommodationId={accommodation.id}
+                            isOpen={isOpenModalAddnew}
+                            onOk={handleOk}
+                            onCancel={handleCancel}
+                        />
+                    )}
+                    {isRoomTypeDisplayModalOpen && selectedRoomType && (
+                        <RoomTypeDisplay
+                            isOpen={isRoomTypeDisplayModalOpen}
+                            onCancel={handleRoomTypeDisplayModalClose}
+                            roomType={selectedRoomType}
+                        />
+                    )}
+                    {isRoomTypeEditModalOpen && selectedRoomTypeForEdit && (
+                        <RoomTypeEdit
+                            accommodationId={accommodation.id}
+                            isOpen={isRoomTypeEditModalOpen}
+                            onOk={handleEditOk}
+                            onCancel={handleEditCancel}
+                            roomType={selectedRoomTypeForEdit}
+                        />
+                    )}
                 </MainCard>
             </Col>
         </Row>
