@@ -31,10 +31,7 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
             <Row gutter={[24, 24]}>
                 <Col span={24} style={{ textAlign: 'center' }}>
                     <div className="mb-3 d-flex justify-content-center">
-                        <ImagesUC 
-                            imageUrl={roomType.coverImageUrl}
-                            viewOnly
-                        />
+                        <ImagesUC imageUrl={roomType.coverImageUrl} viewOnly />
                     </div>
                     <span>Hình đại diện</span>
                 </Col>
@@ -56,23 +53,20 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                 </Col>
                 <Col span={8}>
                     <span>Giá phòng</span>
-                    <Input 
-                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.price)} 
-                        readOnly 
-                    />
+                    <Input value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.price)} readOnly />
                 </Col>
                 <Col span={8}>
                     <span>Phụ phí người lớn</span>
-                    <Input 
-                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.extraAdultPrice)} 
-                        readOnly 
+                    <Input
+                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.extraAdultPrice)}
+                        readOnly
                     />
                 </Col>
                 <Col span={8}>
                     <span>Phụ phí trẻ em</span>
-                    <Input 
-                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.extraChildrenPrice)} 
-                        readOnly 
+                    <Input
+                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.extraChildrenPrice)}
+                        readOnly
                     />
                 </Col>
                 <Col span={8}>
@@ -86,10 +80,7 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                 <Col span={24}>
                     <span>Hình ảnh khác</span>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                        <Gallery
-                            listImage={roomType.listInfoImage}
-                            viewOnly
-                        />
+                        <Gallery listImage={roomType.listInfoImage} viewOnly />
                     </div>
                 </Col>
             </Row>

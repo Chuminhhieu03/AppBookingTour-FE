@@ -64,12 +64,14 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             key: 'actions',
             align: 'center',
             width: 100,
-            render: (_, record) => <>
-                <Space>
-                    <Button type="link" icon={<EditOutlined />} onClick={() => onRoomTypeEditClick(record)} />
-                    <Button type="link" icon={<DeleteOutlined />} />
-                </Space>
-            </>
+            render: (_, record) => (
+                <>
+                    <Space>
+                        <Button type="link" icon={<EditOutlined />} onClick={() => onRoomTypeEditClick(record)} />
+                        <Button type="link" icon={<DeleteOutlined />} />
+                    </Space>
+                </>
+            )
         }
     ].filter(Boolean);
 

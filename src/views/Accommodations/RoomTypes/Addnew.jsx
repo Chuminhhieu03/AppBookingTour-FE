@@ -46,7 +46,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             listInfoImage?.forEach((file) => {
                 formData.append('InfoImgFile', file);
             });
-           const response = await fetch('https://localhost:44331/api/RoomType', {
+            const response = await fetch('https://localhost:44331/api/RoomType', {
                 method: 'POST',
                 body: formData
             });

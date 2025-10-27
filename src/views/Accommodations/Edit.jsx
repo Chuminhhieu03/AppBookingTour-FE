@@ -19,7 +19,7 @@ export default function Edit() {
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
     const { id } = useParams();
-    const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false); 
+    const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false);
 
     const [isRoomTypeDisplayModalOpen, setIsRoomTypeDisplayModalOpen] = useState(false);
     const [selectedRoomType, setSelectedRoomType] = useState(null);
@@ -283,21 +283,21 @@ export default function Edit() {
                     </Row>
                     <Row className="mt-2">
                         <Col span={24}>
-                            <RoomTypeTable 
-                                listRoomType={accommodation.listRoomType} 
-                                onRoomTypeClick={handleRoomTypeDisplayClick} 
+                            <RoomTypeTable
+                                listRoomType={accommodation.listRoomType}
+                                onRoomTypeClick={handleRoomTypeDisplayClick}
                                 onRoomTypeEditClick={handleRoomTypeEditClick}
                             />
                         </Col>
                     </Row>
-                    {isOpenModalAddnew && 
-                        <AddNewRoomType 
+                    {isOpenModalAddnew && (
+                        <AddNewRoomType
                             accommodationId={accommodation.id}
-                            isOpen={isOpenModalAddnew} 
-                            onOk={handleOk} 
-                            onCancel={handleCancel} 
+                            isOpen={isOpenModalAddnew}
+                            onOk={handleOk}
+                            onCancel={handleCancel}
                         />
-                    }
+                    )}
                     {isRoomTypeDisplayModalOpen && selectedRoomType && (
                         <RoomTypeDisplay
                             isOpen={isRoomTypeDisplayModalOpen}
