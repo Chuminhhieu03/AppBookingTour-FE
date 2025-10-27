@@ -13,6 +13,7 @@ export default function Addnew() {
     const [listStatus, setListStatus] = useState([]);
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
+    const [listAmenity, setListAmenity] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
 
     const { TextArea } = Input;
@@ -33,6 +34,7 @@ export default function Addnew() {
         setListStatus(res.listStatus);
         setListType(res.listType);
         setListCity(res.listCity);
+        setListAmenity(res.listAmenity);
     };
 
     const onAddnewAccommodation = async (accommodation) => {
@@ -40,6 +42,7 @@ export default function Addnew() {
         try {
             const accommodationRequest = { ...accommodation };
             accommodationRequest.isActive = Boolean(accommodation.isActive);
+            accommodationRequest.Amenity = accommodation.Amenity?.join(', ');
             const formData = new FormData();
             formData.append('CityId', accommodationRequest.CityId);
             formData.append('Type', accommodationRequest.Type);
@@ -48,7 +51,7 @@ export default function Addnew() {
             formData.append('StarRating', accommodationRequest.starRating);
             formData.append('Description', accommodationRequest.Description ?? '');
             formData.append('Regulation', accommodationRequest.Regulation ?? '');
-            formData.append('Amenities', accommodationRequest.Amenities ?? '');
+            formData.append('Amenities', accommodationRequest.Amenity ?? '');
             formData.append('IsActive', accommodationRequest.isActive);
             formData.append('CoverImgFile', accommodationRequest.CoverImgFile);
             listInfoImage?.forEach((file) => {
@@ -152,6 +155,22 @@ export default function Addnew() {
                                 onChange={(val) => setAccommodation({ ...accommodation, isActive: val })}
                             />
                         </Col>
+                        <Col span={8}>
+                            <span>Tiện ích</span>
+                            <Select
+                                mode="multiple"
+                                value={accommodation.Amenity}
+                                allowClear
+                                className="w-100"
+                                options={listAmenity?.map((item) => ({
+                                    label: item.name,
+                                    value: item.id
+                                }))}
+                                onChange={(val) => {
+                                    setAccommodation({ ...accommodation, Amenity: val })
+                                }}
+                            />
+                        </Col>
                         <Col span={8} className="d-flex align-items-center gap-2">
                             <span>Hạng sao</span>
                             <Rate
@@ -169,14 +188,7 @@ export default function Addnew() {
                                 />
                             </div>
                         </Col>
-                        <Col span={12}>
-                            <span>Tiện ích</span>
-                            <TextArea
-                                value={accommodation.Amenities}
-                                onChange={(e) => setAccommodation({ ...accommodation, Amenities: e.target.value })}
-                            />
-                        </Col>
-                        <Col span={12}>
+                        <Col span={24}>
                             <span>Quy định</span>
                             <TextArea
                                 value={accommodation.Regulation}

@@ -12,12 +12,14 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
     const [roomTypeEdit, setRoomTypeEdit] = useState(roomType || {});
     const [listStatus, setListStatus] = useState([]);
     const [listInfoImage, setListInfoImage] = useState(roomType?.infoImages || []);
+    const [listAmenity, setListAmenity] = useState([]);
 
     useEffect(() => {
         setupEditForm();
     }, []);
 
     useEffect(() => {
+        roomType.amenity = roomType.amenities?.split(', ').map(Number) || [];
         setRoomTypeEdit(roomType || {});
     }, [roomType]);
 
@@ -32,6 +34,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             });
             const res = await response.json();
             setListStatus(res.listStatus || []);
+            setListAmenity(res.listAmenity || []);
         } catch (error) {
             console.error('Error fetching setup data:', error);
         }
@@ -40,6 +43,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
     const onEditRoomType = async (roomTypeData) => {
         LoadingModal.showLoading();
         try {
+            const amenities = roomTypeData.amenity?.join(', ') || '';
             const formData = new FormData();
             formData.append('Id', roomTypeData.id);
             formData.append('Name', roomTypeData.name);
@@ -51,6 +55,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             formData.append('ExtraChildrenPrice', roomTypeData.extraChildrenPrice);
             formData.append('Status', roomTypeData.status);
             formData.append('AccommodationId', accommodationId);
+            formData.append('Amenities', amenities);
             if (roomTypeData.coverImgFile) {
                 formData.append('CoverImgFile', roomTypeData.coverImgFile);
             }
@@ -174,6 +179,22 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                         className="w-100"
                         value={roomTypeEdit.extraChildrenPrice}
                         onChange={(val) => setRoomTypeEdit({ ...roomTypeEdit, extraChildrenPrice: val })}
+                    />
+                </Col>
+                <Col span={8}>
+                    <span>Tiện ích</span>
+                    <Select
+                        mode="multiple"
+                        value={roomTypeEdit.amenity}
+                        allowClear
+                        className="w-100"
+                        options={listAmenity?.map((item) => ({
+                            label: item.name,
+                            value: item.id
+                        }))}
+                        onChange={(val) => {
+                            setRoomTypeEdit({ ...roomTypeEdit, amenity: val });
+                        }}
                     />
                 </Col>
                 <Col span={8}>

@@ -18,8 +18,9 @@ export default function Edit() {
     const [listStatus, setListStatus] = useState([]);
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
+    const [listAmenity, setListAmenity] = useState([]);
     const { id } = useParams();
-    const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false); 
+    const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false);
 
     const [isRoomTypeDisplayModalOpen, setIsRoomTypeDisplayModalOpen] = useState(false);
     const [selectedRoomType, setSelectedRoomType] = useState(null);
@@ -44,8 +45,11 @@ export default function Edit() {
             setListStatus(res.listStatus ?? []);
             setListType(res.listType ?? []);
             setListCity(res.listCity ?? []);
+            setListAmenity(res.listAmenity ?? []);
             const accommodationRes = res.accommodation;
             accommodationRes.isActive = Number(accommodationRes.isActive);
+            accommodationRes.amenity = accommodationRes.amenities?.split(', ').map(Number) ?? [];
+            console.log('accommodationRes', accommodationRes);
             setAccommodation(accommodationRes ?? {});
         } catch (error) {
             console.error('Error fetching accommodation details for edit:', error);
@@ -59,6 +63,7 @@ export default function Edit() {
             const formData = new FormData();
             const accommodationRequest = { ...accommodation };
             accommodationRequest.isActive = Boolean(accommodation.isActive);
+            accommodationRequest.amenity = accommodation.amenity?.join(', ');
             formData.append('Code', accommodationRequest.code);
             formData.append('CityId', accommodationRequest.cityId);
             formData.append('Type', accommodationRequest.type);
@@ -67,9 +72,9 @@ export default function Edit() {
             formData.append('StarRating', accommodationRequest.starRating);
             formData.append('Description', accommodationRequest.description ?? '');
             formData.append('Regulation', accommodationRequest.regulation ?? '');
-            formData.append('Amenities', accommodationRequest.amenities ?? '');
+            formData.append('Amenities', accommodationRequest.amenity ?? '');
             formData.append('IsActive', accommodationRequest.isActive);
-            formData.append('CoverImgUrl', accommodationRequest.coverImgUrl);
+            formData.append('CoverImgUrl', accommodationRequest.coverImgUrl ?? '');
             formData.append('CoverImgFile', accommodationRequest.coverImgFile);
             accommodationRequest.listInfoImage?.forEach((file) => {
                 formData.append('ListInfoImageId', file.id);
@@ -225,6 +230,22 @@ export default function Edit() {
                                 onChange={(val) => setAccommodation({ ...accommodation, isActive: val })}
                             />
                         </Col>
+                        <Col span={8}>
+                            <span>Tiện ích</span>
+                            <Select
+                                mode="multiple"
+                                value={accommodation.amenity}
+                                allowClear
+                                className="w-100"
+                                options={listAmenity?.map((item) => ({
+                                    label: item.name,
+                                    value: item.id
+                                }))}
+                                onChange={(val) => {
+                                    setAccommodation({ ...accommodation, amenity: val });
+                                }}
+                            />
+                        </Col>
                         <Col span={8} className="d-flex align-items-center gap-2">
                             <span>Hạng sao</span>
                             <Rate
@@ -247,14 +268,7 @@ export default function Edit() {
                                 />
                             </div>
                         </Col>
-                        <Col span={12}>
-                            <span>Tiện ích</span>
-                            <TextArea
-                                value={accommodation.amenities}
-                                onChange={(e) => setAccommodation({ ...accommodation, amenities: e.target.value })}
-                            />
-                        </Col>
-                        <Col span={12}>
+                        <Col span={24}>
                             <span>Quy định</span>
                             <TextArea
                                 value={accommodation.regulation}
@@ -283,21 +297,21 @@ export default function Edit() {
                     </Row>
                     <Row className="mt-2">
                         <Col span={24}>
-                            <RoomTypeTable 
-                                listRoomType={accommodation.listRoomType} 
-                                onRoomTypeClick={handleRoomTypeDisplayClick} 
+                            <RoomTypeTable
+                                listRoomType={accommodation.listRoomType}
+                                onRoomTypeClick={handleRoomTypeDisplayClick}
                                 onRoomTypeEditClick={handleRoomTypeEditClick}
                             />
                         </Col>
                     </Row>
-                    {isOpenModalAddnew && 
-                        <AddNewRoomType 
+                    {isOpenModalAddnew && (
+                        <AddNewRoomType
                             accommodationId={accommodation.id}
-                            isOpen={isOpenModalAddnew} 
-                            onOk={handleOk} 
-                            onCancel={handleCancel} 
+                            isOpen={isOpenModalAddnew}
+                            onOk={handleOk}
+                            onCancel={handleCancel}
                         />
-                    }
+                    )}
                     {isRoomTypeDisplayModalOpen && selectedRoomType && (
                         <RoomTypeDisplay
                             isOpen={isRoomTypeDisplayModalOpen}
