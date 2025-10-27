@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import Loadable from 'components/Loadable';
+import ProtectedRoute from 'components/auth/ProtectedRoute';
 import AdminLayout from '../layout/AdminLayout/AdminLayout';
 
 const DiscountDefault = Loadable(lazy(() => import('views/Discounts/Default')));
@@ -12,7 +13,11 @@ const DiscountRoute = {
     children: [
         {
             path: 'admin',
-            element: <AdminLayout />,
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
             children: [
                 {
                     path: 'sale',

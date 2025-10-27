@@ -215,11 +215,10 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
                         <Gallery
                             listImage={roomTypeEdit.listInfoImage}
-                            onChange={(listOldImage, listNewImage) =>
-                            {
+                            onChange={(listOldImage, listNewImage) => {
                                 setRoomTypeEdit({
                                     ...roomTypeEdit,
-                                    listInfoImage: listOldImage,
+                                    listInfoImage: listOldImage
                                 });
                                 setListInfoImage(listNewImage);
                             }}

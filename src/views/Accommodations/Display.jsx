@@ -122,8 +122,8 @@ export default function Display() {
                     </Row>
                     <Row className="mt-2">
                         <Col span={24}>
-                            <RoomTypeTable 
-                                listRoomType={accommodation.listRoomType} 
+                            <RoomTypeTable
+                                listRoomType={accommodation.listRoomType}
                                 onRoomTypeClick={handleRoomTypeDisplayClick}
                                 viewOnly
                             />

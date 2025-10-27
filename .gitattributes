@@ -14,16 +14,19 @@
 
 # source code
 *.php text
-*.css text
-*.sass text
-*.scss text
-*.less text
-*.styl text
+*.css text eol=lf
+*.sass text eol=lf
+*.scss text eol=lf
+*.less text eol=lf
+*.styl text eol=lf
 *.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
 *.coffee text
-*.json text
-*.htm text
-*.html text
+*.json text eol=lf
+*.htm text eol=lf
+*.html text eol=lf
 *.xml text
 *.svg text
 *.txt text

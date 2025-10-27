@@ -1,5 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { message } from 'antd';
 import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
@@ -9,6 +11,7 @@ import Stack from 'react-bootstrap/Stack';
 import MainCard from 'components/MainCard';
 import SimpleBarScroll from 'components/third-party/SimpleBar';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import { logoutAsync } from 'features/auth/authSlice';
 import Img1 from 'assets/images/user/avatar-1.png';
 import Img2 from 'assets/images/user/avatar-2.png';
 import Img3 from 'assets/images/user/avatar-3.png';
@@ -62,6 +65,24 @@ const notifications = [
 export default function Header() {
     const { menuMaster } = useGetMenuMaster();
     const drawerOpen = menuMaster?.isDashboardDrawerOpened;
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { user } = useSelector((state) => state.auth);
+
+    const handleLogout = async () => {
+        try {
+            await dispatch(logoutAsync()).unwrap();
+            message.success('Logout successfully!');
+            navigate('/login');
+        } catch (error) {
+            message.error(error || 'Logout failed!');
+        }
+    };
+
+    const handleChangePassword = () => {
+        navigate('/admin/change-password');
+    };
+
     return (
         <header className="pc-header">
             <div className="header-wrapper">
@@ -166,8 +187,8 @@ export default function Header() {
                                             <Image src={Img2} alt="user-avatar" className="user-avatar wid-35" roundedCircle />
                                         </div>
                                         <Stack gap={1}>
-                                            <h6 className="text-white mb-0">Carson Darrin 🖖</h6>
-                                            <span className="text-white text-opacity-75">carson.darrin@company.io</span>
+                                            <h6 className="text-white mb-0">{user?.fullName || 'User'}</h6>
+                                            <span className="text-white text-opacity-75">{user?.email || 'user@example.com'}</span>
                                         </Stack>
                                     </Stack>
                                 </Dropdown.Header>
@@ -184,12 +205,16 @@ export default function Header() {
                                             <i className="ph ph-share-network me-2" />
                                             Share
                                         </Dropdown.Item>
-                                        <Dropdown.Item as={Link} to="#" className="justify-content-start">
+                                        <Dropdown.Item
+                                            onClick={handleChangePassword}
+                                            className="justify-content-start"
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             <i className="ph ph-lock-key me-2" />
                                             Change Password
                                         </Dropdown.Item>
                                         <div className="d-grid my-2">
-                                            <Button>
+                                            <Button onClick={handleLogout}>
                                                 <i className="ph ph-sign-out align-middle me-2" />
                                                 Logout
                                             </Button>
