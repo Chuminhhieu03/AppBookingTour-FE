@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, Radio, Space, message, Card, Row, Col, Typography } from 'antd';
 import { SaveOutlined, FileTextOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
 import { blogAPI } from 'api/blog/blogAPI';
+import cityAPI from 'api/city/cityAPI';
 import { generateSlug } from 'utils/slugGenerator';
 
 const { Option } = Select;
@@ -15,21 +16,32 @@ const BlogPostsAddnew = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState('');
+    const [cities, setCities] = useState([]); // ← Thêm state
+    const [loadingCities, setLoadingCities] = useState(true); // ← Loading state
 
-    const cities = [
-        'Hà Nội',
-        'Hồ Chí Minh',
-        'Đà Nẵng',
-        'Hải Phòng',
-        'Cần Thơ',
-        'Nha Trang',
-        'Huế',
-        'Đà Lạt',
-        'Vũng Tàu',
-        'Phú Quốc',
-        'Hạ Long',
-        'Hội An'
-    ];
+    // Fetch cities khi component mount
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                setLoadingCities(true);
+                const response = await cityAPI.getAllCities();
+                if (response.success) {
+                    setCities(response.data || []);
+                } else {
+                    message.error('Không thể tải danh sách thành phố');
+                    setCities([]);
+                }
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+                message.error('Đã xảy ra lỗi khi tải danh sách thành phố');
+                setCities([]);
+            } finally {
+                setLoadingCities(false);
+            }
+        };
+
+        fetchCities();
+    }, []);
 
     const handleTitleChange = (e) => {
         const title = e.target.value;
@@ -52,7 +64,7 @@ const BlogPostsAddnew = () => {
                 title: values.title,
                 slug: values.slug,
                 content: content,
-                city: values.city,
+                cityId: values.city,
                 tags: values.tags,
                 status: statusMap[values.status]
             };
@@ -142,10 +154,10 @@ const BlogPostsAddnew = () => {
 
                             <Col xs={24} md={8}>
                                 <Form.Item name="city" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
-                                    <Select placeholder="Chọn thành phố" showSearch>
+                                    <Select placeholder="Chọn thành phố" showSearch loading={loadingCities} optionFilterProp="children">
                                         {cities.map((city) => (
-                                            <Option key={city} value={city}>
-                                                {city}
+                                            <Option key={city.id} value={city.id}>
+                                                {city.name}
                                             </Option>
                                         ))}
                                     </Select>

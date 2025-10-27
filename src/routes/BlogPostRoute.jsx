@@ -15,9 +15,9 @@ const BlogPostRoute = {
         {
             path: 'admin',
             element: (
-                // <ProtectedRoute>
+                <ProtectedRoute>
                     <AdminLayout />
-                // </ProtectedRoute>
+                </ProtectedRoute>
             ),
             children: [
                 {
