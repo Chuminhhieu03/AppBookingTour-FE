@@ -1,7 +1,11 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from '../features/auth/authSlice';
+
+const rootReducer = combineReducers({
+    auth: authReducer
+});
 
 // Persist config
 const persistConfig = {
@@ -11,12 +15,10 @@ const persistConfig = {
     whitelist: ['auth'] // Only persist auth state
 };
 
-const persistedReducer = persistReducer(persistConfig, authReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-    reducer: {
-        auth: persistedReducer
-    },
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
