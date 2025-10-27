@@ -11,28 +11,28 @@ const BootstrapTableBasic = Loadable(lazy(() => import('views/table/bootstrap-ta
 // ==============================|| TABLES ROUTING ||============================== //
 
 const TablesRoutes = {
-  path: '/',
-  children: [
-    {
-      path: '/',
-      element: (
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'tables/bootstrap-table',
-          children: [
-            {
-              path: 'basic-table',
-              element: <BootstrapTableBasic />
-            }
-          ]
+            path: '/',
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+            children: [
+                {
+                    path: 'tables/bootstrap-table',
+                    children: [
+                        {
+                            path: 'basic-table',
+                            element: <BootstrapTableBasic />
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default TablesRoutes;

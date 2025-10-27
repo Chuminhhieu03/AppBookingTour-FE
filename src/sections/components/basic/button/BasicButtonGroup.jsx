@@ -8,13 +8,13 @@ import MainCard from 'components/MainCard';
 // ==============================|| BUTTON - BASIC GROUP ||============================== //
 
 export default function BasicButtonGroup() {
-  return (
-    <MainCard title="Basic Button Group">
-      <ButtonGroup>
-        <Button>Left</Button>
-        <Button>Middle</Button>
-        <Button>Right</Button>
-      </ButtonGroup>
-    </MainCard>
-  );
+    return (
+        <MainCard title="Basic Button Group">
+            <ButtonGroup>
+                <Button>Left</Button>
+                <Button>Middle</Button>
+                <Button>Right</Button>
+            </ButtonGroup>
+        </MainCard>
+    );
 }

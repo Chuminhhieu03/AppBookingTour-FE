@@ -14,37 +14,37 @@ const GoogleMaps = Loadable(lazy(() => import('views/maps/GoogleMap')));
 // ==============================|| CHART & MAP ROUTING ||============================== //
 
 const ChartMapRoutes = {
-  path: '/',
-  children: [
-    {
-      path: '/',
-      element: (
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'charts',
-          children: [
-            {
-              path: 'apex-chart',
-              element: <ApexChart />
-            }
-          ]
-        },
-        {
-          path: 'map',
-          children: [
-            {
-              path: 'google-map',
-              element: <GoogleMaps />
-            }
-          ]
+            path: '/',
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+            children: [
+                {
+                    path: 'charts',
+                    children: [
+                        {
+                            path: 'apex-chart',
+                            element: <ApexChart />
+                        }
+                    ]
+                },
+                {
+                    path: 'map',
+                    children: [
+                        {
+                            path: 'google-map',
+                            element: <GoogleMaps />
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default ChartMapRoutes;

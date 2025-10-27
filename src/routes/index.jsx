@@ -14,22 +14,22 @@ import ChangePasswordRoute from './ChangePasswordRoute';
 import BlogPostRoute from './BlogPostRoute';
 
 const router = createBrowserRouter(
-  [
-    NavigationRoutes,
-    ComponentsRoutes,
-    FormsRoutes,
-    TablesRoutes,
-    ChartMapRoutes,
-    PagesRoutes,
-    OtherRoutes,
-    DiscountRoute,
-    AccommodationRoute,
-    ChangePasswordRoute,
-    BlogPostRoute
-  ],
-  {
-    basename: import.meta.env.VITE_APP_BASE_NAME
-  }
+    [
+        NavigationRoutes,
+        ComponentsRoutes,
+        FormsRoutes,
+        TablesRoutes,
+        ChartMapRoutes,
+        PagesRoutes,
+        OtherRoutes,
+        DiscountRoute,
+        AccommodationRoute,
+        ChangePasswordRoute,
+        BlogPostRoute
+    ],
+    {
+        basename: import.meta.env.VITE_APP_BASE_NAME
+    }
 );
 
 export default router;

@@ -9,91 +9,91 @@ import Utility from '../../utils/Utility';
 const { TextArea } = Input;
 
 export default function Display() {
-  const [discount, setDiscount] = useState({});
-  const { id } = useParams();
+    const [discount, setDiscount] = useState({});
+    const { id } = useParams();
 
-  useEffect(() => {
-    setupDisplayForm();
-  }, []);
+    useEffect(() => {
+        setupDisplayForm();
+    }, []);
 
-  const setupDisplayForm = async () => {
-    try {
-      LoadingModal.showLoading();
-      const response = await fetch(`https://localhost:44331/api/Discount/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+    const setupDisplayForm = async () => {
+        try {
+            LoadingModal.showLoading();
+            const response = await fetch(`https://localhost:44331/api/Discount/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const res = await response.json();
+            setDiscount(res.discount ?? {});
+        } catch (error) {
+            console.error('Error fetching discount details:', error);
+        } finally {
+            LoadingModal.hideLoading();
         }
-      });
-      const res = await response.json();
-      setDiscount(res.discount ?? {});
-    } catch (error) {
-      console.error('Error fetching discount details:', error);
-    } finally {
-      LoadingModal.hideLoading();
-    }
-  };
+    };
 
-  return (
-    <Row>
-      <Col span={24}>
-        <MainCard
-          title="Chi tiết mã giảm giá"
-          secondary={
-            <Space>
-              <Button type="primary" href={`/admin/sale/discount/edit/${id}`} shape="round" icon={<EditOutlined />}>
-                Chỉnh sửa
-              </Button>
-              <Button type="primary" href="/admin/sale/discount" shape="round" icon={<CloseOutlined />}>
-                Thoát
-              </Button>
-            </Space>
-          }
-        >
-          <Row gutter={[24, 24]}>
-            <Col span={8}>
-              <span>Mã</span>
-              <Input value={discount.code} readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Tên mã giảm giá</span>
-              <Input value={discount.name} readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Giá trị giảm (%)</span>
-              <InputNumber value={discount.discountPercent} className="w-100" readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Ngày hiệu lực</span>
-              <Input value={Utility.formatDate(discount.startEffectedDtg)} className="w-100" readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Ngày hết hiệu lực</span>
-              <Input value={Utility.formatDate(discount.endEffectedDtg)} className="w-100" readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Số lượng mã phát hành</span>
-              <Input value={discount.totalQuantity} readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Số lượng mã còn lại</span>
-              <Input value={discount.remainQuantity} className="w-100" readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Loại dịch vụ</span>
-              <Input value={discount.serviceTypeName} readOnly />
-            </Col>
-            <Col span={8}>
-              <span>Trạng thái</span>
-              <Input value={discount.statusName} readOnly />
-            </Col>
+    return (
+        <Row>
             <Col span={24}>
-              <span>Mô tả</span>
-              <TextArea value={discount.description} className="w-100" readOnly />
+                <MainCard
+                    title="Chi tiết mã giảm giá"
+                    secondary={
+                        <Space>
+                            <Button type="primary" href={`/admin/sale/discount/edit/${id}`} shape="round" icon={<EditOutlined />}>
+                                Chỉnh sửa
+                            </Button>
+                            <Button type="primary" href="/admin/sale/discount" shape="round" icon={<CloseOutlined />}>
+                                Thoát
+                            </Button>
+                        </Space>
+                    }
+                >
+                    <Row gutter={[24, 24]}>
+                        <Col span={8}>
+                            <span>Mã</span>
+                            <Input value={discount.code} readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Tên mã giảm giá</span>
+                            <Input value={discount.name} readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Giá trị giảm (%)</span>
+                            <InputNumber value={discount.discountPercent} className="w-100" readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Ngày hiệu lực</span>
+                            <Input value={Utility.formatDate(discount.startEffectedDtg)} className="w-100" readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Ngày hết hiệu lực</span>
+                            <Input value={Utility.formatDate(discount.endEffectedDtg)} className="w-100" readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Số lượng mã phát hành</span>
+                            <Input value={discount.totalQuantity} readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Số lượng mã còn lại</span>
+                            <Input value={discount.remainQuantity} className="w-100" readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Loại dịch vụ</span>
+                            <Input value={discount.serviceTypeName} readOnly />
+                        </Col>
+                        <Col span={8}>
+                            <span>Trạng thái</span>
+                            <Input value={discount.statusName} readOnly />
+                        </Col>
+                        <Col span={24}>
+                            <span>Mô tả</span>
+                            <TextArea value={discount.description} className="w-100" readOnly />
+                        </Col>
+                    </Row>
+                </MainCard>
             </Col>
-          </Row>
-        </MainCard>
-      </Col>
-    </Row>
-  );
+        </Row>
+    );
 }

@@ -10,24 +10,24 @@ const OtherSamplePage = Loadable(lazy(() => import('views/SamplePage')));
 // ==============================|| OTHER ROUTING ||============================== //
 
 const OtherRoutes = {
-  path: '/',
-  children: [
-    {
-      path: '/',
-      element: <AdminLayout />,
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'other',
-          children: [
-            {
-              path: 'sample-page',
-              element: <OtherSamplePage />
-            }
-          ]
+            path: '/',
+            element: <AdminLayout />,
+            children: [
+                {
+                    path: 'other',
+                    children: [
+                        {
+                            path: 'sample-page',
+                            element: <OtherSamplePage />
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default OtherRoutes;

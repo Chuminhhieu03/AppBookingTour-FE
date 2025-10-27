@@ -12,26 +12,26 @@ import ReferenceHeader from 'components/ReferenceHeader';
 // ==============================|| BASIC - BREADCRUMB ||============================== //
 
 export default function BreadcrumbPage() {
-  return (
-    <>
-      <ReferenceHeader
-        caption="Indicate the current page’s location within a navigational hierarchy that automatically adds separators via CSS."
-        link="https://react-bootstrap.netlify.app/docs/components/breadcrumb"
-      />
-      <Row>
-        <Col sm={6}>
-          <BreadcrumbBasic />
-        </Col>
-        <Col sm={6}>
-          <BreadcrumbIcon />
-        </Col>
-        <Col sm={6}>
-          <BreadcrumbCharacter />
-        </Col>
-        <Col sm={6}>
-          <BreadcrumbEmbedded />
-        </Col>
-      </Row>
-    </>
-  );
+    return (
+        <>
+            <ReferenceHeader
+                caption="Indicate the current page’s location within a navigational hierarchy that automatically adds separators via CSS."
+                link="https://react-bootstrap.netlify.app/docs/components/breadcrumb"
+            />
+            <Row>
+                <Col sm={6}>
+                    <BreadcrumbBasic />
+                </Col>
+                <Col sm={6}>
+                    <BreadcrumbIcon />
+                </Col>
+                <Col sm={6}>
+                    <BreadcrumbCharacter />
+                </Col>
+                <Col sm={6}>
+                    <BreadcrumbEmbedded />
+                </Col>
+            </Row>
+        </>
+    );
 }

@@ -29,89 +29,89 @@ import ReferenceHeader from 'components/ReferenceHeader';
 // ==============================|| BASIC - BUTTON ||============================== //
 
 export default function ButtonPage() {
-  return (
-    <>
-      <ReferenceHeader
-        caption="Use React-Bootstrap’s custom button styles for actions in forms, dialogs, and more with support for multiple sizes, states, and more."
-        link="https://react-bootstrap.netlify.app/docs/components/buttons"
-      />
-      <Row className="btn-page">
-        <Col sm={6}>
-          <DefaultButton />
-        </Col>
-        <Col sm={6}>
-          <LightButton />
-        </Col>
-      </Row>
-      <Col>
-        <LinkButton />
-      </Col>
-      <Col>
-        <OutLineButton />
-      </Col>
-      <Col>
-        <DisabledButton />
-      </Col>
-      <Col>
-        <ShadowButton />
-      </Col>
-      <Row>
-        <Col className="col-sm-6">
-          <LargeButton />
-        </Col>
-        <Col className="col-sm-6">
-          <SmallButton />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm={6}>
-          <IconWithButton />
-        </Col>
-        <Col sm={6}>
-          <OutLineIconButton />
-        </Col>
-      </Row>
-      <Col xs={12}>
-        <ButtonIcon />
-      </Col>
-      <Row>
-        <Col md={6}>
-          <BasicButtonGroup />
-        </Col>
-        <Col md={6}>
-          <ToolbarButton />
-        </Col>
-      </Row>
-      <Col md={12}>
-        <ToolbarInputButton />
-      </Col>
-      <Col md={12}>
-        <ToolbarSizeButton />
-      </Col>
-      <Row>
-        <Col md={6}>
-          <NestingButton />
-        </Col>
-        <Col md={6}>
-          <VerticalButton />
-        </Col>
-      </Row>
-      <Row>
-        <Col md={6}>
-          <MixedStyleButton />
-        </Col>
-        <Col md={6}>
-          <OutlineStyleButton />
-        </Col>
-      </Row>
-      <Row>
-        <Col md={6}>
-          <CheckboxButton />
-        </Col>
-        <Col md={6}>
-          <RadioButton />
-        </Col>
-      </Row>
-    </>
-  );
+    return (
+        <>
+            <ReferenceHeader
+                caption="Use React-Bootstrap’s custom button styles for actions in forms, dialogs, and more with support for multiple sizes, states, and more."
+                link="https://react-bootstrap.netlify.app/docs/components/buttons"
+            />
+            <Row className="btn-page">
+                <Col sm={6}>
+                    <DefaultButton />
+                </Col>
+                <Col sm={6}>
+                    <LightButton />
+                </Col>
+            </Row>
+            <Col>
+                <LinkButton />
+            </Col>
+            <Col>
+                <OutLineButton />
+            </Col>
+            <Col>
+                <DisabledButton />
+            </Col>
+            <Col>
+                <ShadowButton />
+            </Col>
+            <Row>
+                <Col className="col-sm-6">
+                    <LargeButton />
+                </Col>
+                <Col className="col-sm-6">
+                    <SmallButton />
+                </Col>
+            </Row>
+            <Row>
+                <Col sm={6}>
+                    <IconWithButton />
+                </Col>
+                <Col sm={6}>
+                    <OutLineIconButton />
+                </Col>
+            </Row>
+            <Col xs={12}>
+                <ButtonIcon />
+            </Col>
+            <Row>
+                <Col md={6}>
+                    <BasicButtonGroup />
+                </Col>
+                <Col md={6}>
+                    <ToolbarButton />
+                </Col>
+            </Row>
+            <Col md={12}>
+                <ToolbarInputButton />
+            </Col>
+            <Col md={12}>
+                <ToolbarSizeButton />
+            </Col>
+            <Row>
+                <Col md={6}>
+                    <NestingButton />
+                </Col>
+                <Col md={6}>
+                    <VerticalButton />
+                </Col>
+            </Row>
+            <Row>
+                <Col md={6}>
+                    <MixedStyleButton />
+                </Col>
+                <Col md={6}>
+                    <OutlineStyleButton />
+                </Col>
+            </Row>
+            <Row>
+                <Col md={6}>
+                    <CheckboxButton />
+                </Col>
+                <Col md={6}>
+                    <RadioButton />
+                </Col>
+            </Row>
+        </>
+    );
 }

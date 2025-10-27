@@ -7,9 +7,9 @@ import Loader from 'components/Loader';
 // ==============================|| LAYOUT - AUTH ||============================== //
 
 export default function AuthLayout() {
-  return (
-    <Suspense fallback={<Loader />}>
-      <Outlet />
-    </Suspense>
-  );
+    return (
+        <Suspense fallback={<Loader />}>
+            <Outlet />
+        </Suspense>
+    );
 }

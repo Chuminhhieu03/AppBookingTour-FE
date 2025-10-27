@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 
 export const formatDate = (isoString) => {
-  if (!isoString) return '-';
-  return dayjs(isoString).format('DD/MM/YYYY HH:mm');
+    if (!isoString) return '-';
+    return dayjs(isoString).format('DD/MM/YYYY HH:mm');
 };
 
 export const formatDateOnly = (isoString) => {
-  if (!isoString) return '-';
-  return dayjs(isoString).format('DD/MM/YYYY');
+    if (!isoString) return '-';
+    return dayjs(isoString).format('DD/MM/YYYY');
 };

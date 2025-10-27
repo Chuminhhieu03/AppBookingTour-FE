@@ -12,28 +12,28 @@ import MainCard from 'components/MainCard';
 // ==============================|| BUTTON - VERTICAL ||============================== //
 
 export default function VerticalButton() {
-  return (
-    <MainCard title="Vertical Variation">
-      <Row>
-        <Col xs={4}>
-          <ButtonGroup vertical>
-            <Button variant="secondary">1</Button>
-            <Button variant="secondary">2</Button>
-            <Button variant="secondary">3</Button>
-          </ButtonGroup>
-        </Col>
-        <Col xs={8}>
-          <ButtonGroup vertical>
-            <Button variant="secondary">1</Button>
-            <Button variant="secondary">2</Button>
+    return (
+        <MainCard title="Vertical Variation">
+            <Row>
+                <Col xs={4}>
+                    <ButtonGroup vertical>
+                        <Button variant="secondary">1</Button>
+                        <Button variant="secondary">2</Button>
+                        <Button variant="secondary">3</Button>
+                    </ButtonGroup>
+                </Col>
+                <Col xs={8}>
+                    <ButtonGroup vertical>
+                        <Button variant="secondary">1</Button>
+                        <Button variant="secondary">2</Button>
 
-            <DropdownButton variant="secondary" as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
-              <Dropdown.Item eventKey="1">Dropdown link</Dropdown.Item>
-              <Dropdown.Item eventKey="2">Dropdown link</Dropdown.Item>
-            </DropdownButton>
-          </ButtonGroup>
-        </Col>
-      </Row>
-    </MainCard>
-  );
+                        <DropdownButton variant="secondary" as={ButtonGroup} title="Dropdown" id="bg-nested-dropdown">
+                            <Dropdown.Item eventKey="1">Dropdown link</Dropdown.Item>
+                            <Dropdown.Item eventKey="2">Dropdown link</Dropdown.Item>
+                        </DropdownButton>
+                    </ButtonGroup>
+                </Col>
+            </Row>
+        </MainCard>
+    );
 }

@@ -4,41 +4,41 @@ import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 
 const initialState = {
-  isDashboardDrawerOpened: false,
-  isComponentDrawerOpened: true
+    isDashboardDrawerOpened: false,
+    isComponentDrawerOpened: true
 };
 
 export const endpoints = {
-  key: 'api/menu',
-  master: 'master'
+    key: 'api/menu',
+    master: 'master'
 };
 
 export function useGetMenuMaster() {
-  const { data, isLoading } = useSWR(endpoints.key + endpoints.master, () => initialState, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false
-  });
+    const { data, isLoading } = useSWR(endpoints.key + endpoints.master, () => initialState, {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false
+    });
 
-  const memoizedValue = useMemo(
-    () => ({
-      menuMaster: data,
-      menuMasterLoading: isLoading
-    }),
-    [data, isLoading]
-  );
+    const memoizedValue = useMemo(
+        () => ({
+            menuMaster: data,
+            menuMasterLoading: isLoading
+        }),
+        [data, isLoading]
+    );
 
-  return memoizedValue;
+    return memoizedValue;
 }
 
 export function handlerDrawerOpen(isDashboardDrawerOpened) {
-  // to update local state based on key
+    // to update local state based on key
 
-  mutate(
-    endpoints.key + endpoints.master,
-    (currentMenuMaster) => {
-      return { ...currentMenuMaster, isDashboardDrawerOpened };
-    },
-    false
-  );
+    mutate(
+        endpoints.key + endpoints.master,
+        (currentMenuMaster) => {
+            return { ...currentMenuMaster, isDashboardDrawerOpened };
+        },
+        false
+    );
 }

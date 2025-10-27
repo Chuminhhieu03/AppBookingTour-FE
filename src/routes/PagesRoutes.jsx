@@ -22,35 +22,35 @@ const ConfirmEmailPage = Loadable(lazy(() => import('views/auth/confirm-email/Co
 // ==============================|| AUTH PAGES ROUTING ||============================== //
 
 const PagesRoutes = {
-  path: '/',
-  children: [
-    {
-      path: '/',
-      element: <AuthLayout />,
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'login',
-          element: <LoginPage />
-        },
-        {
-          path: 'register',
-          element: <RegisterPage />
-        },
-        {
-          path: 'forgot-password',
-          element: <ForgotPasswordPage />
-        },
-        {
-          path: 'reset-password',
-          element: <ResetPasswordPage />
-        },
-        {
-          path: 'confirm-email',
-          element: <ConfirmEmailPage />
+            path: '/',
+            element: <AuthLayout />,
+            children: [
+                {
+                    path: 'login',
+                    element: <LoginPage />
+                },
+                {
+                    path: 'register',
+                    element: <RegisterPage />
+                },
+                {
+                    path: 'forgot-password',
+                    element: <ForgotPasswordPage />
+                },
+                {
+                    path: 'reset-password',
+                    element: <ResetPasswordPage />
+                },
+                {
+                    path: 'confirm-email',
+                    element: <ConfirmEmailPage />
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default PagesRoutes;

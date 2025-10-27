@@ -6,23 +6,23 @@ import AdminLayout from '../layout/AdminLayout/AdminLayout';
 const ChangePasswordPage = Loadable(lazy(() => import('views/auth/change-password/ChangePassword')));
 
 const ChangePasswordRoute = {
-  path: '/',
-  children: [
-    {
-      path: 'admin',
-      element: (
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'change-password',
-          element: <ChangePasswordPage />
+            path: 'admin',
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+            children: [
+                {
+                    path: 'change-password',
+                    element: <ChangePasswordPage />
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default ChangePasswordRoute;

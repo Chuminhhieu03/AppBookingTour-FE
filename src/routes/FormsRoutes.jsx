@@ -11,28 +11,28 @@ const FormBasic = Loadable(lazy(() => import('views/forms/form-element/FormBasic
 // ==============================|| FORMS ROUTING ||============================== //
 
 const FormsRoutes = {
-  path: '/',
-  children: [
-    {
-      path: '/',
-      element: (
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'forms',
-          children: [
-            {
-              path: 'form-elements',
-              children: [{ path: 'basic', element: <FormBasic /> }]
-            }
-          ]
+            path: '/',
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+            children: [
+                {
+                    path: 'forms',
+                    children: [
+                        {
+                            path: 'form-elements',
+                            children: [{ path: 'basic', element: <FormBasic /> }]
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default FormsRoutes;

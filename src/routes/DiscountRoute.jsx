@@ -9,45 +9,45 @@ const DiscountDisplay = Loadable(lazy(() => import('views/Discounts/Display')));
 const DiscountEdit = Loadable(lazy(() => import('views/Discounts/Edit')));
 
 const DiscountRoute = {
-  path: '/',
-  children: [
-    {
-      path: 'admin',
-      element: (
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'sale',
-          children: [
-            {
-              path: 'discount',
-              children: [
+            path: 'admin',
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+            children: [
                 {
-                  index: true,
-                  element: <DiscountDefault />
-                },
-                {
-                  path: 'addnew',
-                  element: <DiscountAddNew />
-                },
-                {
-                  path: 'display/:id',
-                  element: <DiscountDisplay />
-                },
-                {
-                  path: 'edit/:id',
-                  element: <DiscountEdit />
+                    path: 'sale',
+                    children: [
+                        {
+                            path: 'discount',
+                            children: [
+                                {
+                                    index: true,
+                                    element: <DiscountDefault />
+                                },
+                                {
+                                    path: 'addnew',
+                                    element: <DiscountAddNew />
+                                },
+                                {
+                                    path: 'display/:id',
+                                    element: <DiscountDisplay />
+                                },
+                                {
+                                    path: 'edit/:id',
+                                    element: <DiscountEdit />
+                                }
+                            ]
+                        }
+                    ]
                 }
-              ]
-            }
-          ]
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default DiscountRoute;

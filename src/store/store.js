@@ -5,24 +5,24 @@ import authReducer from '../features/auth/authSlice';
 
 // Persist config
 const persistConfig = {
-  key: 'root',
-  version: 1,
-  storage,
-  whitelist: ['auth'] // Only persist auth state
+    key: 'root',
+    version: 1,
+    storage,
+    whitelist: ['auth'] // Only persist auth state
 };
 
 const persistedReducer = persistReducer(persistConfig, authReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: persistedReducer
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
-      }
-    })
+    reducer: {
+        auth: persistedReducer
+    },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+            }
+        })
 });
 
 export const persistor = persistStore(store);

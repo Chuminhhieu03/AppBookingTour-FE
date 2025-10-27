@@ -11,7 +11,7 @@ import service from './Service';
 import blog from './Blog';
 
 const drawerItems = {
-  items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount, service, blog]
+    items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount, service, blog]
 };
 
 export default drawerItems;

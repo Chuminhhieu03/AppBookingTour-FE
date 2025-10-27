@@ -9,45 +9,45 @@ const AccommodationDisplay = Loadable(lazy(() => import('views/Accommodations/Di
 const AccommodationEdit = Loadable(lazy(() => import('views/Accommodations/Edit')));
 
 const AccommodationRoute = {
-  path: '/',
-  children: [
-    {
-      path: 'admin',
-      element: (
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      ),
-      children: [
+    path: '/',
+    children: [
         {
-          path: 'service',
-          children: [
-            {
-              path: 'accommodation',
-              children: [
+            path: 'admin',
+            element: (
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
+            ),
+            children: [
                 {
-                  index: true,
-                  element: <AccommodationDefault />
-                },
-                {
-                  path: 'addnew',
-                  element: <AccommodationAddNew />
-                },
-                {
-                  path: 'display/:id',
-                  element: <AccommodationDisplay />
-                },
-                {
-                  path: 'edit/:id',
-                  element: <AccommodationEdit />
+                    path: 'service',
+                    children: [
+                        {
+                            path: 'accommodation',
+                            children: [
+                                {
+                                    index: true,
+                                    element: <AccommodationDefault />
+                                },
+                                {
+                                    path: 'addnew',
+                                    element: <AccommodationAddNew />
+                                },
+                                {
+                                    path: 'display/:id',
+                                    element: <AccommodationDisplay />
+                                },
+                                {
+                                    path: 'edit/:id',
+                                    element: <AccommodationEdit />
+                                }
+                            ]
+                        }
+                    ]
                 }
-              ]
-            }
-          ]
+            ]
         }
-      ]
-    }
-  ]
+    ]
 };
 
 export default AccommodationRoute;
