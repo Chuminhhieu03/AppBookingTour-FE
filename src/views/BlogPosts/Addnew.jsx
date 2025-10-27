@@ -41,15 +41,20 @@ const BlogPostsAddnew = () => {
 
     const handleSubmit = async (values) => {
         setLoading(true);
+        const statusMap = {
+            Draft: 1,
+            Published: 2,
+            Archived: 3
+        };
+
         try {
             const data = {
                 title: values.title,
                 slug: values.slug,
                 content: content,
-                author: values.author,
                 city: values.city,
                 tags: values.tags,
-                status: values.status
+                status: statusMap[values.status]
             };
 
             const response = await blogAPI.create(data);
@@ -123,10 +128,6 @@ const BlogPostsAddnew = () => {
                                     ]}
                                 >
                                     <Input placeholder="vi-du-bai-viet-hay" />
-                                </Form.Item>
-
-                                <Form.Item name="author" label="Tác giả" rules={[{ required: true, message: 'Vui lòng nhập tên tác giả' }]}>
-                                    <Input placeholder="Nhập tên tác giả" />
                                 </Form.Item>
 
                                 <Form.Item label="Nội dung" required>
