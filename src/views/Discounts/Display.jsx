@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
 import Utility from '../../utils/Utility';
-import axiosIntance from '../../api/axiosInstance'
+import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
 
