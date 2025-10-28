@@ -8,6 +8,7 @@ import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
 import RoomTypeDisplay from './RoomTypes/Display';
+import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -24,13 +25,8 @@ export default function Display() {
     const setupDisplayForm = async () => {
         try {
             LoadingModal.showLoading();
-            const response = await fetch(`https://localhost:44331/api/Accommodation/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            const res = await response.json();
+            const response = await axiosIntance.get(`/Accommodation/${id}`);
+            const res = response.data;
             setAccommodation(res.accommodation ?? {});
         } catch (error) {
             console.error('Error fetching accommodation details:', error);

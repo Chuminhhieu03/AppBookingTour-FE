@@ -10,6 +10,7 @@ import Gallery from '../components/basic/Gallery';
 import AddNewRoomType from './RoomTypes/Addnew';
 import RoomTypeDisplay from './RoomTypes/Display';
 import RoomTypeEdit from './RoomTypes/Edit';
+import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -35,13 +36,8 @@ export default function Edit() {
     const setupEditForm = async () => {
         LoadingModal.showLoading();
         try {
-            const response = await fetch(`https://localhost:44331/api/Accommodation/setup-edit/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            const res = await response.json();
+            const response = await axiosIntance.post(`/Accommodation/setup-edit/${id}`, {});
+            const res = response.data;
             setListStatus(res.listStatus ?? []);
             setListType(res.listType ?? []);
             setListCity(res.listCity ?? []);
@@ -82,11 +78,12 @@ export default function Edit() {
             accommodationRequest.ListNewInfoImage?.forEach((file) => {
                 formData.append('ListNewInfoImage', file);
             });
-            const response = await fetch(`https://localhost:44331/api/Accommodation/${id}`, {
-                method: 'PUT',
-                body: formData
+            const response = await axiosIntance.put(`/Accommodation/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-            const res = await response.json();
+            const res = response.data;
             if (res.success) {
                 window.location.href = `/admin/service/accommodation/display/${id}`;
             } else {

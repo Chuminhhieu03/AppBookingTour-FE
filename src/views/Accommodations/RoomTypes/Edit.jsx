@@ -5,6 +5,7 @@ import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../../components/LoadingModal';
 import { set } from 'react-hook-form';
+import axiosIntance from '../../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -25,14 +26,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
     const setupEditForm = async () => {
         try {
-            const response = await fetch('https://localhost:44331/api/RoomType/setup-addnew', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            });
-            const res = await response.json();
+            const response = await axiosIntance.post('/RoomType/setup-addnew', {});
+            const res = response.data;
             setListStatus(res.listStatus || []);
             setListAmenity(res.listAmenity || []);
         } catch (error) {
@@ -56,20 +51,20 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             formData.append('Status', roomTypeData.status);
             formData.append('AccommodationId', accommodationId);
             formData.append('Amenities', amenities);
-            if (roomTypeData.coverImgFile) {
-                formData.append('CoverImgFile', roomTypeData.coverImgFile);
-            }
+            formData.append('CoverImageUrl', roomTypeData.coverImageUrl);
+            formData.append('CoverImgFile', roomTypeData.coverImgFile);
             roomTypeData.listInfoImage?.forEach((file) => {
                 formData.append('ListInfoImageId', file.id);
             });
             listInfoImage?.forEach((file) => {
                 formData.append('ListNewInfoImage', file);
             });
-            const response = await fetch(`https://localhost:44331/api/RoomType/${roomTypeData.id}`, {
-                method: 'PUT',
-                body: formData
+            const response = await axiosIntance.put(`/RoomType/${roomTypeData.id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-            const res = await response.json();
+            const res = response.data;
             if (res.success) {
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal

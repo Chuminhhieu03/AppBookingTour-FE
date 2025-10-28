@@ -8,6 +8,7 @@ import DiscountFilter from '../../DTO/Discounts/SearchDiscounts/SearchDiscountFi
 import Constants from '../../Constants/Constants';
 import Utility from '../../utils/Utility';
 import LoadingModal from '../../components/LoadingModal';
+import axiosIntance from '../../api/axiosInstance'
 
 export default function Default() {
     const [query, setQuery] = React.useState(new SearchDiscountQuery());
@@ -81,14 +82,8 @@ export default function Default() {
     }, [filter, query, isReset]);
 
     const setupDefault = async () => {
-        const response = await fetch('https://localhost:44331/api/Discount/setup-default', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        });
-        const res = await response.json();
+        const response = await axiosIntance.post('/Discount/setup-default', {});
+        const res = response.data;
         setListStatus(res.listStatus);
     };
 
@@ -99,14 +94,8 @@ export default function Default() {
             request.PageIndex = pageIndex;
             request.PageSize = Constants.DEFAULT_PAGE_SIZE;
             request.DiscountFilter = { ...filter };
-            const response = await fetch('https://localhost:44331/api/Discount/search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(request)
-            });
-            const res = await response.json();
+            const response = await axiosIntance.post('/Discount/search', request);
+            const res = response.data;
             setListDiscount(res.listDiscount);
             setIsReset(false);
         } catch (error) {

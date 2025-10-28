@@ -3,6 +3,7 @@ import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
+import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -16,39 +17,31 @@ export default function Addnew() {
     }, []);
 
     const setupAddnewForm = async () => {
-        const response = await fetch('https://localhost:44331/api/Discount/setup-addnew', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        });
-        const res = await response.json();
+        const response = await axiosIntance.post('/Discount/setup-addnew', {});
+        const res = response.data;
         setListStatus(res.listStatus);
         setListServiceType(res.listServiceType);
     };
 
     const onAddnewDiscount = async (discount) => {
         LoadingModal.showLoading();
-        const request = {};
-        request.Discount = { ...discount };
-        request.Discount.StartEffectedDtg = discount.StartEffectedDtg?.toDate().toISOString();
-        request.Discount.EndEffectedDtg = discount.EndEffectedDtg?.toDate().toISOString();
-        const response = await fetch('https://localhost:44331/api/Discount', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request)
-        });
-        const res = await response.json();
-        const discountRes = res.discount;
-        if (res.success) {
-            window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
-        } else {
-            const errorData = res.data || [];
-            const listErrorMessage = errorData?.map((e) => e.errorMessage);
-            alert(`Lỗi khi thêm mới mã giảm giá:\n${listErrorMessage.join('\n')}`);
+        try {
+            const request = {};
+            request.Discount = { ...discount };
+            request.Discount.StartEffectedDtg = discount.StartEffectedDtg?.toDate().toISOString();
+            request.Discount.EndEffectedDtg = discount.EndEffectedDtg?.toDate().toISOString();
+            const response = await axiosIntance.post('/Discount', request);
+            const res = response.data;
+            const discountRes = res.discount;
+            if (res.success) {
+                window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
+            } else {
+                const errorData = res.data || [];
+                const listErrorMessage = errorData?.map((e) => e.errorMessage);
+                alert(`Lỗi khi thêm mới mã giảm giá:\n${listErrorMessage.join('\n')}`);
+            }
+        } catch (error) {
+            console.error('Error adding new discount:', error);
         }
         LoadingModal.hideLoading();
     };

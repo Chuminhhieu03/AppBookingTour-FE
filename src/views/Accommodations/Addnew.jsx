@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
+import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -23,18 +24,16 @@ export default function Addnew() {
     }, []);
 
     const setupAddnewForm = async () => {
-        const response = await fetch('https://localhost:44331/api/Accommodation/setup-addnew', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        });
-        const res = await response.json();
-        setListStatus(res.listStatus);
-        setListType(res.listType);
-        setListCity(res.listCity);
-        setListAmenity(res.listAmenity);
+        try {
+            const response = await axiosIntance.post('/Accommodation/setup-addnew', {});
+            const res = response.data;
+            setListStatus(res.listStatus);
+            setListType(res.listType);
+            setListCity(res.listCity);
+            setListAmenity(res.listAmenity);
+        } catch (error) {
+            console.error('Error fetching setup addnew data:', error);
+        }
     };
 
     const onAddnewAccommodation = async (accommodation) => {
@@ -58,11 +57,12 @@ export default function Addnew() {
                 formData.append('InfoImgFile', file);
             });
 
-            const response = await fetch('https://localhost:44331/api/Accommodation', {
-                method: 'POST',
-                body: formData
+            const response = await axiosIntance.post('/Accommodation', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-            const res = await response.json();
+            const res = response.data;
             const accommodationRes = res.accommodation;
             window.location.href = `/admin/service/accommodation/display/${accommodationRes.id}`;
         } catch (error) {

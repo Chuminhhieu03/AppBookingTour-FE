@@ -4,6 +4,7 @@ import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../../components/LoadingModal';
+import axiosIntance from '../../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -18,16 +19,14 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
     }, []);
 
     const setupAddnewForm = async () => {
-        const response = await fetch('https://localhost:44331/api/RoomType/setup-addnew', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        });
-        const res = await response.json();
-        setListStatus(res.listStatus);
-        setListAmenity(res.listAmenity);
+        try {
+            const response = await axiosIntance.post('/RoomType/setup-addnew', {});
+            const res = response.data;
+            setListStatus(res.listStatus);
+            setListAmenity(res.listAmenity);
+        } catch (error) {
+            console.error('Error fetching setup addnew for room type:', error);
+        }
     };
 
     const onAddnewRoomType = async (roomType) => {
@@ -50,11 +49,12 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             listInfoImage?.forEach((file) => {
                 formData.append('InfoImgFile', file);
             });
-            const response = await fetch('https://localhost:44331/api/RoomType', {
-                method: 'POST',
-                body: formData
+            const response = await axiosIntance.post('/RoomType', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-            const res = await response.json();
+            const res = response.data;
             if (res.success) {
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal

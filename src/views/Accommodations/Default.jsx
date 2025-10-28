@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import Constants from '../../Constants/Constants';
 import LoadingModal from '../../components/LoadingModal';
+import axiosIntance from '../../api/axiosInstance';
 
 export default function Default() {
     const [query, setQuery] = React.useState({});
@@ -87,17 +88,15 @@ export default function Default() {
     }, [filter, query, isReset]);
 
     const setupDefault = async () => {
-        const response = await fetch('https://localhost:44331/api/Accommodation/setup-default', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        });
-        const res = await response.json();
-        setListStatus(res.listStatus);
-        setListType(res.listType);
-        setListCity(res.listCity);
+        try {
+            const response = await axiosIntance.post('/Accommodation/setup-default', {});
+            const res = response.data;
+            setListStatus(res.listStatus);
+            setListType(res.listType);
+            setListCity(res.listCity);
+        } catch (error) {
+            console.error('Error fetching setup default:', error);
+        }
     };
 
     const searchData = async (pageIndex = 0) => {
@@ -109,14 +108,8 @@ export default function Default() {
             if (request.searchAccommodationFilter.IsActive) {
                 request.searchAccommodationFilter.IsActive = Boolean(request.searchAccommodationFilter.IsActive);
             }
-            const response = await fetch('https://localhost:44331/api/Accommodation/search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(request)
-            });
-            const res = await response.json();
+            const response = await axiosIntance.post('/Accommodation/search', request);
+            const res = response.data;
             setListAccommodation(res.listAccommodation);
             setIsReset(false);
         } catch (error) {

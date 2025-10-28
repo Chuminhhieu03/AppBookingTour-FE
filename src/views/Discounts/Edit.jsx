@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
 import Utility from '../../utils/Utility';
+import axiosIntance from '../../api/axiosInstance'
 
 const { TextArea } = Input;
 
@@ -19,13 +20,8 @@ export default function Edit() {
     }, []);
 
     const setupEditForm = async () => {
-        const response = await fetch(`https://localhost:44331/api/Discount/setup-edit/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const res = await response.json();
+        const response = await axiosIntance.post(`/Discount/setup-edit/${id}`);
+        const res = response.data;
         setListStatus(res.listStatus);
         setListServiceType(res.listServiceType);
         const discountRes = res.discount ?? {};
@@ -39,14 +35,8 @@ export default function Edit() {
         const request = { ...discount };
         request.startEffectedDtg = discount.startEffectedDtg?.toDate().toISOString();
         request.endEffectedDtg = discount.endEffectedDtg?.toDate().toISOString();
-        const response = await fetch(`https://localhost:44331/api/Discount/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request)
-        });
-        const res = await response.json();
+        const response = await axiosIntance.put(`/Discount/${id}`, request);
+        const res = response.data;
         const discountRes = res.discount ?? {};
         if (res.success) {
             window.location.href = `/admin/sale/discount/display/${discountRes.id}`;

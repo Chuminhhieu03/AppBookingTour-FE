@@ -4,6 +4,7 @@ import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../../components/LoadingModal';
+import axiosIntance from '../../../api/axiosInstance';
 
 const { TextArea } = Input;
 
@@ -17,8 +18,8 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
 
     const setupDisplayForm = async () => {
         try {
-            const response = await fetch(`https://localhost:44331/api/RoomType/${roomType.id}`);
-            const res = await response.json();
+            const response = await axiosIntance.get(`/RoomType/${roomType.id}`);
+            const res = response.data;
             setRoomTypeDisplay(res.roomType || {});
         } catch (error) {
             console.error('Error fetching setup data:', error);
