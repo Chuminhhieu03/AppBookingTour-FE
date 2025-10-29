@@ -1,7 +1,7 @@
-import { Table, Button, Space, Card, Tag, message } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Card, Tag, message, Modal } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
 
@@ -31,25 +31,31 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
         }
     };
 
-    const handleDelete = async (departureId) => {
-        try {
-            const confirmed = window.confirm('Bạn có chắc chắn muốn xóa lịch khởi hành này?');
-            if (!confirmed) return;
-
-            LoadingModal.showLoading();
-            const response = await tourDepartureAPI.delete(departureId);
-            if (response.success) {
-                message.success('Xóa lịch khởi hành thành công!');
-                fetchDepartures(); // Refresh the list
-            } else {
-                message.error('Xóa lịch khởi hành thất bại!');
+    const handleDelete = (departureId) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa lịch khởi hành này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    LoadingModal.showLoading();
+                    const response = await tourDepartureAPI.delete(departureId);
+                    if (response.success) {
+                        message.success('Xóa lịch khởi hành thành công!');
+                        fetchDepartures(); // Refresh the list
+                    } else {
+                        message.error('Xóa lịch khởi hành thất bại!');
+                    }
+                } catch (error) {
+                    console.error('Error deleting departure:', error);
+                    message.error('Đã xảy ra lỗi khi xóa lịch khởi hành.');
+                } finally {
+                    LoadingModal.hideLoading();
+                }
             }
-        } catch (error) {
-            console.error('Error deleting departure:', error);
-            message.error('Đã xảy ra lỗi khi xóa lịch khởi hành.');
-        } finally {
-            LoadingModal.hideLoading();
-        }
+        });
     };
 
     const handleEdit = (record) => {
@@ -73,13 +79,7 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
             dataIndex: 'departureDate',
             key: 'departureDate',
             onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (date, record) => (
-                <div style={{ textAlign: 'center' }}>
-                    <Link to={`/admin/service/tour/${tourId}/departure/display/${record.id}`}>
-                        {new Date(date).toLocaleDateString('vi-VN')}
-                    </Link>
-                </div>
-            )
+            render: (date) => <div style={{ textAlign: 'center' }}>{new Date(date).toLocaleDateString('vi-VN')}</div>
         },
         {
             title: 'Ngày kết thúc',
@@ -117,22 +117,32 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
         }
     ];
 
-    // Add action column only in edit mode
-    if (isEditMode) {
-        columns.push({
-            title: 'Chức năng',
-            key: 'actions',
-            align: 'center',
-            width: 120,
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (_, record) => (
-                <Space>
-                    <Button type="link" icon={<EditOutlined />} onClick={() => handleEdit(record)} title="Chỉnh sửa" />
-                    <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger title="Xóa" />
-                </Space>
-            )
-        });
-    }
+    // Always add action column - show different buttons based on mode
+    columns.push({
+        title: 'Hành động',
+        key: 'action',
+        width: 150,
+        align: 'center',
+        fixed: 'right',
+        onHeaderCell: () => ({ style: { textAlign: 'center' } }),
+        render: (_, record) => (
+            <Space size="small">
+                <Button
+                    type="primary"
+                    ghost
+                    size="small"
+                    icon={<EyeOutlined />}
+                    onClick={() => navigate(`/admin/service/tour/${tourId}/departure/display/${record.id}`)}
+                />
+                {isEditMode && (
+                    <>
+                        <Button type="default" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                        <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+                    </>
+                )}
+            </Space>
+        )
+    });
 
     return (
         <Card
@@ -154,7 +164,7 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
                 pagination={false}
                 size="small"
                 bordered
-                scroll={{ x: isEditMode ? 900 : 800 }}
+                scroll={{ x: 900 }}
                 locale={{
                     emptyText: 'Chưa có lịch khởi hành nào'
                 }}

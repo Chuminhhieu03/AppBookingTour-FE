@@ -1,30 +1,32 @@
-import { Form, Input, Button, Select, Row, Col, message, Space, Upload } from 'antd';
-import { CloseOutlined, CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { Input, Button, Select, Row, Col, message, Space, Form } from 'antd';
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import ImagesUC from '../../components/basic/ImagesUC';
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 export default function TourTypeAddnew() {
-    const [form] = Form.useForm();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm();
     const [imageFile, setImageFile] = useState(null);
 
-    const handleSubmit = async (values) => {
-        try {
-            setLoading(true);
-            LoadingModal.showLoading();
+    const onFinish = async (values) => {
+        LoadingModal.showLoading();
 
+        try {
             const formData = new FormData();
-            formData.append('name', values.name);
-            if (values.description) formData.append('description', values.description);
-            formData.append('isActive', values.isActive || true);
-            if (imageFile) formData.append('imageFile', imageFile);
+            formData.append('Name', values.name);
+            formData.append('Description', values.description || '');
+            formData.append('PriceLevel', values.priceLevel || '');
+            formData.append('IsActive', values.isActive !== undefined ? values.isActive : true);
+
+            if (imageFile) {
+                formData.append('Image', imageFile);
+            }
 
             const response = await tourTypeAPI.create(formData);
 
@@ -35,21 +37,15 @@ export default function TourTypeAddnew() {
                 message.error(response.message || 'Không thể thêm loại tour!');
             }
         } catch (error) {
-            console.error('Error creating tour type:', error);
+            console.error('Error adding new tour type:', error);
             message.error('Đã xảy ra lỗi khi thêm loại tour.');
         } finally {
-            setLoading(false);
             LoadingModal.hideLoading();
         }
     };
 
-    const handleCancel = () => {
-        navigate('/admin/service/tour-type');
-    };
-
-    const handleImageUpload = (file) => {
+    const handleImageChange = (imgUrl, file) => {
         setImageFile(file);
-        return false; // Prevent automatic upload
     };
 
     return (
@@ -59,61 +55,73 @@ export default function TourTypeAddnew() {
                     title="Thêm loại tour mới"
                     secondary={
                         <Space>
-                            <Button type="primary" onClick={() => form.submit()} loading={loading} shape="round" icon={<CheckOutlined />}>
+                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={() => form.submit()}>
                                 Lưu
                             </Button>
-                            <Button onClick={handleCancel} shape="round" icon={<CloseOutlined />}>
+                            <Button type="primary" href="/admin/service/tour-type" shape="round" icon={<CloseOutlined />}>
                                 Thoát
                             </Button>
                         </Space>
                     }
                 >
-                    <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off" requiredMark={false}>
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={onFinish}
+                        initialValues={{
+                            isActive: true
+                        }}
+                    >
                         <Row gutter={[24, 24]}>
-                            <Col span={12}>
+                            <Col span={24} style={{ textAlign: 'center' }}>
+                                <div className="mb-3 d-flex justify-content-center">
+                                    <ImagesUC onChange={handleImageChange} />
+                                </div>
+                                <span>Hình ảnh loại tour</span>
+                            </Col>
+
+                            <Col span={8}>
                                 <Form.Item
-                                    label="Tên loại tour"
                                     name="name"
+                                    label="Tên loại tour"
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Vui lòng nhập tên loại tour!'
-                                        },
-                                        {
-                                            max: 200,
-                                            message: 'Tên loại tour không được vượt quá 200 ký tự!'
+                                            message: 'Tên loại tour không được để trống!'
                                         }
                                     ]}
                                 >
                                     <Input placeholder="Nhập tên loại tour" />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Trạng thái" name="isActive" initialValue={true}>
-                                    <Select>
-                                        <Option value={true}>Hoạt động</Option>
-                                        <Option value={false}>Ngừng hoạt động</Option>
-                                    </Select>
+
+                            <Col span={8}>
+                                <Form.Item name="priceLevel" label="Loại mức giá">
+                                    <Select
+                                        allowClear
+                                        placeholder="Chọn loại mức giá (tùy chọn)"
+                                        options={[
+                                            { label: 'Tiết kiệm', value: 1 },
+                                            { label: 'Tiêu chuẩn', value: 2 },
+                                            { label: 'Cao cấp', value: 3 }
+                                        ]}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={24}>
-                                <Form.Item label="Hình ảnh">
-                                    <Upload beforeUpload={handleImageUpload} showUploadList={true} maxCount={1} accept="image/*">
-                                        <Button icon={<UploadOutlined />}>Chọn hình ảnh</Button>
-                                    </Upload>
+
+                            <Col span={8}>
+                                <Form.Item name="isActive" label="Trạng thái">
+                                    <Select
+                                        options={[
+                                            { label: 'Hoạt động', value: true },
+                                            { label: 'Ngừng hoạt động', value: false }
+                                        ]}
+                                    />
                                 </Form.Item>
                             </Col>
+
                             <Col span={24}>
-                                <Form.Item
-                                    label="Mô tả"
-                                    name="description"
-                                    rules={[
-                                        {
-                                            max: 1000,
-                                            message: 'Mô tả không được vượt quá 1000 ký tự!'
-                                        }
-                                    ]}
-                                >
+                                <Form.Item name="description" label="Mô tả">
                                     <TextArea rows={4} placeholder="Nhập mô tả cho loại tour (không bắt buộc)" />
                                 </Form.Item>
                             </Col>

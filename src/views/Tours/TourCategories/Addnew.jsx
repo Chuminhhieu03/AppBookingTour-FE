@@ -1,18 +1,17 @@
-import { Form, Input, Button, Select, Row, Col, message, Space, Upload } from 'antd';
-import { CloseOutlined, CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { Input, Button, Select, Row, Col, message, Space, Form } from 'antd';
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourCategoryAPI from '../../../api/tour/tourCategoryAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import ImagesUC from '../../components/basic/ImagesUC';
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 export default function TourCategoryAddnew() {
-    const [form] = Form.useForm();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm();
     const [parentCategories, setParentCategories] = useState([]);
     const [imageFile, setImageFile] = useState(null);
 
@@ -24,7 +23,6 @@ export default function TourCategoryAddnew() {
         try {
             const response = await tourCategoryAPI.getList();
             if (response.success) {
-                // Filter to get only parent categories (no parentCategoryId)
                 const parents = (response.data || []).filter((cat) => !cat.parentCategoryId);
                 setParentCategories(parents);
             }
@@ -33,17 +31,20 @@ export default function TourCategoryAddnew() {
         }
     };
 
-    const handleSubmit = async (values) => {
-        try {
-            setLoading(true);
-            LoadingModal.showLoading();
+    const onFinish = async (values) => {
+        LoadingModal.showLoading();
 
+        try {
             const formData = new FormData();
-            formData.append('name', values.name);
-            if (values.description) formData.append('description', values.description);
-            if (values.parentCategoryId) formData.append('parentCategoryId', values.parentCategoryId);
-            formData.append('isActive', values.isActive || true);
-            if (imageFile) formData.append('imageFile', imageFile);
+            formData.append('Name', values.name);
+            formData.append('Description', values.description || '');
+            if (values.parentCategoryId) {
+                formData.append('ParentCategoryId', values.parentCategoryId);
+            }
+            formData.append('IsActive', values.isActive !== undefined ? values.isActive : true);
+            if (imageFile) {
+                formData.append('Image', imageFile);
+            }
 
             const response = await tourCategoryAPI.create(formData);
 
@@ -54,21 +55,15 @@ export default function TourCategoryAddnew() {
                 message.error(response.message || 'Không thể thêm danh mục tour!');
             }
         } catch (error) {
-            console.error('Error creating category:', error);
+            console.error('Error adding new tour category:', error);
             message.error('Đã xảy ra lỗi khi thêm danh mục tour.');
         } finally {
-            setLoading(false);
             LoadingModal.hideLoading();
         }
     };
 
-    const handleCancel = () => {
-        navigate('/admin/service/tour-category');
-    };
-
-    const handleImageUpload = (file) => {
+    const handleImageChange = (imgUrl, file) => {
         setImageFile(file);
-        return false; // Prevent automatic upload
     };
 
     return (
@@ -78,72 +73,72 @@ export default function TourCategoryAddnew() {
                     title="Thêm danh mục tour mới"
                     secondary={
                         <Space>
-                            <Button type="primary" onClick={() => form.submit()} loading={loading} shape="round" icon={<CheckOutlined />}>
+                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={() => form.submit()}>
                                 Lưu
                             </Button>
-                            <Button onClick={handleCancel} shape="round" icon={<CloseOutlined />}>
+                            <Button type="primary" href="/admin/service/tour-category" shape="round" icon={<CloseOutlined />}>
                                 Thoát
                             </Button>
                         </Space>
                     }
                 >
-                    <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off" requiredMark={false}>
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        onFinish={onFinish}
+                        initialValues={{
+                            isActive: true
+                        }}
+                    >
                         <Row gutter={[24, 24]}>
-                            <Col span={12}>
+                            <Col span={24} style={{ textAlign: 'center' }}>
+                                <div className="mb-3 d-flex justify-content-center">
+                                    <ImagesUC onChange={handleImageChange} />
+                                </div>
+                                <span>Hình ảnh danh mục</span>
+                            </Col>
+
+                            <Col span={8}>
                                 <Form.Item
-                                    label="Tên danh mục"
                                     name="name"
+                                    label="Tên danh mục"
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Vui lòng nhập tên danh mục!'
-                                        },
-                                        {
-                                            max: 200,
-                                            message: 'Tên danh mục không được vượt quá 200 ký tự!'
+                                            message: 'Tên danh mục không được để trống!'
                                         }
                                     ]}
                                 >
                                     <Input placeholder="Nhập tên danh mục" />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Danh mục cha" name="parentCategoryId">
-                                    <Select placeholder="Chọn danh mục cha (tùy chọn)" allowClear>
-                                        {parentCategories.map((category) => (
-                                            <Option key={category.id} value={category.id}>
-                                                {category.name}
-                                            </Option>
-                                        ))}
-                                    </Select>
+
+                            <Col span={8}>
+                                <Form.Item name="parentCategoryId" label="Danh mục cha">
+                                    <Select
+                                        allowClear
+                                        placeholder="Chọn danh mục cha (tùy chọn)"
+                                        options={parentCategories?.map((item) => ({
+                                            label: item.name,
+                                            value: item.id
+                                        }))}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Trạng thái" name="isActive" initialValue={true}>
-                                    <Select>
-                                        <Option value={true}>Hoạt động</Option>
-                                        <Option value={false}>Ngừng hoạt động</Option>
-                                    </Select>
+
+                            <Col span={8}>
+                                <Form.Item name="isActive" label="Trạng thái">
+                                    <Select
+                                        options={[
+                                            { label: 'Hoạt động', value: true },
+                                            { label: 'Ngừng hoạt động', value: false }
+                                        ]}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Hình ảnh">
-                                    <Upload beforeUpload={handleImageUpload} showUploadList={true} maxCount={1} accept="image/*">
-                                        <Button icon={<UploadOutlined />}>Chọn hình ảnh</Button>
-                                    </Upload>
-                                </Form.Item>
-                            </Col>
+
                             <Col span={24}>
-                                <Form.Item
-                                    label="Mô tả"
-                                    name="description"
-                                    rules={[
-                                        {
-                                            max: 1000,
-                                            message: 'Mô tả không được vượt quá 1000 ký tự!'
-                                        }
-                                    ]}
-                                >
+                                <Form.Item name="description" label="Mô tả">
                                     <TextArea rows={4} placeholder="Nhập mô tả cho danh mục (không bắt buộc)" />
                                 </Form.Item>
                             </Col>

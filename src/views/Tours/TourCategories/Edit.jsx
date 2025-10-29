@@ -1,79 +1,81 @@
-import { Form, Input, Button, Select, Row, Col, message, Space, Upload } from 'antd';
-import { CloseOutlined, CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { Input, Button, Select, Row, Col, message, Space, Form } from 'antd';
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourCategoryAPI from '../../../api/tour/tourCategoryAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import ImagesUC from '../../components/basic/ImagesUC';
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 export default function TourCategoryEdit() {
-    const [form] = Form.useForm();
     const navigate = useNavigate();
     const { id } = useParams();
-    const [category, setCategory] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm();
     const [parentCategories, setParentCategories] = useState([]);
     const [imageFile, setImageFile] = useState(null);
+    const [initialImageUrl, setInitialImageUrl] = useState('');
 
     useEffect(() => {
+        const fetchTourCategory = async () => {
+            try {
+                LoadingModal.showLoading();
+                const response = await tourCategoryAPI.getById(id);
+                if (response.success) {
+                    const data = response.data;
+                    setInitialImageUrl(data.imageUrl);
+                    form.setFieldsValue({
+                        name: data.name,
+                        description: data.description,
+                        parentCategoryId: data.parentCategoryId,
+                        isActive: data.isActive
+                    });
+                } else {
+                    message.error('Không tìm thấy danh mục tour!');
+                    navigate('/admin/service/tour-category');
+                }
+            } catch (error) {
+                console.error('Error fetching category:', error);
+                message.error('Đã xảy ra lỗi khi tải danh mục tour.');
+            } finally {
+                LoadingModal.hideLoading();
+            }
+        };
+
+        const fetchParentCategories = async () => {
+            try {
+                const response = await tourCategoryAPI.getList();
+                if (response.success) {
+                    // Filter to get only parent categories (no parentCategoryId) and exclude current category
+                    const parents = (response.data || []).filter((cat) => !cat.parentCategoryId && cat.id !== parseInt(id));
+                    setParentCategories(parents);
+                }
+            } catch (error) {
+                console.error('Error fetching parent categories:', error);
+            }
+        };
+
         if (id) {
-            fetchCategory();
+            fetchTourCategory();
             fetchParentCategories();
         }
-    }, [id]);
+    }, [id, navigate, form]);
 
-    const fetchCategory = async () => {
+    const onFinish = async (values) => {
+        LoadingModal.showLoading();
+
         try {
-            LoadingModal.showLoading();
-            const response = await tourCategoryAPI.getById(id);
-            if (response.success) {
-                const data = response.data;
-                setCategory(data);
-                form.setFieldsValue({
-                    name: data.name,
-                    description: data.description,
-                    parentCategoryId: data.parentCategoryId,
-                    isActive: data.isActive
-                });
-            } else {
-                message.error('Không tìm thấy danh mục tour!');
-                navigate('/admin/service/tour-category');
-            }
-        } catch (error) {
-            console.error('Error fetching category:', error);
-            message.error('Đã xảy ra lỗi khi tải danh mục tour.');
-        } finally {
-            LoadingModal.hideLoading();
-        }
-    };
-
-    const fetchParentCategories = async () => {
-        try {
-            const response = await tourCategoryAPI.getList();
-            if (response.success) {
-                // Filter to get only parent categories (no parentCategoryId) and exclude current category
-                const parents = (response.data || []).filter((cat) => !cat.parentCategoryId && cat.id !== parseInt(id));
-                setParentCategories(parents);
-            }
-        } catch (error) {
-            console.error('Error fetching parent categories:', error);
-        }
-    };
-
-    const handleSubmit = async (values) => {
-        try {
-            setLoading(true);
-            LoadingModal.showLoading();
-
             const formData = new FormData();
-            formData.append('name', values.name);
-            if (values.description) formData.append('description', values.description);
-            if (values.parentCategoryId) formData.append('parentCategoryId', values.parentCategoryId);
-            formData.append('isActive', values.isActive);
-            if (imageFile) formData.append('imageFile', imageFile);
+            formData.append('Name', values.name);
+            formData.append('Description', values.description || '');
+            if (values.parentCategoryId) {
+                formData.append('ParentCategoryId', values.parentCategoryId);
+            }
+            formData.append('IsActive', values.isActive !== undefined ? values.isActive : true);
+            if (imageFile) {
+                formData.append('Image', imageFile);
+            }
 
             const response = await tourCategoryAPI.update(id, formData);
 
@@ -84,21 +86,15 @@ export default function TourCategoryEdit() {
                 message.error(response.message || 'Không thể cập nhật danh mục tour!');
             }
         } catch (error) {
-            console.error('Error updating category:', error);
+            console.error('Error updating tour category:', error);
             message.error('Đã xảy ra lỗi khi cập nhật danh mục tour.');
         } finally {
-            setLoading(false);
             LoadingModal.hideLoading();
         }
     };
 
-    const handleCancel = () => {
-        navigate('/admin/service/tour-category');
-    };
-
-    const handleImageUpload = (file) => {
+    const handleImageChange = (imgUrl, file) => {
         setImageFile(file);
-        return false; // Prevent automatic upload
     };
 
     return (
@@ -108,91 +104,65 @@ export default function TourCategoryEdit() {
                     title="Chỉnh sửa danh mục tour"
                     secondary={
                         <Space>
-                            <Button type="primary" onClick={() => form.submit()} loading={loading} shape="round" icon={<CheckOutlined />}>
+                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={() => form.submit()}>
                                 Lưu
                             </Button>
-                            <Button onClick={handleCancel} shape="round" icon={<CloseOutlined />}>
+                            <Button type="primary" href="/admin/service/tour-category" shape="round" icon={<CloseOutlined />}>
                                 Thoát
                             </Button>
                         </Space>
                     }
                 >
-                    <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off" requiredMark={false}>
+                    <Form form={form} layout="vertical" onFinish={onFinish}>
                         <Row gutter={[24, 24]}>
-                            <Col span={12}>
+                            <Col span={24} style={{ textAlign: 'center' }}>
+                                <div className="mb-3 d-flex justify-content-center">
+                                    <ImagesUC imageUrl={initialImageUrl} onChange={handleImageChange} />
+                                </div>
+                                <span>Hình ảnh danh mục</span>
+                            </Col>
+
+                            <Col span={8}>
                                 <Form.Item
-                                    label="Tên danh mục"
                                     name="name"
+                                    label="Tên danh mục"
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Vui lòng nhập tên danh mục!'
-                                        },
-                                        {
-                                            max: 200,
-                                            message: 'Tên danh mục không được vượt quá 200 ký tự!'
+                                            message: 'Tên danh mục không được để trống!'
                                         }
                                     ]}
                                 >
                                     <Input placeholder="Nhập tên danh mục" />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Danh mục cha" name="parentCategoryId">
-                                    <Select placeholder="Chọn danh mục cha (tùy chọn)" allowClear>
-                                        {parentCategories.map((category) => (
-                                            <Option key={category.id} value={category.id}>
-                                                {category.name}
-                                            </Option>
-                                        ))}
-                                    </Select>
+
+                            <Col span={8}>
+                                <Form.Item name="parentCategoryId" label="Danh mục cha">
+                                    <Select
+                                        allowClear
+                                        placeholder="Chọn danh mục cha (tùy chọn)"
+                                        options={parentCategories?.map((item) => ({
+                                            label: item.name,
+                                            value: item.id
+                                        }))}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Trạng thái"
-                                    name="isActive"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn trạng thái!'
-                                        }
-                                    ]}
-                                >
-                                    <Select>
-                                        <Option value={true}>Hoạt động</Option>
-                                        <Option value={false}>Ngừng hoạt động</Option>
-                                    </Select>
+
+                            <Col span={8}>
+                                <Form.Item name="isActive" label="Trạng thái">
+                                    <Select
+                                        options={[
+                                            { label: 'Hoạt động', value: true },
+                                            { label: 'Ngừng hoạt động', value: false }
+                                        ]}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Hình ảnh">
-                                    {category.imageUrl && (
-                                        <div style={{ marginBottom: 8 }}>
-                                            <img
-                                                src={category.imageUrl}
-                                                alt="Current"
-                                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 4 }}
-                                            />
-                                            <p style={{ margin: 0, fontSize: 12, color: '#666' }}>Hình ảnh hiện tại</p>
-                                        </div>
-                                    )}
-                                    <Upload beforeUpload={handleImageUpload} showUploadList={true} maxCount={1} accept="image/*">
-                                        <Button icon={<UploadOutlined />}>Chọn hình ảnh mới</Button>
-                                    </Upload>
-                                </Form.Item>
-                            </Col>
+
                             <Col span={24}>
-                                <Form.Item
-                                    label="Mô tả"
-                                    name="description"
-                                    rules={[
-                                        {
-                                            max: 1000,
-                                            message: 'Mô tả không được vượt quá 1000 ký tự!'
-                                        }
-                                    ]}
-                                >
+                                <Form.Item name="description" label="Mô tả">
                                     <TextArea rows={4} placeholder="Nhập mô tả cho danh mục (không bắt buộc)" />
                                 </Form.Item>
                             </Col>

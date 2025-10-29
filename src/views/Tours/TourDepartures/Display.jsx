@@ -61,9 +61,9 @@ export default function TourDepartureDisplay() {
                         </Space>
                     }
                 >
-                    {/* Hàng 1: Ngày khởi hành | Ngày kết thúc | Trạng thái */}
+                    {/* Hàng 1: Thông tin ngày giờ khởi hành và kết thúc */}
                     <Row gutter={[24, 24]}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <span>Ngày khởi hành</span>
                             <DatePicker
                                 value={departure.departureDate ? dayjs(departure.departureDate) : null}
@@ -72,7 +72,15 @@ export default function TourDepartureDisplay() {
                                 format="DD/MM/YYYY"
                             />
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <span>Giờ khởi hành</span>
+                            <Input
+                                value={departure.departureDate ? dayjs(departure.departureDate).format('HH:mm') : ''}
+                                disabled
+                                style={{ width: '100%' }}
+                            />
+                        </Col>
+                        <Col span={6}>
                             <span>Ngày kết thúc</span>
                             <DatePicker
                                 value={departure.returnDate ? dayjs(departure.returnDate) : null}
@@ -81,13 +89,13 @@ export default function TourDepartureDisplay() {
                                 format="DD/MM/YYYY"
                             />
                         </Col>
-                        <Col span={8}>
-                            <span>Trạng thái</span>
-                            <Select value={departure.status} disabled style={{ width: '100%' }}>
-                                <Option value={1}>Có sẵn</Option>
-                                <Option value={2}>Hết chỗ</Option>
-                                <Option value={3}>Đã hủy</Option>
-                            </Select>
+                        <Col span={6}>
+                            <span>Giờ trở về</span>
+                            <Input
+                                value={departure.returnDate ? dayjs(departure.returnDate).format('HH:mm') : ''}
+                                disabled
+                                style={{ width: '100%' }}
+                            />
                         </Col>
                     </Row>
 
@@ -115,13 +123,21 @@ export default function TourDepartureDisplay() {
                         </Col>
                     </Row>
 
-                    {/* Hàng 3: Số chỗ còn trống | Hướng dẫn viên */}
+                    {/* Hàng 3: Số chỗ còn trống | Trạng thái | Hướng dẫn viên */}
                     <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                        <Col span={12}>
+                        <Col span={8}>
                             <span>Số chỗ còn trống</span>
                             <InputNumber value={departure.availableSlots} readOnly style={{ width: '100%' }} />
                         </Col>
-                        <Col span={12}>
+                        <Col span={8}>
+                            <span>Trạng thái</span>
+                            <Select value={departure.status} disabled style={{ width: '100%' }}>
+                                <Option value={1}>Có sẵn</Option>
+                                <Option value={2}>Hết chỗ</Option>
+                                <Option value={3}>Đã hủy</Option>
+                            </Select>
+                        </Col>
+                        <Col span={8}>
                             <span>Hướng dẫn viên phụ trách</span>
                             <Select value={departure.guideId} disabled style={{ width: '100%' }}>
                                 <Option value="guide-1">Nguyễn Văn A</Option>

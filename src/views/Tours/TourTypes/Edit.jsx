@@ -1,62 +1,71 @@
-import { Form, Input, Button, Select, Row, Col, message, Space, Upload } from 'antd';
-import { CloseOutlined, CheckOutlined, UploadOutlined } from '@ant-design/icons';
+import { Input, Button, Select, Row, Col, message, Space, Form } from 'antd';
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import ImagesUC from '../../components/basic/ImagesUC';
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 export default function TourTypeEdit() {
-    const [form] = Form.useForm();
     const navigate = useNavigate();
     const { id } = useParams();
-    const [tourType, setTourType] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [form] = Form.useForm();
     const [imageFile, setImageFile] = useState(null);
+    const [initialImageUrl, setInitialImageUrl] = useState('');
 
     useEffect(() => {
+        const fetchTourType = async () => {
+            try {
+                LoadingModal.showLoading();
+                const response = await tourTypeAPI.getById(id);
+                if (response.success) {
+                    const data = response.data;
+                    setTourType({
+                        Name: data.name,
+                        Description: data.description,
+                        PriceLevel: data.priceLevel,
+                        ImageUrl: data.imageUrl,
+                        Image: null,
+                        IsActive: data.isActive
+                    });
+                } else {
+                    message.error('Không tìm thấy loại tour!');
+                    navigate('/admin/service/tour-type');
+                }
+            } catch (error) {
+                console.error('Error fetching tour type:', error);
+                message.error('Đã xảy ra lỗi khi tải loại tour.');
+            } finally {
+                LoadingModal.hideLoading();
+            }
+        };
+
         if (id) {
             fetchTourType();
         }
-    }, [id]);
+    }, [id, navigate]);
 
-    const fetchTourType = async () => {
-        try {
-            LoadingModal.showLoading();
-            const response = await tourTypeAPI.getById(id);
-            if (response.success) {
-                const data = response.data;
-                setTourType(data);
-                form.setFieldsValue({
-                    name: data.name,
-                    description: data.description,
-                    isActive: data.isActive
-                });
-            } else {
-                message.error('Không tìm thấy loại tour!');
-                navigate('/admin/service/tour-type');
-            }
-        } catch (error) {
-            console.error('Error fetching tour type:', error);
-            message.error('Đã xảy ra lỗi khi tải loại tour.');
-        } finally {
-            LoadingModal.hideLoading();
+    const onUpdateTourType = async (tourType) => {
+        if (!tourType.Name?.trim()) {
+            message.warning('Tên loại tour không được để trống!');
+            return;
         }
-    };
 
-    const handleSubmit = async (values) => {
+        LoadingModal.showLoading();
+
         try {
-            setLoading(true);
-            LoadingModal.showLoading();
-
             const formData = new FormData();
-            formData.append('name', values.name);
-            if (values.description) formData.append('description', values.description);
-            formData.append('isActive', values.isActive);
-            if (imageFile) formData.append('imageFile', imageFile);
+            formData.append('Name', tourType.Name);
+            formData.append('Description', tourType.Description || '');
+            formData.append('PriceLevel', tourType.PriceLevel || '');
+            formData.append('IsActive', tourType.IsActive);
+
+            if (tourType.Image) {
+                formData.append('Image', tourType.Image);
+            }
 
             const response = await tourTypeAPI.update(id, formData);
 
@@ -70,18 +79,8 @@ export default function TourTypeEdit() {
             console.error('Error updating tour type:', error);
             message.error('Đã xảy ra lỗi khi cập nhật loại tour.');
         } finally {
-            setLoading(false);
             LoadingModal.hideLoading();
         }
-    };
-
-    const handleCancel = () => {
-        navigate('/admin/service/tour-type');
-    };
-
-    const handleImageUpload = (file) => {
-        setImageFile(file);
-        return false; // Prevent automatic upload
     };
 
     return (
@@ -91,85 +90,71 @@ export default function TourTypeEdit() {
                     title="Chỉnh sửa loại tour"
                     secondary={
                         <Space>
-                            <Button type="primary" onClick={() => form.submit()} loading={loading} shape="round" icon={<CheckOutlined />}>
+                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={() => onUpdateTourType(tourType)}>
                                 Lưu
                             </Button>
-                            <Button onClick={handleCancel} shape="round" icon={<CloseOutlined />}>
+                            <Button type="primary" href="/admin/service/tour-type" shape="round" icon={<CloseOutlined />}>
                                 Thoát
                             </Button>
                         </Space>
                     }
                 >
-                    <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off" requiredMark={false}>
-                        <Row gutter={[24, 24]}>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Tên loại tour"
-                                    name="name"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập tên loại tour!'
-                                        },
-                                        {
-                                            max: 200,
-                                            message: 'Tên loại tour không được vượt quá 200 ký tự!'
-                                        }
-                                    ]}
-                                >
-                                    <Input placeholder="Nhập tên loại tour" />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item
-                                    label="Trạng thái"
-                                    name="isActive"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn trạng thái!'
-                                        }
-                                    ]}
-                                >
-                                    <Select>
-                                        <Option value={true}>Hoạt động</Option>
-                                        <Option value={false}>Ngừng hoạt động</Option>
-                                    </Select>
-                                </Form.Item>
-                            </Col>
-                            <Col span={24}>
-                                <Form.Item label="Hình ảnh">
-                                    {tourType.imageUrl && (
-                                        <div style={{ marginBottom: 8 }}>
-                                            <img
-                                                src={tourType.imageUrl}
-                                                alt="Current"
-                                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 4 }}
-                                            />
-                                            <p style={{ margin: 0, fontSize: 12, color: '#666' }}>Hình ảnh hiện tại</p>
-                                        </div>
-                                    )}
-                                    <Upload beforeUpload={handleImageUpload} showUploadList={true} maxCount={1} accept="image/*">
-                                        <Button icon={<UploadOutlined />}>Chọn hình ảnh mới</Button>
-                                    </Upload>
-                                </Form.Item>
-                            </Col>
-                            <Col span={24}>
-                                <Form.Item
-                                    label="Mô tả"
-                                    name="description"
-                                    rules={[
-                                        {
-                                            max: 1000,
-                                            message: 'Mô tả không được vượt quá 1000 ký tự!'
-                                        }
-                                    ]}
-                                >
-                                    <TextArea rows={4} placeholder="Nhập mô tả cho loại tour (không bắt buộc)" />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Form>
+                    <Row gutter={[24, 24]}>
+                        <Col span={24} style={{ textAlign: 'center' }}>
+                            <div className="mb-3 d-flex justify-content-center">
+                                <ImagesUC imageUrl={tourType.ImageUrl} onChange={(_, file) => setTourType({ ...tourType, Image: file })} />
+                            </div>
+                            <span>Hình ảnh loại tour</span>
+                        </Col>
+
+                        <Col span={8}>
+                            <span>Tên loại tour</span>
+                            <Input
+                                value={tourType.Name}
+                                onChange={(e) => setTourType({ ...tourType, Name: e.target.value })}
+                                placeholder="Nhập tên loại tour"
+                            />
+                        </Col>
+
+                        <Col span={8}>
+                            <span>Loại mức giá</span>
+                            <Select
+                                value={tourType.PriceLevel}
+                                allowClear
+                                className="w-100"
+                                placeholder="Chọn loại mức giá (tùy chọn)"
+                                options={[
+                                    { label: 'Tiết kiệm', value: 1 },
+                                    { label: 'Tiêu chuẩn', value: 2 },
+                                    { label: 'Cao cấp', value: 3 }
+                                ]}
+                                onChange={(val) => setTourType({ ...tourType, PriceLevel: val })}
+                            />
+                        </Col>
+
+                        <Col span={8}>
+                            <span>Trạng thái</span>
+                            <Select
+                                value={tourType.IsActive}
+                                className="w-100"
+                                options={[
+                                    { label: 'Hoạt động', value: true },
+                                    { label: 'Ngừng hoạt động', value: false }
+                                ]}
+                                onChange={(val) => setTourType({ ...tourType, IsActive: val })}
+                            />
+                        </Col>
+
+                        <Col span={24}>
+                            <span>Mô tả</span>
+                            <TextArea
+                                value={tourType.Description}
+                                onChange={(e) => setTourType({ ...tourType, Description: e.target.value })}
+                                rows={4}
+                                placeholder="Nhập mô tả cho loại tour (không bắt buộc)"
+                            />
+                        </Col>
+                    </Row>
                 </MainCard>
             </Col>
         </Row>

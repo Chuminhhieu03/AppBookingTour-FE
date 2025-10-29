@@ -1,7 +1,7 @@
-import { Table, Button, Space, Card, message } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Card, message, Modal } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import tourItineraryAPI from '../../../api/tour/tourItineraryAPI';
 import LoadingModal from '../../../components/LoadingModal';
 
@@ -30,25 +30,31 @@ export default function TourItineraryTable({ tourId, isEditMode = false, title =
         }
     };
 
-    const handleDelete = async (itineraryId) => {
-        try {
-            const confirmed = window.confirm('Bạn có chắc chắn muốn xóa lịch trình này?');
-            if (!confirmed) return;
-
-            LoadingModal.showLoading();
-            const response = await tourItineraryAPI.delete(itineraryId);
-            if (response.success) {
-                message.success('Xóa lịch trình thành công!');
-                fetchItineraries(); // Refresh the list
-            } else {
-                message.error('Xóa lịch trình thất bại!');
+    const handleDelete = (itineraryId) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa lịch trình này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    LoadingModal.showLoading();
+                    const response = await tourItineraryAPI.delete(itineraryId);
+                    if (response.success) {
+                        message.success('Xóa lịch trình thành công!');
+                        fetchItineraries(); // Refresh the list
+                    } else {
+                        message.error('Xóa lịch trình thất bại!');
+                    }
+                } catch (error) {
+                    console.error('Error deleting itinerary:', error);
+                    message.error('Đã xảy ra lỗi khi xóa lịch trình.');
+                } finally {
+                    LoadingModal.hideLoading();
+                }
             }
-        } catch (error) {
-            console.error('Error deleting itinerary:', error);
-            message.error('Đã xảy ra lỗi khi xóa lịch trình.');
-        } finally {
-            LoadingModal.hideLoading();
-        }
+        });
     };
 
     const handleEdit = (record) => {
@@ -73,11 +79,7 @@ export default function TourItineraryTable({ tourId, isEditMode = false, title =
             key: 'dayNumber',
             width: 200,
             onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (dayNumber, record) => (
-                <div style={{ textAlign: 'center' }}>
-                    <Link to={`/admin/service/tour/${tourId}/itinerary/display/${record.id}`}>{`Ngày ${dayNumber}`}</Link>
-                </div>
-            )
+            render: (dayNumber) => <div style={{ textAlign: 'center' }}>{`Ngày ${dayNumber}`}</div>
         },
         {
             title: 'Tiêu đề',
@@ -96,22 +98,32 @@ export default function TourItineraryTable({ tourId, isEditMode = false, title =
         }
     ];
 
-    // Add action column only in edit mode
-    if (isEditMode) {
-        columns.push({
-            title: 'Chức năng',
-            key: 'actions',
-            align: 'center',
-            width: 120,
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (_, record) => (
-                <Space>
-                    <Button type="link" icon={<EditOutlined />} onClick={() => handleEdit(record)} title="Chỉnh sửa" />
-                    <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger title="Xóa" />
-                </Space>
-            )
-        });
-    }
+    // Always add action column - show different buttons based on mode
+    columns.push({
+        title: 'Hành động',
+        key: 'action',
+        width: 150,
+        align: 'center',
+        fixed: 'right',
+        onHeaderCell: () => ({ style: { textAlign: 'center' } }),
+        render: (_, record) => (
+            <Space size="small">
+                <Button
+                    type="primary"
+                    ghost
+                    size="small"
+                    icon={<EyeOutlined />}
+                    onClick={() => navigate(`/admin/service/tour/${tourId}/itinerary/display/${record.id}`)}
+                />
+                {isEditMode && (
+                    <>
+                        <Button type="default" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                        <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+                    </>
+                )}
+            </Space>
+        )
+    });
 
     return (
         <Card
@@ -134,7 +146,7 @@ export default function TourItineraryTable({ tourId, isEditMode = false, title =
                 pagination={false}
                 size="small"
                 bordered
-                scroll={{ x: isEditMode ? 700 : 600 }}
+                scroll={{ x: 700 }}
                 locale={{
                     emptyText: 'Chưa có lịch trình chi tiết nào'
                 }}

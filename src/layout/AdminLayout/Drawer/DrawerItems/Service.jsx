@@ -18,19 +18,19 @@ const service = {
             children: [
                 {
                     id: 'tour-list',
-                    title: 'Danh sách Tour',
+                    title: 'Tour',
                     type: 'item',
                     url: '/admin/service/tour'
                 },
                 {
                     id: 'tour-category-list',
-                    title: 'Danh sách Danh mục Tour',
+                    title: 'Danh mục Tour',
                     type: 'item',
                     url: '/admin/service/tour-category'
                 },
                 {
                     id: 'tour-type-list',
-                    title: 'Danh sách Loại Tour',
+                    title: 'Loại Tour',
                     type: 'item',
                     url: '/admin/service/tour-type'
                 }

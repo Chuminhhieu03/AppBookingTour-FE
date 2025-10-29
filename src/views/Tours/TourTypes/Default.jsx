@@ -1,7 +1,7 @@
-import { Col, Row, Button, Space, Input, Select, Table, Tag, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Col, Row, Button, Space, Input, Select, Table, Tag, message, Modal } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import LoadingModal from '../../../components/LoadingModal';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
@@ -18,26 +18,24 @@ export default function TourTypeDefault() {
 
     // Filters
     const [filterName, setFilterName] = useState('');
-    const [filterIsActive, setFilterIsActive] = useState('');
 
     const fetchTourTypes = async (params = {}) => {
         setLoading(true);
         try {
-            const { page = pagination.current, pageSize = pagination.pageSize } = params;
+            const { page = pagination.current, pageSize = pagination.pageSize, name = filterName } = params;
 
             const searchData = {
                 pageIndex: page,
                 pageSize: pageSize,
                 filter: {
-                    name: filterName || null,
-                    isActive: filterIsActive !== '' ? filterIsActive : null
+                    name: name || null
                 }
             };
 
             const response = await tourTypeAPI.search(searchData);
             console.log('API Response:', response);
 
-            if (response?.data?.tourTypes) {
+            if (response?.success && response?.data?.tourTypes) {
                 const tourTypeList = response.data.tourTypes;
                 const meta = response.data.meta;
 
@@ -47,44 +45,72 @@ export default function TourTypeDefault() {
                     pageSize: meta?.pageSize || 10,
                     total: meta?.totalCount || tourTypeList.length
                 });
-            } else if (response?.data) {
-                // If API returns direct array
-                setTourTypes(response.data);
+            } else {
+                message.warning('Không tìm thấy dữ liệu loại tour.');
+                setTourTypes([]);
                 setPagination({
                     current: 1,
                     pageSize: 10,
-                    total: response.data.length
+                    total: 0
                 });
-            } else {
-                message.warning('Không tìm thấy dữ liệu loại tour.');
             }
         } catch (error) {
             console.error('Error fetching tour types:', error);
             message.error('Đã xảy ra lỗi khi tải danh sách loại tour.');
+            setTourTypes([]);
+            setPagination({
+                current: 1,
+                pageSize: 10,
+                total: 0
+            });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            const confirmed = window.confirm('Bạn có chắc chắn muốn xóa loại tour này?');
-            if (!confirmed) return;
+    const handleSearch = () => {
+        fetchTourTypes({
+            page: 1,
+            name: filterName
+        });
+    };
 
-            LoadingModal.showLoading();
-            const response = await tourTypeAPI.delete(id);
-            if (response.success) {
-                message.success('Xóa loại tour thành công!');
-                fetchTourTypes();
-            } else {
-                message.error('Xóa loại tour thất bại!');
+    const handleReset = () => {
+        // Reset state
+        setFilterName('');
+
+        // Fetch với filter rỗng ngay lập tức
+        fetchTourTypes({
+            page: 1,
+            name: ''
+        });
+    };
+
+    const handleDelete = (id) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa loại tour này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    LoadingModal.showLoading();
+                    const response = await tourTypeAPI.delete(id);
+                    if (response.success) {
+                        message.success('Xóa loại tour thành công!');
+                        fetchTourTypes();
+                    } else {
+                        message.error('Xóa loại tour thất bại!');
+                    }
+                } catch (error) {
+                    console.error('Error deleting tour type:', error);
+                    message.error('Đã xảy ra lỗi khi xóa loại tour.');
+                } finally {
+                    LoadingModal.hideLoading();
+                }
             }
-        } catch (error) {
-            console.error('Error deleting tour type:', error);
-            message.error('Đã xảy ra lỗi khi xóa loại tour.');
-        } finally {
-            LoadingModal.hideLoading();
-        }
+        });
     };
 
     useEffect(() => {
@@ -97,62 +123,60 @@ export default function TourTypeDefault() {
             title: 'STT',
             key: 'index',
             align: 'center',
+            width: 60,
             render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
         },
         {
             title: 'Tên loại tour',
             dataIndex: 'name',
             key: 'name',
-            align: 'center',
-            render: (text, record) => <Link to={`/admin/service/tour-type/display/${record.id}`}>{text}</Link>
+            align: 'center'
         },
         {
             title: 'Mô tả',
             dataIndex: 'description',
             key: 'description',
-            align: 'center',
-            render: (text) => text || '—'
-        },
-        {
-            title: 'Hình ảnh',
-            dataIndex: 'imageUrl',
-            key: 'imageUrl',
-            align: 'center',
-            render: (imageUrl) =>
-                imageUrl ? (
-                    <img src={imageUrl} alt="Tour Type" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} />
-                ) : (
-                    '—'
-                )
+            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
+            render: (text) => text || '—',
+            ellipsis: true
         },
         {
             title: 'Trạng thái',
             dataIndex: 'isActive',
             key: 'isActive',
             align: 'center',
-            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng</Tag>)
+            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>)
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdAt',
             key: 'createdAt',
             align: 'center',
+            width: 120,
             render: (date) => (date ? new Date(date).toLocaleDateString('vi-VN') : '—')
         },
         {
-            title: 'Chức năng',
-            key: 'actions',
+            title: 'Hành động',
+            key: 'action',
+            width: 150,
             align: 'center',
-            width: 120,
+            fixed: 'right',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button
-                        type="link"
+                        type="primary"
+                        ghost
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/admin/service/tour-type/display/${record.id}`)}
+                    />
+                    <Button
+                        type="default"
+                        size="small"
                         icon={<EditOutlined />}
                         onClick={() => navigate(`/admin/service/tour-type/edit/${record.id}`)}
-                        title="Chỉnh sửa"
                     />
-                    <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger title="Xóa" />
+                    <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
                 </Space>
             )
         }
@@ -175,34 +199,15 @@ export default function TourTypeDefault() {
                     }
                 >
                     <Row gutter={[16, 16]} className="mb-4">
-                        <Col span={8}>
+                        <Col span={6}>
                             <Input value={filterName} onChange={(e) => setFilterName(e.target.value)} placeholder="Nhập tên loại tour" />
                         </Col>
-                        <Col span={8}>
-                            <Select
-                                value={filterIsActive !== '' ? filterIsActive : undefined}
-                                onChange={(value) => setFilterIsActive(value)}
-                                allowClear
-                                placeholder="Chọn trạng thái"
-                                style={{ width: '100%' }}
-                            >
-                                <Select.Option value={true}>Hoạt động</Select.Option>
-                                <Select.Option value={false}>Ngừng hoạt động</Select.Option>
-                            </Select>
-                        </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Space>
-                                <Button type="primary" icon={<SearchOutlined />} onClick={() => fetchTourTypes({ page: 1 })}>
+                                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                                     Tìm kiếm
                                 </Button>
-                                <Button
-                                    icon={<ReloadOutlined />}
-                                    onClick={() => {
-                                        setFilterName('');
-                                        setFilterIsActive('');
-                                        fetchTourTypes({ page: 1 });
-                                    }}
-                                >
+                                <Button icon={<ReloadOutlined />} onClick={handleReset}>
                                     Đặt lại
                                 </Button>
                             </Space>
@@ -224,7 +229,11 @@ export default function TourTypeDefault() {
                             showSizeChanger: true,
                             onChange: (page, pageSize) => {
                                 setPagination({ ...pagination, current: page, pageSize });
-                                fetchTourTypes({ page, pageSize });
+                                fetchTourTypes({
+                                    page,
+                                    pageSize,
+                                    name: filterName
+                                });
                             }
                         }}
                     />

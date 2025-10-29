@@ -1,10 +1,11 @@
-import { Form, Input, InputNumber, Button, DatePicker, Select, Row, Col, message, Space } from 'antd';
+import { Form, Input, InputNumber, Button, DatePicker, TimePicker, Select, Row, Col, message, Space } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -14,23 +15,32 @@ export default function TourDepartureAddnew() {
     const { tourId } = useParams();
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (values) => {
+        const handleSubmit = async (values) => {
         try {
             setLoading(true);
             LoadingModal.showLoading();
 
+            // Kết hợp ngày và giờ thành datetime
+            const departureDateTime = values.departureDate
+                .hour(values.departureTime?.hour() || 0)
+                .minute(values.departureTime?.minute() || 0)
+                .second(0);
+                
+            const returnDateTime = values.returnDate
+                .hour(values.returnTime?.hour() || 0)  
+                .minute(values.returnTime?.minute() || 0)
+                .second(0);
+
             const payload = {
                 tourId: Number(tourId),
-                departureDate: values.departureDate.format('YYYY-MM-DDTHH:mm:ss[Z]'),
-                returnDate: values.returnDate.format('YYYY-MM-DDTHH:mm:ss[Z]'),
+                departureDate: departureDateTime.format('YYYY-MM-DDTHH:mm:ss[Z]'),
+                returnDate: returnDateTime.format('YYYY-MM-DDTHH:mm:ss[Z]'),
                 availableSlots: values.availableSlots,
                 priceAdult: values.priceAdult,
                 priceChildren: values.priceChildren,
                 status: values.status
                 // guideId: values.guideId || null
-            };
-
-            const response = await tourDepartureAPI.create(payload);
+            };            const response = await tourDepartureAPI.create(payload);
 
             if (response.success) {
                 message.success('Thêm lịch khởi hành mới thành công!');
@@ -67,10 +77,10 @@ export default function TourDepartureAddnew() {
                         </Space>
                     }
                 >
-                    <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off" requiredMark={false}>
-                        {/* Hàng 1: Ngày khởi hành | Ngày kết thúc | Trạng thái */}
+                    <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
+                        {/* Hàng 1: Tất cả thông tin ngày giờ */}
                         <Row gutter={[24, 24]}>
-                            <Col span={8}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Ngày khởi hành"
                                     name="departureDate"
@@ -78,43 +88,104 @@ export default function TourDepartureAddnew() {
                                         {
                                             required: true,
                                             message: 'Vui lòng chọn ngày khởi hành!'
+                                        },
+                                        {
+                                            validator: (_, value) => {
+                                                if (!value) return Promise.resolve();
+                                                const tomorrow = dayjs().add(1, 'day');
+                                                if (value.isBefore(tomorrow, 'day')) {
+                                                    return Promise.reject(new Error('Ngày khởi hành phải từ ngày mai trở đi!'));
+                                                }
+                                                return Promise.resolve();
+                                            }
                                         }
                                     ]}
                                 >
-                                    <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" placeholder="Chọn ngày khởi hành" />
+                                    <DatePicker 
+                                        style={{ width: '100%' }} 
+                                        format="DD/MM/YYYY" 
+                                        placeholder="Chọn ngày khởi hành"
+                                        disabledDate={(current) => {
+                                            return current && current.isBefore(dayjs().add(1, 'day'), 'day');
+                                        }}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
+                            <Col span={6}>
+                                <Form.Item
+                                    label="Giờ khởi hành"
+                                    name="departureTime"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Vui lòng chọn giờ khởi hành!'
+                                        }
+                                    ]}
+                                >
+                                    <TimePicker
+                                        style={{ width: '100%' }}
+                                        format="HH:mm"
+                                        placeholder="Chọn giờ khởi hành"
+                                        minuteStep={15}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Ngày kết thúc"
                                     name="returnDate"
+                                    dependencies={['departureDate']}
                                     rules={[
                                         {
                                             required: true,
                                             message: 'Vui lòng chọn ngày kết thúc!'
-                                        }
+                                        },
+                                        ({ getFieldValue }) => ({
+                                            validator: (_, value) => {
+                                                if (!value) return Promise.resolve();
+                                                const departureDate = getFieldValue('departureDate');
+                                                if (departureDate && value.isBefore(departureDate, 'day')) {
+                                                    return Promise.reject(new Error('Ngày kết thúc phải sau ngày khởi hành!'));
+                                                }
+                                                if (departureDate && value.isSame(departureDate, 'day')) {
+                                                    return Promise.reject(new Error('Ngày kết thúc phải sau ngày khởi hành!'));
+                                                }
+                                                return Promise.resolve();
+                                            }
+                                        })
                                     ]}
                                 >
-                                    <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" placeholder="Chọn ngày kết thúc" />
+                                    <DatePicker 
+                                        style={{ width: '100%' }} 
+                                        format="DD/MM/YYYY" 
+                                        placeholder="Chọn ngày kết thúc"
+                                        disabledDate={(current) => {
+                                            const departureDate = form.getFieldValue('departureDate');
+                                            if (departureDate) {
+                                                return current && (current.isBefore(departureDate, 'day') || current.isSame(departureDate, 'day'));
+                                            }
+                                            return current && current.isBefore(dayjs().add(1, 'day'), 'day');
+                                        }}
+                                    />
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
+                            <Col span={6}>
                                 <Form.Item
-                                    label="Trạng thái"
-                                    name="status"
-                                    initialValue={1}
+                                    label="Giờ trở về"
+                                    name="returnTime"
                                     rules={[
                                         {
                                             required: true,
-                                            message: 'Vui lòng chọn trạng thái!'
+                                            message: 'Vui lòng chọn giờ trở về!'
                                         }
                                     ]}
                                 >
-                                    <Select placeholder="Chọn trạng thái">
-                                        <Option value={1}>Có sẵn</Option>
-                                        <Option value={2}>Hết chỗ</Option>
-                                        <Option value={3}>Đã hủy</Option>
-                                    </Select>
+                                    <TimePicker
+                                        style={{ width: '100%' }}
+                                        format="HH:mm"
+                                        placeholder="Chọn giờ trở về"
+                                        minuteStep={15}
+                                    />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -173,9 +244,9 @@ export default function TourDepartureAddnew() {
                             </Col>
                         </Row>
 
-                        {/* Hàng 3: Số chỗ còn trống | Hướng dẫn viên */}
+                        {/* Hàng 3: Số chỗ còn trống | Trạng thái | Hướng dẫn viên */}
                         <Row gutter={[24, 24]}>
-                            <Col span={12}>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Số chỗ còn trống"
                                     name="availableSlots"
@@ -194,15 +265,28 @@ export default function TourDepartureAddnew() {
                                     <InputNumber style={{ width: '100%' }} placeholder="Nhập số chỗ còn trống" min={1} />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={8}>
+                                <Form.Item
+                                    label="Trạng thái"
+                                    name="status"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Vui lòng chọn trạng thái!'
+                                        }
+                                    ]}
+                                >
+                                    <Select placeholder="Chọn trạng thái" defaultValue={1}>
+                                        <Option value={1}>Có sẵn</Option>
+                                        <Option value={2}>Hết chỗ</Option>
+                                        <Option value={3}>Đã hủy</Option>
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Hướng dẫn viên phụ trách"
                                     name="guideId"
-                                    rules={[
-                                        {
-                                            message: 'Vui lòng chọn hướng dẫn viên!'
-                                        }
-                                    ]}
                                 >
                                     <Select placeholder="Chọn hướng dẫn viên (tùy chọn)" allowClear>
                                         {/* Mock data - sẽ thay thế bằng API call sau */}

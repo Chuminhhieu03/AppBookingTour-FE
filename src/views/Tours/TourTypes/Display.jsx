@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import MainCard from '../../../components/MainCard';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import ImagesUC from '../../components/basic/ImagesUC';
 
 const { TextArea } = Input;
 
@@ -14,27 +15,27 @@ export default function TourTypeDisplay() {
     const [tourType, setTourType] = useState({});
 
     useEffect(() => {
+        const fetchTourType = async () => {
+            try {
+                LoadingModal.showLoading();
+                const response = await tourTypeAPI.getById(id);
+                if (response.success) {
+                    setTourType(response.data || {});
+                } else {
+                    message.error('Không tìm thấy loại tour!');
+                }
+            } catch (error) {
+                console.error('Error fetching tour type:', error);
+                message.error('Đã xảy ra lỗi khi tải loại tour.');
+            } finally {
+                LoadingModal.hideLoading();
+            }
+        };
+
         if (id) {
             fetchTourType();
         }
     }, [id]);
-
-    const fetchTourType = async () => {
-        try {
-            LoadingModal.showLoading();
-            const response = await tourTypeAPI.getById(id);
-            if (response.success) {
-                setTourType(response.data || {});
-            } else {
-                message.error('Không tìm thấy loại tour!');
-            }
-        } catch (error) {
-            console.error('Error fetching tour type:', error);
-            message.error('Đã xảy ra lỗi khi tải loại tour.');
-        } finally {
-            LoadingModal.hideLoading();
-        }
-    };
 
     const handleEdit = () => {
         navigate(`/admin/service/tour-type/edit/${id}`);
@@ -61,43 +62,46 @@ export default function TourTypeDisplay() {
                     }
                 >
                     <Row gutter={[24, 24]}>
-                        <Col span={12}>
+                        <Col span={24} style={{ textAlign: 'center' }}>
+                            <div className="mb-3 d-flex justify-content-center">
+                                <ImagesUC imageUrl={tourType.imageUrl} viewOnly={true} />
+                            </div>
+                            <span>Hình ảnh loại tour</span>
+                        </Col>
+                        <Col span={8}>
                             <span>Tên loại tour</span>
                             <Input value={tourType.name} readOnly />
                         </Col>
-                        <Col span={12}>
+                        <Col span={8}>
+                            <span>Loại mức giá</span>
+                            <Input
+                                value={
+                                    tourType.priceLevel === 1
+                                        ? 'Tiết kiệm'
+                                        : tourType.priceLevel === 2
+                                          ? 'Tiêu chuẩn'
+                                          : tourType.priceLevel === 3
+                                            ? 'Cao cấp'
+                                            : 'Chưa xác định'
+                                }
+                                readOnly
+                            />
+                        </Col>
+                        <Col span={8}>
                             <span>Trạng thái</span>
                             <Select value={tourType.isActive} disabled style={{ width: '100%' }}>
                                 <Select.Option value={true}>Hoạt động</Select.Option>
                                 <Select.Option value={false}>Ngừng hoạt động</Select.Option>
                             </Select>
                         </Col>
-                        <Col span={12}>
+                        <Col span={8}>
                             <span>Ngày tạo</span>
                             <Input value={tourType.createdAt ? new Date(tourType.createdAt).toLocaleDateString('vi-VN') : ''} readOnly />
                         </Col>
                         {tourType.updatedAt && (
-                            <Col span={12}>
+                            <Col span={8}>
                                 <span>Ngày cập nhật</span>
                                 <Input value={new Date(tourType.updatedAt).toLocaleDateString('vi-VN')} readOnly />
-                            </Col>
-                        )}
-                        {tourType.imageUrl && (
-                            <Col span={24}>
-                                <span>Hình ảnh</span>
-                                <div style={{ marginTop: 8 }}>
-                                    <img
-                                        src={tourType.imageUrl}
-                                        alt={tourType.name}
-                                        style={{
-                                            maxWidth: 300,
-                                            maxHeight: 200,
-                                            objectFit: 'cover',
-                                            borderRadius: 4,
-                                            border: '1px solid #d9d9d9'
-                                        }}
-                                    />
-                                </div>
                             </Col>
                         )}
                         <Col span={24}>

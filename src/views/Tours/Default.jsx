@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, message } from 'antd';
-import { SearchOutlined, ReloadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, message, Modal } from 'antd';
+import { SearchOutlined, ReloadOutlined, PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import { tourAPI } from '../../api/tour/tourAPI';
 import tourCategoryAPI from '../../api/tour/tourCategoryAPI';
@@ -62,19 +62,29 @@ export default function TourDefault() {
     const fetchTours = async (params = {}) => {
         setLoading(true);
         try {
-            const { page = pagination.current, pageSize = pagination.pageSize } = params;
+            const {
+                page = pagination.current,
+                pageSize = pagination.pageSize,
+                code = filterCode,
+                name = filterName,
+                categoryId = filterCategoryId,
+                typeId = filterTypeId,
+                cityId = filterCityId,
+                priceFrom = filterPriceFrom,
+                priceTo = filterPriceTo
+            } = params;
 
             const searchData = {
                 pageIndex: page,
                 pageSize: pageSize,
                 filter: {
-                    code: filterCode || null,
-                    name: filterName || null,
-                    categoryId: filterCategoryId || null,
-                    typeId: filterTypeId || null,
-                    cityId: filterCityId || null,
-                    priceFrom: filterPriceFrom ? parseFloat(filterPriceFrom) : null,
-                    priceTo: filterPriceTo ? parseFloat(filterPriceTo) : null
+                    code: code || null,
+                    name: name || null,
+                    categoryId: categoryId || null,
+                    typeId: typeId || null,
+                    cityId: cityId || null,
+                    priceFrom: priceFrom ? parseFloat(priceFrom) : null,
+                    priceTo: priceTo ? parseFloat(priceTo) : null
                 }
             };
 
@@ -102,26 +112,73 @@ export default function TourDefault() {
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            // You can add a confirmation modal here
-            const confirmed = window.confirm('Bạn có chắc chắn muốn xóa tour này?');
-            if (!confirmed) return;
-
-            LoadingModal.showLoading();
-            const response = await tourAPI.delete(id);
-            if (response.success) {
-                message.success('Xóa tour thành công!');
-                fetchTours(); // Refresh the list
-            } else {
-                message.error('Xóa tour thất bại!');
-            }
-        } catch (error) {
-            console.error('Error deleting tour:', error);
-            message.error('Đã xảy ra lỗi khi xóa tour.');
-        } finally {
-            LoadingModal.hideLoading();
+    const handleSearch = () => {
+        // Validate before search
+        if (filterPriceFrom && filterPriceTo && parseFloat(filterPriceFrom) >= parseFloat(filterPriceTo)) {
+            message.error('Giá từ phải nhỏ hơn giá đến. Vui lòng kiểm tra lại!');
+            return;
         }
+
+        fetchTours({
+            page: 1,
+            code: filterCode,
+            name: filterName,
+            categoryId: filterCategoryId,
+            typeId: filterTypeId,
+            cityId: filterCityId,
+            priceFrom: filterPriceFrom,
+            priceTo: filterPriceTo
+        });
+    };
+
+    const handleReset = () => {
+        // Reset state
+        setFilterName('');
+        setFilterCode('');
+        setFilterCategoryId('');
+        setFilterTypeId('');
+        setFilterCityId('');
+        setFilterPriceFrom('');
+        setFilterPriceTo('');
+
+        // Fetch với filter rỗng ngay lập tức
+        fetchTours({
+            page: 1,
+            code: '',
+            name: '',
+            categoryId: '',
+            typeId: '',
+            cityId: '',
+            priceFrom: '',
+            priceTo: ''
+        });
+    };
+
+    const handleDelete = (id) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa tour này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    LoadingModal.showLoading();
+                    const response = await tourAPI.delete(id);
+                    if (response.success) {
+                        message.success('Xóa tour thành công!');
+                        fetchTours(); // Refresh the list
+                    } else {
+                        message.error('Xóa tour thất bại!');
+                    }
+                } catch (error) {
+                    console.error('Error deleting tour:', error);
+                    message.error('Đã xảy ra lỗi khi xóa tour.');
+                } finally {
+                    LoadingModal.hideLoading();
+                }
+            }
+        });
     };
 
     useEffect(() => {
@@ -141,8 +198,7 @@ export default function TourDefault() {
             title: 'Mã Tour',
             dataIndex: 'code',
             key: 'code',
-            align: 'center',
-            render: (text, record) => <Link to={`/admin/service/tour/display/${record.id}`}>{text}</Link>
+            align: 'center'
         },
         {
             title: 'Tên Tour',
@@ -189,19 +245,27 @@ export default function TourDefault() {
             render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng</Tag>)
         },
         {
-            title: 'Chức năng',
-            key: 'actions',
+            title: 'Hành động',
+            key: 'action',
+            width: 150,
             align: 'center',
-            width: 120,
+            fixed: 'right',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button
-                        type="link"
+                        type="primary"
+                        ghost
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/admin/service/tour/display/${record.id}`)}
+                    />
+                    <Button
+                        type="default"
+                        size="small"
                         icon={<EditOutlined />}
                         onClick={() => navigate(`/admin/service/tour/edit/${record.id}`)}
-                        title="Chỉnh sửa"
                     />
-                    <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger title="Xóa" />
+                    <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
                 </Space>
             )
         }
@@ -278,33 +342,10 @@ export default function TourDefault() {
                         </Col>
                         <Col span={4}>
                             <Space>
-                                <Button
-                                    type="primary"
-                                    icon={<SearchOutlined />}
-                                    onClick={() => {
-                                        // Validate before search
-                                        if (filterPriceFrom && filterPriceTo && parseFloat(filterPriceFrom) >= parseFloat(filterPriceTo)) {
-                                            message.error('Giá từ phải nhỏ hơn giá đến. Vui lòng kiểm tra lại!');
-                                            return;
-                                        }
-                                        fetchTours({ page: 1 });
-                                    }}
-                                >
+                                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                                     Tìm kiếm
                                 </Button>
-                                <Button
-                                    icon={<ReloadOutlined />}
-                                    onClick={() => {
-                                        setFilterName('');
-                                        setFilterCode('');
-                                        setFilterCategoryId('');
-                                        setFilterTypeId('');
-                                        setFilterCityId('');
-                                        setFilterPriceFrom('');
-                                        setFilterPriceTo('');
-                                        fetchTours({ page: 1 });
-                                    }}
-                                >
+                                <Button icon={<ReloadOutlined />} onClick={handleReset}>
                                     Đặt lại
                                 </Button>
                             </Space>
@@ -358,7 +399,17 @@ export default function TourDefault() {
                             showSizeChanger: true,
                             onChange: (page, pageSize) => {
                                 setPagination({ ...pagination, current: page, pageSize });
-                                fetchTours({ page, pageSize });
+                                fetchTours({
+                                    page,
+                                    pageSize,
+                                    code: filterCode,
+                                    name: filterName,
+                                    categoryId: filterCategoryId,
+                                    typeId: filterTypeId,
+                                    cityId: filterCityId,
+                                    priceFrom: filterPriceFrom,
+                                    priceTo: filterPriceTo
+                                });
                             }
                         }}
                     />

@@ -38,10 +38,9 @@ const TourRoute = {
         {
             path: 'admin',
             element: (
-                // Nếu cần bảo vệ route, bật lại ProtectedRoute:
-                // <ProtectedRoute>
-                <AdminLayout />
-                // </ProtectedRoute>
+                <ProtectedRoute>
+                    <AdminLayout />
+                </ProtectedRoute>
             ),
             children: [
                 {

@@ -1,7 +1,7 @@
-import { Col, Row, Button, Space, Input, Select, Table, Tag, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Col, Row, Button, Space, Input, Select, Table, Tag, message, Modal } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import LoadingModal from '../../../components/LoadingModal';
 import tourCategoryAPI from '../../../api/tour/tourCategoryAPI';
@@ -19,7 +19,6 @@ export default function TourCategoryDefault() {
     // Filters
     const [filterName, setFilterName] = useState('');
     const [filterParentCategoryId, setFilterParentCategoryId] = useState('');
-    const [filterIsActive, setFilterIsActive] = useState('');
 
     // Parent categories for dropdown
     const [parentCategories, setParentCategories] = useState([]);
@@ -41,22 +40,26 @@ export default function TourCategoryDefault() {
     const fetchCategories = async (params = {}) => {
         setLoading(true);
         try {
-            const { page = pagination.current, pageSize = pagination.pageSize } = params;
+            const {
+                page = pagination.current,
+                pageSize = pagination.pageSize,
+                name = filterName,
+                parentCategoryId = filterParentCategoryId
+            } = params;
 
             const searchData = {
                 pageIndex: page,
                 pageSize: pageSize,
                 filter: {
-                    name: filterName || null,
-                    parentCategoryId: filterParentCategoryId || null,
-                    isActive: filterIsActive !== '' ? filterIsActive : null
+                    name: name || null,
+                    parentCategoryId: parentCategoryId || null
                 }
             };
 
             const response = await tourCategoryAPI.search(searchData);
             console.log('API Response:', response);
 
-            if (response?.data?.categories) {
+            if (response?.success && response?.data?.categories) {
                 const categoryList = response.data.categories;
                 const meta = response.data.meta;
 
@@ -66,44 +69,75 @@ export default function TourCategoryDefault() {
                     pageSize: meta?.pageSize || 10,
                     total: meta?.totalCount || categoryList.length
                 });
-            } else if (response?.data) {
-                // If API returns direct array
-                setCategories(response.data);
+            } else {
+                message.warning('Không tìm thấy dữ liệu danh mục tour.');
+                setCategories([]);
                 setPagination({
                     current: 1,
                     pageSize: 10,
-                    total: response.data.length
+                    total: 0
                 });
-            } else {
-                message.warning('Không tìm thấy dữ liệu danh mục tour.');
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
             message.error('Đã xảy ra lỗi khi tải danh sách danh mục tour.');
+            setCategories([]);
+            setPagination({
+                current: 1,
+                pageSize: 10,
+                total: 0
+            });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            const confirmed = window.confirm('Bạn có chắc chắn muốn xóa danh mục tour này?');
-            if (!confirmed) return;
+    const handleSearch = () => {
+        fetchCategories({
+            page: 1,
+            name: filterName,
+            parentCategoryId: filterParentCategoryId
+        });
+    };
 
-            LoadingModal.showLoading();
-            const response = await tourCategoryAPI.delete(id);
-            if (response.success) {
-                message.success('Xóa danh mục tour thành công!');
-                fetchCategories();
-            } else {
-                message.error('Xóa danh mục tour thất bại!');
+    const handleReset = () => {
+        // Reset state
+        setFilterName('');
+        setFilterParentCategoryId('');
+
+        // Fetch với filter rỗng ngay lập tức
+        fetchCategories({
+            page: 1,
+            name: '',
+            parentCategoryId: ''
+        });
+    };
+
+    const handleDelete = (id) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa danh mục tour này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    LoadingModal.showLoading();
+                    const response = await tourCategoryAPI.delete(id);
+                    if (response.success) {
+                        message.success('Xóa danh mục tour thành công!');
+                        fetchCategories();
+                    } else {
+                        message.error('Xóa danh mục tour thất bại!');
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                    message.error('Đá xảy ra lỗi khi xóa danh mục tour.');
+                } finally {
+                    LoadingModal.hideLoading();
+                }
             }
-        } catch (error) {
-            console.error('Error deleting category:', error);
-            message.error('Đã xảy ra lỗi khi xóa danh mục tour.');
-        } finally {
-            LoadingModal.hideLoading();
-        }
+        });
     };
 
     useEffect(() => {
@@ -117,6 +151,7 @@ export default function TourCategoryDefault() {
             title: 'STT',
             key: 'index',
             align: 'center',
+            width: 60,
             render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
         },
         {
@@ -124,62 +159,60 @@ export default function TourCategoryDefault() {
             dataIndex: 'name',
             key: 'name',
             align: 'center',
-            render: (text, record) => <Link to={`/admin/service/tour-category/display/${record.id}`}>{text}</Link>
+            onHeaderCell: () => ({ style: { textAlign: 'center' } })
         },
         {
-            title: 'Mô tả',
+            title: 'Mô tả về danh mục',
             dataIndex: 'description',
             key: 'description',
-            align: 'center',
-            render: (text) => text || '—'
+            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
+            render: (text) => text || '—',
+            ellipsis: true
         },
         {
-            title: 'Danh mục cha',
+            title: 'Tên danh mục cha',
             dataIndex: 'parentCategoryName',
             key: 'parentCategoryName',
             align: 'center',
-            render: (text) => text || 'Danh mục gốc'
-        },
-        {
-            title: 'Hình ảnh',
-            dataIndex: 'imageUrl',
-            key: 'imageUrl',
-            align: 'center',
-            render: (imageUrl) =>
-                imageUrl ? (
-                    <img src={imageUrl} alt="Category" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} />
-                ) : (
-                    '—'
-                )
+            render: (text) => text || 'Không có'
         },
         {
             title: 'Trạng thái',
             dataIndex: 'isActive',
             key: 'isActive',
             align: 'center',
-            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng</Tag>)
+            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>)
         },
         {
             title: 'Ngày tạo',
             dataIndex: 'createdAt',
             key: 'createdAt',
             align: 'center',
+            width: 120,
             render: (date) => (date ? new Date(date).toLocaleDateString('vi-VN') : '—')
         },
         {
-            title: 'Chức năng',
-            key: 'actions',
+            title: 'Hành động',
+            key: 'action',
+            width: 150,
             align: 'center',
-            width: 120,
+            fixed: 'right',
             render: (_, record) => (
-                <Space>
+                <Space size="small">
                     <Button
-                        type="link"
+                        type="primary"
+                        ghost
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/admin/service/tour-category/display/${record.id}`)}
+                    />
+                    <Button
+                        type="default"
+                        size="small"
                         icon={<EditOutlined />}
                         onClick={() => navigate(`/admin/service/tour-category/edit/${record.id}`)}
-                        title="Chỉnh sửa"
                     />
-                    <Button type="link" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger title="Xóa" />
+                    <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
                 </Space>
             )
         }
@@ -223,31 +256,11 @@ export default function TourCategoryDefault() {
                             </Select>
                         </Col>
                         <Col span={6}>
-                            <Select
-                                value={filterIsActive !== '' ? filterIsActive : undefined}
-                                onChange={(value) => setFilterIsActive(value)}
-                                allowClear
-                                placeholder="Chọn trạng thái"
-                                style={{ width: '100%' }}
-                            >
-                                <Select.Option value={true}>Hoạt động</Select.Option>
-                                <Select.Option value={false}>Ngừng hoạt động</Select.Option>
-                            </Select>
-                        </Col>
-                        <Col span={6}>
                             <Space>
-                                <Button type="primary" icon={<SearchOutlined />} onClick={() => fetchCategories({ page: 1 })}>
+                                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                                     Tìm kiếm
                                 </Button>
-                                <Button
-                                    icon={<ReloadOutlined />}
-                                    onClick={() => {
-                                        setFilterName('');
-                                        setFilterParentCategoryId('');
-                                        setFilterIsActive('');
-                                        fetchCategories({ page: 1 });
-                                    }}
-                                >
+                                <Button icon={<ReloadOutlined />} onClick={handleReset}>
                                     Đặt lại
                                 </Button>
                             </Space>
@@ -269,7 +282,12 @@ export default function TourCategoryDefault() {
                             showSizeChanger: true,
                             onChange: (page, pageSize) => {
                                 setPagination({ ...pagination, current: page, pageSize });
-                                fetchCategories({ page, pageSize });
+                                fetchCategories({
+                                    page,
+                                    pageSize,
+                                    name: filterName,
+                                    parentCategoryId: filterParentCategoryId
+                                });
                             }
                         }}
                     />
