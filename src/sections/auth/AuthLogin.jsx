@@ -15,13 +15,9 @@ export default function AuthLoginForm() {
     const [form] = Form.useForm();
 
     const onFinish = async (values) => {
-        try {
-            const result = await dispatch(loginAsync({ email: values.email, password: values.password })).unwrap();
-            if (result) {
-                navigate('/admin/service/accommodation');
-            }
-        } catch (error) {
-            console.error('Login failed:', error);
+        const result = await dispatch(loginAsync({ email: values.email, password: values.password })).unwrap();
+        if (result) {
+            navigate('/admin/service/accommodation');
         }
     };
 

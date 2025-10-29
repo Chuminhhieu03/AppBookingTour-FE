@@ -21,7 +21,11 @@ export const loginAsync = createAsyncThunk('auth/login', async ({ email, passwor
             message.success(response.data.message || 'Đăng nhập thành công!');
             return response.data;
         }
-        return rejectWithValue(response.message || 'Đăng nhập thất bại');
+
+        // ✅ FIX: Định nghĩa errorMessage trước khi dùng
+        const errorMessage = response.message || response.data?.message || 'Đăng nhập thất bại';
+        message.error(errorMessage);
+        return rejectWithValue(errorMessage);
     } catch (error) {
         const errorMessage = error.response?.data?.message || error.message || 'Có lỗi xảy ra khi đăng nhập';
         message.error(errorMessage);
@@ -154,7 +158,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.token = action.payload.token;
                 state.isAuthenticated = true;
-                state.user = { email: action.meta.arg.email }; // Store basic user info
+                state.user = { email: action.meta.arg.email };
             })
             .addCase(loginAsync.rejected, (state, action) => {
                 state.loading = false;
