@@ -78,9 +78,9 @@ export default function TourDepartureEdit() {
                 .hour(values.departureTime?.hour() || 0)
                 .minute(values.departureTime?.minute() || 0)
                 .second(0);
-                
+
             const returnDateTime = values.returnDate
-                .hour(values.returnTime?.hour() || 0)  
+                .hour(values.returnTime?.hour() || 0)
                 .minute(values.returnTime?.minute() || 0)
                 .second(0);
 
@@ -156,9 +156,9 @@ export default function TourDepartureEdit() {
                                         }
                                     ]}
                                 >
-                                    <DatePicker 
-                                        style={{ width: '100%' }} 
-                                        format="DD/MM/YYYY" 
+                                    <DatePicker
+                                        style={{ width: '100%' }}
+                                        format="DD/MM/YYYY"
                                         placeholder="Chọn ngày khởi hành"
                                         disabledDate={(current) => {
                                             return current && current.isBefore(dayjs().add(1, 'day'), 'day');
@@ -177,12 +177,7 @@ export default function TourDepartureEdit() {
                                         }
                                     ]}
                                 >
-                                    <TimePicker
-                                        style={{ width: '100%' }}
-                                        format="HH:mm"
-                                        placeholder="Chọn giờ khởi hành"
-                                        minuteStep={15}
-                                    />
+                                    <TimePicker style={{ width: '100%' }} format="HH:mm" placeholder="Chọn giờ khởi hành" minuteStep={15} />
                                 </Form.Item>
                             </Col>
                             <Col span={6}>
@@ -210,14 +205,17 @@ export default function TourDepartureEdit() {
                                         })
                                     ]}
                                 >
-                                    <DatePicker 
-                                        style={{ width: '100%' }} 
-                                        format="DD/MM/YYYY" 
+                                    <DatePicker
+                                        style={{ width: '100%' }}
+                                        format="DD/MM/YYYY"
                                         placeholder="Chọn ngày kết thúc"
                                         disabledDate={(current) => {
                                             const departureDate = form.getFieldValue('departureDate');
                                             if (departureDate) {
-                                                return current && (current.isBefore(departureDate, 'day') || current.isSame(departureDate, 'day'));
+                                                return (
+                                                    current &&
+                                                    (current.isBefore(departureDate, 'day') || current.isSame(departureDate, 'day'))
+                                                );
                                             }
                                             return current && current.isBefore(dayjs().add(1, 'day'), 'day');
                                         }}
@@ -235,12 +233,7 @@ export default function TourDepartureEdit() {
                                         }
                                     ]}
                                 >
-                                    <TimePicker
-                                        style={{ width: '100%' }}
-                                        format="HH:mm"
-                                        placeholder="Chọn giờ trở về"
-                                        minuteStep={15}
-                                    />
+                                    <TimePicker style={{ width: '100%' }} format="HH:mm" placeholder="Chọn giờ trở về" minuteStep={15} />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -339,10 +332,7 @@ export default function TourDepartureEdit() {
                                 </Form.Item>
                             </Col>
                             <Col span={8}>
-                                <Form.Item
-                                    label="Hướng dẫn viên phụ trách"
-                                    name="guideId"
-                                >
+                                <Form.Item label="Hướng dẫn viên phụ trách" name="guideId">
                                     <Select placeholder="Chọn hướng dẫn viên (tùy chọn)" allowClear>
                                         {/* Mock data - sẽ thay thế bằng API call sau */}
                                         <Option value="guide-1">Nguyễn Văn A</Option>
