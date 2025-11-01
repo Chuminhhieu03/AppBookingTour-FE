@@ -27,6 +27,7 @@ export default function TourDefault() {
     const [filterCityId, setFilterCityId] = useState('');
     const [filterPriceFrom, setFilterPriceFrom] = useState('');
     const [filterPriceTo, setFilterPriceTo] = useState('');
+    const [filterActive, setFilterActive] = useState('');
 
     // Dropdown data
     const [tourCategories, setTourCategories] = useState([]);
@@ -71,7 +72,8 @@ export default function TourDefault() {
                 typeId = filterTypeId,
                 cityId = filterCityId,
                 priceFrom = filterPriceFrom,
-                priceTo = filterPriceTo
+                priceTo = filterPriceTo,
+                active = filterActive
             } = params;
 
             const searchData = {
@@ -84,7 +86,8 @@ export default function TourDefault() {
                     typeId: typeId || null,
                     cityId: cityId || null,
                     priceFrom: priceFrom ? parseFloat(priceFrom) : null,
-                    priceTo: priceTo ? parseFloat(priceTo) : null
+                    priceTo: priceTo ? parseFloat(priceTo) : null,
+                    active: active !== '' ? active : null
                 }
             };
 
@@ -127,7 +130,8 @@ export default function TourDefault() {
             typeId: filterTypeId,
             cityId: filterCityId,
             priceFrom: filterPriceFrom,
-            priceTo: filterPriceTo
+            priceTo: filterPriceTo,
+            active: filterActive
         });
     };
 
@@ -140,6 +144,7 @@ export default function TourDefault() {
         setFilterCityId('');
         setFilterPriceFrom('');
         setFilterPriceTo('');
+        setFilterActive('');
 
         // Fetch với filter rỗng ngay lập tức
         fetchTours({
@@ -150,7 +155,8 @@ export default function TourDefault() {
             typeId: '',
             cityId: '',
             priceFrom: '',
-            priceTo: ''
+            priceTo: '',
+            active: ''
         });
     };
 
@@ -242,7 +248,7 @@ export default function TourDefault() {
             dataIndex: 'isActive',
             key: 'isActive',
             align: 'center',
-            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng</Tag>)
+            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>)
         },
         {
             title: 'Hành động',
@@ -382,6 +388,18 @@ export default function TourDefault() {
                                 min="0"
                             />
                         </Col>
+                        <Col span={4}>
+                            <Select
+                                value={filterActive || undefined}
+                                onChange={(value) => setFilterActive(value)}
+                                allowClear
+                                placeholder="Chọn trạng thái"
+                                style={{ width: '100%' }}
+                            >
+                                <Select.Option value={true}>Hoạt động</Select.Option>
+                                <Select.Option value={false}>Ngừng hoạt động</Select.Option>
+                            </Select>
+                        </Col>
                     </Row>
 
                     <h6 className="mb-3">Tổng số bản ghi: {pagination.total}</h6>
@@ -408,7 +426,8 @@ export default function TourDefault() {
                                     typeId: filterTypeId,
                                     cityId: filterCityId,
                                     priceFrom: filterPriceFrom,
-                                    priceTo: filterPriceTo
+                                    priceTo: filterPriceTo,
+                                    active: filterActive
                                 });
                             }
                         }}

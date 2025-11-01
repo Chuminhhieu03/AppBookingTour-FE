@@ -15,13 +15,21 @@ const tourAPI = {
 
     // Create tour
     create: async (data) => {
-        const response = await axiosInstance.post('/tours', data);
+        const response = await axiosInstance.post('/tours', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     },
 
     // Update tour
     update: async (id, data) => {
-        const response = await axiosInstance.put(`/tours/${id}`, data);
+        const response = await axiosInstance.put(`/tours/${id}`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     },
 

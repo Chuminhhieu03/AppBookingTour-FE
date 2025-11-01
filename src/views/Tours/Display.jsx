@@ -56,67 +56,99 @@ export default function TourDisplay() {
                     <Row gutter={[24, 24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
-                                <ImagesUC imageUrl={tour.coverImgUrl} viewOnly />
+                                <ImagesUC imageUrl={tour.imageMainUrl} viewOnly />
                             </div>
-                            <span>Hình đại diện</span>
+                            <span>Ảnh bìa</span>
                         </Col>
-                        <Col span={8}>
+
+                        <Col span={6}>
+                            <span>Mã tour</span>
+                            <Input value={tour.code} readOnly />
+                        </Col>
+                        <Col span={18}>
                             <span>Tên tour</span>
                             <Input value={tour.name} readOnly />
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <span>Loại tour</span>
-                            <Input value={tour.tourTypeName} readOnly />
+                            <Input value={tour.typeName} readOnly />
                         </Col>
-                        <Col span={8}>
-                            <span>Nơi khởi hành</span>
-                            <Input value={tour.departurePoint?.name} readOnly />
+                        <Col span={6}>
+                            <span>Danh mục tour</span>
+                            <Input value={tour.categoryName} readOnly />
                         </Col>
-                        <Col span={8}>
-                            <span>Nơi đến</span>
-                            <Input value={tour.destination} readOnly />
+                        <Col span={6}>
+                            <span>Thành phố khởi hành</span>
+                            <Input value={tour.departureCityName} readOnly />
                         </Col>
-                        <Col span={8}>
-                            <span>Ngày khởi hành</span>
-                            <Input value={tour.startDate} readOnly />
-                            {/* Cần format ngày tháng */}
+                        <Col span={6}>
+                            <span>Thành phố tham quan</span>
+                            <Input value={tour.destinationCityName} readOnly />
                         </Col>
-                        <Col span={8}>
-                            <span>Thời gian</span>
-                            <Input value={tour.duration} readOnly />
+                        <Col span={6}>
+                            <span>Số ngày lưu trú</span>
+                            <InputNumber value={tour.durationDays} className="w-100" readOnly addonAfter="Ngày" />
                         </Col>
-                        <Col span={8}>
-                            <span>Giá (VND)</span>
+                        <Col span={6}>
+                            <span>Số đêm lưu trú</span>
+                            <InputNumber value={tour.durationNights} className="w-100" readOnly addonAfter="Đêm" />
+                        </Col>
+                        <Col span={6}>
+                            <span>Số lượng hành khách tối thiểu</span>
+                            <InputNumber value={tour.minParticipants} className="w-100" readOnly addonAfter="Hành khách" />
+                        </Col>
+                        <Col span={6}>
+                            <span>Số lượng hành khách tối đa</span>
+                            <InputNumber value={tour.maxParticipants} className="w-100" readOnly addonAfter="Hành khách" />
+                        </Col>
+                        <Col span={6}>
+                            <span>Giá cơ bản người lớn (VND)</span>
                             <InputNumber
-                                value={tour.price}
+                                value={tour.basePriceAdult}
                                 className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
                                 readOnly
+                                addonAfter="VNĐ"
                             />
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <span>Giá cơ bản trẻ em (VND)</span>
+                            <InputNumber
+                                value={tour.basePriceChild}
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                readOnly
+                                addonAfter="VNĐ"
+                            />
+                        </Col>
+                        <Col span={6}>
                             <span>Trạng thái</span>
-                            <Input value={tour.statusName} readOnly />
+                            <Input value={tour.isActive ? 'Hoạt động' : 'Ngừng hoạt động'} readOnly />
                         </Col>
 
                         <Col span={24}>
                             <span>Hình ảnh khác</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                                <Gallery listImage={tour.listInfoImage} viewOnly />
+                                <Gallery listImage={tour.imageUrls?.map((url) => ({ url })) || []} viewOnly />
                             </div>
                         </Col>
                         <Col span={12}>
-                            <span>Dịch vụ bao gồm</span>
-                            <TextArea value={tour.inclusions} readOnly rows={6} />
+                            <span>Tour bao gồm</span>
+                            <TextArea value={tour.includes?.join('\n')} readOnly rows={4} />
                         </Col>
                         <Col span={12}>
-                            <span>Lịch trình chi tiết</span>
-                            <TextArea value={tour.itinerary} readOnly rows={6} />
+                            <span>Tour không bao gồm</span>
+                            <TextArea value={tour.excludes?.join('\n')} readOnly rows={4} />
                         </Col>
                         <Col span={24}>
-                            <span>Mô tả</span>
+                            <span>Mô tả về tour</span>
                             <TextArea value={tour.description} readOnly rows={4} />
+                        </Col>
+                        <Col span={24}>
+                            <span>Điều khoản & điều kiện của tour</span>
+                            <TextArea value={tour.termsConditions} readOnly rows={4} />
                         </Col>
                     </Row>
                     {/* Tour Itineraries Section */}

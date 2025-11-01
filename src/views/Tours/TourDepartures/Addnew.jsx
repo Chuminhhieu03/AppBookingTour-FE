@@ -1,7 +1,7 @@
 import { Form, Input, InputNumber, Button, DatePicker, TimePicker, Select, Row, Col, message, Space } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
@@ -12,8 +12,25 @@ const { Option } = Select;
 export default function TourDepartureAddnew() {
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const location = useLocation();
     const { tourId } = useParams();
     const [loading, setLoading] = useState(false);
+
+    const tourData = location.state;
+
+    useEffect(() => {
+        if (tourData) {
+            form.setFieldsValue({
+                priceAdult: tourData.priceAdult,
+                priceChildren: tourData.priceChildren,
+                status: 1
+            });
+        } else {
+            form.setFieldsValue({
+                status: 1
+            });
+        }
+    }, [tourData, form]);
 
     const handleSubmit = async (values) => {
         try {
@@ -109,6 +126,14 @@ export default function TourDepartureAddnew() {
                                         disabledDate={(current) => {
                                             return current && current.isBefore(dayjs().add(1, 'day'), 'day');
                                         }}
+                                        onChange={(date) => {
+                                            if (date && tourData?.duration) {
+                                                const endDate = date.add(tourData.duration, 'day');
+                                                form.setFieldsValue({
+                                                    returnDate: endDate
+                                                });
+                                            }
+                                        }}
                                     />
                                 </Form.Item>
                             </Col>
@@ -127,44 +152,12 @@ export default function TourDepartureAddnew() {
                                 </Form.Item>
                             </Col>
                             <Col span={6}>
-                                <Form.Item
-                                    label="Ngày kết thúc"
-                                    name="returnDate"
-                                    dependencies={['departureDate']}
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn ngày kết thúc!'
-                                        },
-                                        ({ getFieldValue }) => ({
-                                            validator: (_, value) => {
-                                                if (!value) return Promise.resolve();
-                                                const departureDate = getFieldValue('departureDate');
-                                                if (departureDate && value.isBefore(departureDate, 'day')) {
-                                                    return Promise.reject(new Error('Ngày kết thúc phải sau ngày khởi hành!'));
-                                                }
-                                                if (departureDate && value.isSame(departureDate, 'day')) {
-                                                    return Promise.reject(new Error('Ngày kết thúc phải sau ngày khởi hành!'));
-                                                }
-                                                return Promise.resolve();
-                                            }
-                                        })
-                                    ]}
-                                >
+                                <Form.Item label="Ngày kết thúc" name="returnDate">
                                     <DatePicker
                                         style={{ width: '100%' }}
                                         format="DD/MM/YYYY"
-                                        placeholder="Chọn ngày kết thúc"
-                                        disabledDate={(current) => {
-                                            const departureDate = form.getFieldValue('departureDate');
-                                            if (departureDate) {
-                                                return (
-                                                    current &&
-                                                    (current.isBefore(departureDate, 'day') || current.isSame(departureDate, 'day'))
-                                                );
-                                            }
-                                            return current && current.isBefore(dayjs().add(1, 'day'), 'day');
-                                        }}
+                                        placeholder="Tự động tính toán"
+                                        disabled={true}
                                     />
                                 </Form.Item>
                             </Col>

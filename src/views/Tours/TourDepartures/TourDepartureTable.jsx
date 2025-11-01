@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
 
-export default function TourDepartureTable({ tourId, isEditMode = false, title = 'Danh sách lịch khởi hành' }) {
+export default function TourDepartureTable({ tourId, isEditMode = false, title = 'Danh sách lịch khởi hành', tourData = null }) {
     const navigate = useNavigate();
     const [departures, setDepartures] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -62,8 +62,16 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
         navigate(`/admin/service/tour/${tourId}/departure/edit/${record.id}`);
     };
 
-    const handleAdd = () => {
-        navigate(`/admin/service/tour/${tourId}/departure/addnew`);
+    const handleAdd = (tourData = null) => {
+        navigate(`/admin/service/tour/${tourId}/departure/addnew`, {
+            state: tourData
+                ? {
+                      duration: tourData.durationDays,
+                      priceAdult: tourData.basePriceAdult,
+                      priceChildren: tourData.basePriceChild
+                  }
+                : null
+        });
     };
 
     const columns = [
@@ -150,7 +158,7 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
             size="small"
             extra={
                 isEditMode && (
-                    <Button type="primary" icon={<PlusOutlined />} size="small" onClick={handleAdd}>
+                    <Button type="primary" icon={<PlusOutlined />} size="small" onClick={() => handleAdd(tourData)}>
                         Thêm lịch khởi hành
                     </Button>
                 )

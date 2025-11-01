@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, Select, InputNumber, DatePicker, message } from 'antd';
+import { Col, Row, Button, Space, Input, Select, InputNumber, message } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -63,7 +63,12 @@ export default function TourEdit() {
             LoadingModal.showLoading();
             const response = await tourAPI.getById(id);
             if (response.success) {
-                setTour(response.data || {});
+                const tourData = response.data || {};
+                setTour({
+                    ...tourData,
+                    originalImageUrls: tourData.imageUrls || [], // Lưu URLs gốc để track xóa
+                    newImageFiles: []
+                });
             }
         } catch (error) {
             console.error('Error fetching tour details for edit:', error);
@@ -73,10 +78,58 @@ export default function TourEdit() {
         }
     };
 
-    const onEditTour = async (tourData) => {
+    const onEditTour = async () => {
         try {
             LoadingModal.showLoading();
-            const response = await tourAPI.update(id, tourData);
+
+            const formData = new FormData();
+
+            // Append các field theo TourCreateRequestDTO
+            formData.append('Code', tour.code || '');
+            formData.append('Name', tour.name || '');
+            formData.append('TypeId', tour.typeId || '');
+            formData.append('CategoryId', tour.categoryId || '');
+            formData.append('DepartureCityId', tour.departureCityId || '');
+            formData.append('DestinationCityId', tour.destinationCityId || '');
+            formData.append('DurationDays', tour.durationDays || 0);
+            formData.append('DurationNights', tour.durationNights || 0);
+            formData.append('MaxParticipants', tour.maxParticipants || 0);
+            formData.append('MinParticipants', tour.minParticipants || 0);
+            formData.append('BasePriceAdult', tour.basePriceAdult || 0);
+            formData.append('BasePriceChild', tour.basePriceChild || 0);
+            formData.append('IsActive', Boolean(tour.isActive));
+            formData.append('Description', tour.description || '');
+            formData.append('Includes', tour.includes?.join('\n') || '');
+            formData.append('Excludes', tour.excludes?.join('\n') || '');
+            formData.append('TermsConditions', tour.termsConditions || '');
+
+            // Append ImageMain nếu có thay đổi ảnh bìa
+            if (tour.imageMainFile) {
+                formData.append('ImageMain', tour.imageMainFile);
+            }
+
+            // Append Images mới nếu có
+            if (tour.newImageFiles && tour.newImageFiles.length > 0) {
+                tour.newImageFiles.forEach((file) => {
+                    if (file) {
+                        formData.append('Images', file);
+                    }
+                });
+            }
+
+            // Tính toán RemoveImageUrls lúc submit
+            const originalUrls = tour.originalImageUrls || [];
+            const currentUrls = tour.imageUrls || [];
+            const removedUrls = originalUrls.filter((url) => !currentUrls.includes(url));
+
+            // Append RemoveImageUrls nếu có ảnh bị xóa
+            if (removedUrls && removedUrls.length > 0) {
+                removedUrls.forEach((url) => {
+                    formData.append('RemoveImageUrls', url);
+                });
+            }
+
+            const response = await tourAPI.update(id, formData);
             if (response.success) {
                 message.success('Cập nhật tour thành công!');
                 navigate(`/admin/service/tour/display/${id}`);
@@ -105,7 +158,7 @@ export default function TourEdit() {
                     title="Chỉnh sửa tour"
                     secondary={
                         <Space>
-                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={() => onEditTour(tour)}>
+                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={onEditTour}>
                                 Lưu
                             </Button>
                             <Button
@@ -123,35 +176,22 @@ export default function TourEdit() {
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
                                 <ImagesUC
-                                    imageUrl={tour.coverImgUrl}
-                                    onChange={(imgUrl, file) => setTour({ ...tour, coverImgFile: file, coverImgUrl: imgUrl })}
+                                    imageUrl={tour.imageMainUrl}
+                                    onChange={(imgUrl, file) => setTour({ ...tour, imageMainFile: file, imageMainUrl: imgUrl })}
                                 />
                             </div>
-                            <span>Hình đại diện</span>
+                            <span>Ảnh bìa</span>
                         </Col>
-                        <Col span={8}>
+
+                        <Col span={6}>
+                            <span>Mã tour</span>
+                            <Input value={tour.code} onChange={(e) => setTour({ ...tour, code: e.target.value })} />
+                        </Col>
+                        <Col span={18}>
                             <span>Tên tour</span>
                             <Input value={tour.name} onChange={(e) => setTour({ ...tour, name: e.target.value })} />
                         </Col>
-                        <Col span={8}>
-                            <span>Danh mục tour</span>
-                            <Select
-                                value={tour.categoryId}
-                                allowClear
-                                placeholder="Chọn danh mục"
-                                className="w-100"
-                                showSearch
-                                filterOption={(input, option) => option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                onChange={(val) => setTour({ ...tour, categoryId: val })}
-                            >
-                                {tourCategories.map((category) => (
-                                    <Select.Option key={category.id} value={category.id}>
-                                        {category.name}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <span>Loại tour</span>
                             <Select
                                 value={tour.typeId}
@@ -169,14 +209,32 @@ export default function TourEdit() {
                                 ))}
                             </Select>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <span>Danh mục tour</span>
+                            <Select
+                                value={tour.categoryId}
+                                allowClear
+                                placeholder="Chọn danh mục tour"
+                                className="w-100"
+                                showSearch
+                                filterOption={(input, option) => option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                onChange={(val) => setTour({ ...tour, categoryId: val })}
+                            >
+                                {tourCategories.map((category) => (
+                                    <Select.Option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Col>
+                        <Col span={6}>
                             <span>Thành phố khởi hành</span>
                             <Select
                                 showSearch
                                 optionFilterProp="children"
                                 value={tour.departureCityId}
                                 allowClear
-                                placeholder="Chọn thành phố"
+                                placeholder="Chọn thành phố khởi hành"
                                 className="w-100"
                                 filterOption={(input, option) => option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                                 onChange={(val) => setTour({ ...tour, departureCityId: val })}
@@ -188,33 +246,90 @@ export default function TourEdit() {
                                 ))}
                             </Select>
                         </Col>
-                        <Col span={8}>
-                            <span>Nơi đến (Destinations)</span>
-                            <Input value={tour.destination} onChange={(e) => setTour({ ...tour, destination: e.target.value })} />
-                        </Col>
-                        <Col span={8}>
-                            <span>Ngày khởi hành</span>
-                            <DatePicker
+                        <Col span={6}>
+                            <span>Thành phố tham quan</span>
+                            <Select
+                                showSearch
+                                optionFilterProp="children"
+                                value={tour.destinationCityId}
+                                allowClear
+                                placeholder="Chọn thành phố tham quan"
                                 className="w-100"
-                                value={tour.startDate} // Cần xử lý state cho DatePicker (moment/dayjs)
-                                onChange={(date, dateString) => setTour({ ...tour, startDate: dateString })}
-                            />
+                                filterOption={(input, option) => option.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                onChange={(val) => setTour({ ...tour, destinationCityId: val })}
+                            >
+                                {cities.map((city) => (
+                                    <Select.Option key={city.id} value={city.id}>
+                                        {city.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Col>
-                        <Col span={8}>
-                            <span>Thời gian (VD: 3N2Đ)</span>
-                            <Input value={tour.duration} onChange={(e) => setTour({ ...tour, duration: e.target.value })} />
-                        </Col>
-                        <Col span={8}>
-                            <span>Giá (VND)</span>
+                        <Col span={6}>
+                            <span>Số ngày lưu trú</span>
                             <InputNumber
-                                value={tour.price}
+                                value={tour.durationDays}
                                 className="w-100"
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-                                onChange={(val) => setTour({ ...tour, price: val })}
+                                min={1}
+                                onChange={(val) => setTour({ ...tour, durationDays: val })}
+                                addonAfter="Ngày"
                             />
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <span>Số đêm lưu trú</span>
+                            <InputNumber
+                                value={tour.durationNights}
+                                className="w-100"
+                                min={0}
+                                onChange={(val) => setTour({ ...tour, durationNights: val })}
+                                addonAfter="Đêm"
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <span>Số lượng hành khách tối thiểu</span>
+                            <InputNumber
+                                value={tour.minParticipants}
+                                className="w-100"
+                                min={1}
+                                onChange={(val) => setTour({ ...tour, minParticipants: val })}
+                                addonAfter="Hành khách"
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <span>Số lượng hành khách tối đa</span>
+                            <InputNumber
+                                value={tour.maxParticipants}
+                                className="w-100"
+                                min={1}
+                                onChange={(val) => setTour({ ...tour, maxParticipants: val })}
+                                addonAfter="Hành khách"
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <span>Giá cơ bản người lớn (VND)</span>
+                            <InputNumber
+                                value={tour.basePriceAdult}
+                                className="w-100"
+                                min={0}
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                onChange={(val) => setTour({ ...tour, basePriceAdult: val })}
+                                addonAfter="VNĐ"
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <span>Giá cơ bản trẻ em (VND)</span>
+                            <InputNumber
+                                value={tour.basePriceChild}
+                                className="w-100"
+                                min={0}
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                onChange={(val) => setTour({ ...tour, basePriceChild: val })}
+                                addonAfter="VNĐ"
+                            />
+                        </Col>
+                        <Col span={6}>
                             <span>Trạng thái</span>
                             <Select
                                 value={tour.isActive}
@@ -232,32 +347,52 @@ export default function TourEdit() {
                             <span>Hình ảnh khác</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
                                 <Gallery
-                                    listImage={tour.listInfoImage}
-                                    onChange={(listOldImage, listNewImage) =>
+                                    listImage={tour.imageUrls?.map((url) => ({ url })) || []}
+                                    onChange={(listOldImage, listNewImage) => {
                                         setTour({
                                             ...tour,
-                                            listInfoImage: listOldImage,
-                                            ListNewInfoImage: listNewImage
-                                        })
-                                    }
+                                            imageUrls: listOldImage?.map((item) => item.url) || [],
+                                            newImageFiles: listNewImage || []
+                                        });
+                                    }}
                                 />
                             </div>
                         </Col>
                         <Col span={12}>
-                            <span>Dịch vụ bao gồm</span>
-                            <TextArea value={tour.inclusions} onChange={(e) => setTour({ ...tour, inclusions: e.target.value })} rows={6} />
+                            <span>Tour bao gồm</span>
+                            <TextArea
+                                value={tour.includes?.join('\n')}
+                                onChange={(e) => setTour({ ...tour, includes: e.target.value.split('\n').filter((item) => item.trim()) })}
+                                rows={4}
+                                placeholder="Nhập mỗi mục trên một dòng"
+                            />
                         </Col>
                         <Col span={12}>
-                            <span>Lịch trình chi tiết</span>
-                            <TextArea value={tour.itinerary} onChange={(e) => setTour({ ...tour, itinerary: e.target.value })} rows={6} />
+                            <span>Tour không bao gồm</span>
+                            <TextArea
+                                value={tour.excludes?.join('\n')}
+                                onChange={(e) => setTour({ ...tour, excludes: e.target.value.split('\n').filter((item) => item.trim()) })}
+                                rows={4}
+                                placeholder="Nhập mỗi mục trên một dòng"
+                            />
                         </Col>
                         <Col span={24}>
-                            <span>Mô tả</span>
+                            <span>Mô tả về tour</span>
                             <TextArea
                                 value={tour.description}
                                 allowClear
                                 className="w-100"
                                 onChange={(e) => setTour({ ...tour, description: e.target.value })}
+                                rows={4}
+                            />
+                        </Col>
+                        <Col span={24}>
+                            <span>Điều khoản & điều kiện của tour</span>
+                            <TextArea
+                                value={tour.termsConditions}
+                                allowClear
+                                className="w-100"
+                                onChange={(e) => setTour({ ...tour, termsConditions: e.target.value })}
                                 rows={4}
                             />
                         </Col>
@@ -273,7 +408,7 @@ export default function TourEdit() {
                     {/* Tour Departures Section */}
                     <Row>
                         <Col span={24}>
-                            <TourDepartureTable tourId={id} isEditMode={true} />
+                            <TourDepartureTable tourId={id} isEditMode={true} tourData={tour} />
                         </Col>
                     </Row>
                 </MainCard>
