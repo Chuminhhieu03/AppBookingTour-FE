@@ -145,6 +145,7 @@ export default function TourTypeDefault() {
             dataIndex: 'isActive',
             key: 'isActive',
             align: 'center',
+            width: 200,
             render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>)
         },
         {
@@ -152,13 +153,13 @@ export default function TourTypeDefault() {
             dataIndex: 'createdAt',
             key: 'createdAt',
             align: 'center',
-            width: 120,
+            width: 160,
             render: (date) => (date ? new Date(date).toLocaleDateString('vi-VN') : '—')
         },
         {
             title: 'Hành động',
             key: 'action',
-            width: 150,
+            width: 160,
             align: 'center',
             fixed: 'right',
             render: (_, record) => (

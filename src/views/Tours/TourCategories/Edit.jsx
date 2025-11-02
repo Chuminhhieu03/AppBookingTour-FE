@@ -87,7 +87,11 @@ export default function TourCategoryEdit() {
             }
         } catch (error) {
             console.error('Error updating tour category:', error);
-            message.error('Đã xảy ra lỗi khi cập nhật danh mục tour.');
+            if (error.response && error.response.data && error.response.data.message) {
+                message.error(error.response.data.message);
+            } else {
+                message.error('Đã xảy ra lỗi khi cập nhật danh mục tour.');
+            }
         } finally {
             LoadingModal.hideLoading();
         }
@@ -133,7 +137,7 @@ export default function TourCategoryEdit() {
                                         }
                                     ]}
                                 >
-                                    <Input placeholder="Nhập tên danh mục" />
+                                    <Input placeholder="Nhập tên danh mục" maxLength={100} />
                                 </Form.Item>
                             </Col>
 
@@ -163,7 +167,7 @@ export default function TourCategoryEdit() {
 
                             <Col span={24}>
                                 <Form.Item name="description" label="Mô tả">
-                                    <TextArea rows={4} placeholder="Nhập mô tả cho danh mục (không bắt buộc)" />
+                                    <TextArea rows={4} placeholder="Nhập mô tả cho danh mục (không bắt buộc)" maxLength={500} showCount />
                                 </Form.Item>
                             </Col>
                         </Row>

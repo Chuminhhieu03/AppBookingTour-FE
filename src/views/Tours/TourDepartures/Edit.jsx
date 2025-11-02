@@ -133,7 +133,6 @@ export default function TourDepartureEdit() {
                     }
                 >
                     <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
-                        {/* Hàng 1: Ngày khởi hành | Giờ khởi hành | Ngày kết thúc | Giờ trở về */}
                         <Row gutter={[24, 24]}>
                             <Col span={6}>
                                 <Form.Item
@@ -237,10 +236,8 @@ export default function TourDepartureEdit() {
                                 </Form.Item>
                             </Col>
                         </Row>
-
-                        {/* Hàng 2: Giá người lớn | Giá trẻ em */}
                         <Row gutter={[24, 24]}>
-                            <Col span={12}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Giá người lớn"
                                     name="priceAdult"
@@ -265,7 +262,7 @@ export default function TourDepartureEdit() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Giá trẻ em"
                                     name="priceChildren"
@@ -290,11 +287,7 @@ export default function TourDepartureEdit() {
                                     />
                                 </Form.Item>
                             </Col>
-                        </Row>
-
-                        {/* Hàng 3: Số chỗ còn trống | Trạng thái | Hướng dẫn viên */}
-                        <Row gutter={[24, 24]}>
-                            <Col span={8}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Số chỗ còn trống"
                                     name="availableSlots"
@@ -313,7 +306,7 @@ export default function TourDepartureEdit() {
                                     <InputNumber style={{ width: '100%' }} placeholder="Nhập số chỗ còn trống" min={1} />
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Trạng thái"
                                     name="status"
@@ -331,7 +324,9 @@ export default function TourDepartureEdit() {
                                     </Select>
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
+                        </Row>
+                        <Row gutter={[24, 24]}>
+                            <Col span={6}>
                                 <Form.Item label="Hướng dẫn viên phụ trách" name="guideId">
                                     <Select placeholder="Chọn hướng dẫn viên (tùy chọn)" allowClear>
                                         {/* Mock data - sẽ thay thế bằng API call sau */}

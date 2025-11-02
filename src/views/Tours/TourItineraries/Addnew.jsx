@@ -29,11 +29,16 @@ export default function TourItineraryAddnew() {
                 message.success('Tạo lịch trình thành công!');
                 navigate(`/admin/service/tour/edit/${tourId}`);
             } else {
-                message.error('Tạo lịch trình thất bại!');
+                console.error('Error response from server:', response);
+                message.error(response.message || 'Tạo lịch trình thất bại!');
             }
         } catch (error) {
             console.error('Error creating itinerary:', error);
-            message.error('Đã xảy ra lỗi khi tạo lịch trình.');
+            if (error.response && error.response.data && error.response.data.message) {
+                message.error(error.response.data.message);
+            } else {
+                message.error('Đã xảy ra lỗi khi tạo lịch trình tour.');
+            }
         } finally {
             setLoading(false);
             LoadingModal.hideLoading();
@@ -94,7 +99,7 @@ export default function TourItineraryAddnew() {
                                         { max: 200, message: 'Tiêu đề không được vượt quá 200 ký tự!' }
                                     ]}
                                 >
-                                    <Input placeholder="Nhập tiêu đề lịch trình" />
+                                    <Input placeholder="Nhập tiêu đề lịch trình" maxLength={200} />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
@@ -103,7 +108,7 @@ export default function TourItineraryAddnew() {
                                     label="Mô tả chi tiết"
                                     rules={[{ max: 500, message: 'Mô tả không được vượt quá 500 ký tự!' }]}
                                 >
-                                    <TextArea rows={4} placeholder="Nhập mô tả chi tiết của lịch trình" />
+                                    <TextArea rows={4} placeholder="Nhập mô tả chi tiết của lịch trình" maxLength={500} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
@@ -115,16 +120,16 @@ export default function TourItineraryAddnew() {
                                         { max: 1000, message: 'Hoạt động không được vượt quá 1000 ký tự!' }
                                     ]}
                                 >
-                                    <TextArea rows={6} placeholder="Mô tả chi tiết các hoạt động trong ngày" />
+                                    <TextArea rows={6} placeholder="Mô tả chi tiết các hoạt động trong ngày" maxLength={1000} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
                                 <Form.Item
                                     name="note"
                                     label="Ghi chú"
-                                    rules={[{ max: 300, message: 'Ghi chú không được vượt quá 300 ký tự!' }]}
+                                    rules={[{ max: 500, message: 'Ghi chú không được vượt quá 500 ký tự!' }]}
                                 >
-                                    <TextArea rows={3} placeholder="Nhập ghi chú bổ sung (không bắt buộc)" />
+                                    <TextArea rows={4} placeholder="Nhập ghi chú bổ sung (không bắt buộc)" maxLength={500} showCount />
                                 </Form.Item>
                             </Col>
                         </Row>

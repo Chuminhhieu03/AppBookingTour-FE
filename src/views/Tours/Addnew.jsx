@@ -100,7 +100,11 @@ export default function TourAddnew() {
             }
         } catch (error) {
             console.error('Error adding new tour:', error);
-            message.error('Đã xảy ra lỗi khi tạo tour mới.');
+            if (error.response && error.response.data && error.response.data.message) {
+                message.error(error.response.data.message);
+            } else {
+                message.error('Đã xảy ra lỗi khi tạo tour mới.');
+            }
         } finally {
             LoadingModal.hideLoading();
         }
@@ -144,12 +148,12 @@ export default function TourAddnew() {
 
                             <Col span={6}>
                                 <Form.Item name="code" label="Mã tour" rules={[{ required: true, message: 'Vui lòng nhập mã tour!' }]}>
-                                    <Input placeholder="Nhập mã tour" />
+                                    <Input placeholder="Nhập mã tour" maxLength={50} />
                                 </Form.Item>
                             </Col>
                             <Col span={18}>
                                 <Form.Item name="name" label="Tên tour" rules={[{ required: true, message: 'Vui lòng nhập tên tour!' }]}>
-                                    <Input placeholder="Nhập tên tour" />
+                                    <Input placeholder="Nhập tên tour" maxLength={200} />
                                 </Form.Item>
                             </Col>
                             <Col span={6}>
@@ -188,7 +192,18 @@ export default function TourAddnew() {
                                 <Form.Item
                                     name="departureCityId"
                                     label="Thành phố khởi hành"
-                                    rules={[{ required: true, message: 'Vui lòng chọn thành phố khởi hành!' }]}
+                                    rules={[
+                                        { required: true, message: 'Vui lòng chọn thành phố khởi hành!' },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                const destinationCityId = getFieldValue('destinationCityId');
+                                                if (!value || !destinationCityId || value !== destinationCityId) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(new Error('Giá trị của hai thành phố không được trùng nhau!'));
+                                            }
+                                        })
+                                    ]}
                                 >
                                     <Select
                                         showSearch
@@ -206,7 +221,18 @@ export default function TourAddnew() {
                                 <Form.Item
                                     name="destinationCityId"
                                     label="Thành phố tham quan"
-                                    rules={[{ required: true, message: 'Vui lòng chọn thành phố tham quan!' }]}
+                                    rules={[
+                                        { required: true, message: 'Vui lòng chọn thành phố tham quan!' },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                const departureCityId = getFieldValue('departureCityId');
+                                                if (!value || !departureCityId || value !== departureCityId) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(new Error('Giá trị của hai thành phố không được trùng nhau!'));
+                                            }
+                                        })
+                                    ]}
                                 >
                                     <Select
                                         showSearch
@@ -251,7 +277,18 @@ export default function TourAddnew() {
                                     label="Số lượng hành khách tối thiểu"
                                     rules={[
                                         { required: true, message: 'Vui lòng nhập số lượng tối thiểu!' },
-                                        { type: 'number', min: 1, message: 'Số lượng phải lớn hơn 0!' }
+                                        { type: 'number', min: 1, message: 'Số lượng phải lớn hơn 0!' },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                const maxParticipants = getFieldValue('maxParticipants');
+                                                if (!value || !maxParticipants || value <= maxParticipants) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(
+                                                    new Error('Số lượng tối thiểu phải nhỏ hơn hoặc bằng số lượng tối đa!')
+                                                );
+                                            }
+                                        })
                                     ]}
                                 >
                                     <InputNumber className="w-100" min={1} placeholder="Nhập số lượng tối thiểu" addonAfter="Hành khách" />
@@ -263,7 +300,18 @@ export default function TourAddnew() {
                                     label="Số lượng hành khách tối đa"
                                     rules={[
                                         { required: true, message: 'Vui lòng nhập số lượng tối đa!' },
-                                        { type: 'number', min: 1, message: 'Số lượng phải lớn hơn 0!' }
+                                        { type: 'number', min: 1, message: 'Số lượng phải lớn hơn 0!' },
+                                        ({ getFieldValue }) => ({
+                                            validator(_, value) {
+                                                const minParticipants = getFieldValue('minParticipants');
+                                                if (!value || !minParticipants || value >= minParticipants) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(
+                                                    new Error('Số lượng tối đa phải lớn hơn hoặc bằng số lượng tối thiểu!')
+                                                );
+                                            }
+                                        })
                                     ]}
                                 >
                                     <InputNumber className="w-100" min={1} placeholder="Nhập số lượng tối đa" addonAfter="Hành khách" />
@@ -337,22 +385,22 @@ export default function TourAddnew() {
 
                             <Col span={12}>
                                 <Form.Item name="includes" label="Tour bao gồm">
-                                    <TextArea rows={4} placeholder="Nhập các dịch vụ tour bao gồm" />
+                                    <TextArea rows={4} placeholder="Nhập các dịch vụ tour bao gồm" maxLength={1500} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
                                 <Form.Item name="excludes" label="Tour không bao gồm">
-                                    <TextArea rows={4} placeholder="Nhập các dịch vụ tour không bao gồm" />
+                                    <TextArea rows={4} placeholder="Nhập các dịch vụ tour không bao gồm" maxLength={1500} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
                                 <Form.Item name="description" label="Mô tả về tour">
-                                    <TextArea rows={4} placeholder="Nhập mô tả chi tiết về tour" />
+                                    <TextArea rows={6} placeholder="Nhập mô tả chi tiết về tour" maxLength={3000} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
                                 <Form.Item name="termsConditions" label="Điều khoản & điều kiện của tour">
-                                    <TextArea rows={4} placeholder="Nhập điều khoản và điều kiện" />
+                                    <TextArea rows={5} placeholder="Nhập điều khoản và điều kiện" maxLength={2000} showCount />
                                 </Form.Item>
                             </Col>
                         </Row>

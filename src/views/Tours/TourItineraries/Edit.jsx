@@ -52,11 +52,16 @@ export default function TourItineraryEdit() {
                 message.success('Cập nhật lịch trình thành công!');
                 navigate(`/admin/service/tour/edit/${tourId}`);
             } else {
-                message.error('Cập nhật lịch trình thất bại!');
+                console.error('Error response from server:', response);
+                message.error(response.message || 'Cập nhật lịch trình thất bại!');
             }
         } catch (error) {
             console.error('Error updating itinerary:', error);
-            message.error('Đã xảy ra lỗi khi cập nhật lịch trình.');
+            if (error.response && error.response.data && error.response.data.message) {
+                message.error(error.response.data.message);
+            } else {
+                message.error('Đã xảy ra lỗi khi cập nhật lịch trình tour.');
+            }
         } finally {
             setLoading(false);
             LoadingModal.hideLoading();
@@ -115,7 +120,7 @@ export default function TourItineraryEdit() {
                                     label="Mô tả chi tiết"
                                     rules={[{ max: 500, message: 'Mô tả không được vượt quá 500 ký tự!' }]}
                                 >
-                                    <TextArea rows={4} placeholder="Nhập mô tả chi tiết của lịch trình" />
+                                    <TextArea rows={4} placeholder="Nhập mô tả chi tiết của lịch trình" maxLength={500} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
@@ -127,16 +132,16 @@ export default function TourItineraryEdit() {
                                         { max: 1000, message: 'Hoạt động không được vượt quá 1000 ký tự!' }
                                     ]}
                                 >
-                                    <TextArea rows={6} placeholder="Mô tả chi tiết các hoạt động trong ngày" />
+                                    <TextArea rows={6} placeholder="Mô tả chi tiết các hoạt động trong ngày" maxLength={1000} showCount />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
                                 <Form.Item
                                     name="note"
                                     label="Ghi chú"
-                                    rules={[{ max: 300, message: 'Ghi chú không được vượt quá 300 ký tự!' }]}
+                                    rules={[{ max: 500, message: 'Ghi chú không được vượt quá 500 ký tự!' }]}
                                 >
-                                    <TextArea rows={3} placeholder="Nhập ghi chú bổ sung (không bắt buộc)" />
+                                    <TextArea rows={4} placeholder="Nhập ghi chú bổ sung (không bắt buộc)" maxLength={500} showCount />
                                 </Form.Item>
                             </Col>
                         </Row>

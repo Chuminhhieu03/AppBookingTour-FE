@@ -38,7 +38,11 @@ export default function TourTypeAddnew() {
             }
         } catch (error) {
             console.error('Error adding new tour type:', error);
-            message.error('Đã xảy ra lỗi khi thêm loại tour.');
+            if (error.response && error.response.data && error.response.data.message) {
+                message.error(error.response.data.message);
+            } else {
+                message.error('Đã xảy ra lỗi khi thêm loại tour.');
+            }
         } finally {
             LoadingModal.hideLoading();
         }
@@ -88,10 +92,14 @@ export default function TourTypeAddnew() {
                                         {
                                             required: true,
                                             message: 'Tên loại tour không được để trống!'
+                                        },
+                                        {
+                                            max: 100,
+                                            message: 'Tên loại tour không được vượt quá 100 ký tự!'
                                         }
                                     ]}
                                 >
-                                    <Input placeholder="Nhập tên loại tour" />
+                                    <Input placeholder="Nhập tên loại tour" maxLength={100} />
                                 </Form.Item>
                             </Col>
 
@@ -121,8 +129,17 @@ export default function TourTypeAddnew() {
                             </Col>
 
                             <Col span={24}>
-                                <Form.Item name="description" label="Mô tả">
-                                    <TextArea rows={4} placeholder="Nhập mô tả cho loại tour (không bắt buộc)" />
+                                <Form.Item
+                                    name="description"
+                                    label="Mô tả"
+                                    rules={[
+                                        {
+                                            max: 500,
+                                            message: 'Mô tả không được vượt quá 500 ký tự!'
+                                        }
+                                    ]}
+                                >
+                                    <TextArea rows={4} placeholder="Nhập mô tả cho loại tour (không bắt buộc)" maxLength={500} showCount />
                                 </Form.Item>
                             </Col>
                         </Row>
