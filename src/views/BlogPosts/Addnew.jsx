@@ -24,7 +24,7 @@ const BlogPostsAddnew = () => {
         const fetchCities = async () => {
             try {
                 setLoadingCities(true);
-                const response = await cityAPI.getAllCities();
+                const response = await cityAPI.getListCity();
                 if (response.success) {
                     setCities(response.data || []);
                 } else {

@@ -13,6 +13,7 @@ import AccommodationRoute from './AccommodationRoute';
 import ChangePasswordRoute from './ChangePasswordRoute';
 import BlogPostRoute from './BlogPostRoute';
 import AccommodationCustomerRoutes from './Customers/AccommodationCustomerRout';
+import TourRoute from './TourRoute';
 
 const router = createBrowserRouter(
     [
@@ -27,7 +28,8 @@ const router = createBrowserRouter(
         AccommodationRoute,
         ChangePasswordRoute,
         BlogPostRoute,
-        AccommodationCustomerRoutes
+        AccommodationCustomerRoutes,
+        TourRoute
     ],
     {
         basename: import.meta.env.VITE_APP_BASE_NAME
