@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select } from 'antd';
-import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, Modal, message } from 'antd';
+import { SearchOutlined, ReloadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import SearchDiscountQuery from '../../DTO/Discounts/SearchDiscounts/SearchDiscountQuery';
@@ -8,7 +8,8 @@ import DiscountFilter from '../../DTO/Discounts/SearchDiscounts/SearchDiscountFi
 import Constants from '../../Constants/Constants';
 import Utility from '../../utils/Utility';
 import LoadingModal from '../../components/LoadingModal';
-import axiosIntance from '../../api/axiosInstance'
+import axiosIntance from '../../api/axiosInstance';
+import discountAPI from '../../api/discount/discountAPI';
 
 export default function Default() {
     const [query, setQuery] = React.useState(new SearchDiscountQuery());
@@ -67,6 +68,16 @@ export default function Default() {
             render: (value, record) => {
                 return record.status === Constants.Status.Active ? <Tag color="green">{value}</Tag> : <Tag color="red">{value}</Tag>;
             }
+        },
+        {
+            title: 'Hành động',
+            key: 'action',
+            align: 'center',
+            render: (_, record) => (
+                <Space size="small">
+                    <Button type="link" size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+                </Space>
+            )
         }
     ];
 
@@ -87,6 +98,30 @@ export default function Default() {
         setListStatus(res.listStatus);
     };
 
+    const handleDelete = async (id) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa mã giảm giá này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    const response = await discountAPI.delete(id);
+                    if (response.success) {
+                        message.success('Xóa mã giảm giá thành công');
+                        searchData();
+                    } else {
+                        message.error(response.message || 'Không thể xóa mã giảm giá');
+                    }
+                } catch (error) {
+                    console.error('Error deleting blog post:', error);
+                    message.error('Đã xảy ra lỗi khi xóa mã giảm giá');
+                }
+            }
+        });
+    }
+
     const searchData = async (pageIndex = 0) => {
         try {
             LoadingModal.showLoading();
@@ -94,8 +129,7 @@ export default function Default() {
             request.PageIndex = pageIndex;
             request.PageSize = Constants.DEFAULT_PAGE_SIZE;
             request.DiscountFilter = { ...filter };
-            const response = await axiosIntance.post('/Discount/search', request);
-            const res = response.data;
+            const res = await discountAPI.search(request);
             setListDiscount(res.listDiscount);
             setIsReset(false);
         } catch (error) {

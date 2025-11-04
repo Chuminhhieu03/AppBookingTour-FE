@@ -68,7 +68,7 @@ export default function Default() {
             }
         },
         {
-            title: 'Chức năng',
+            title: 'Hành động',
             key: 'actions',
             align: 'center',
             width: 100,

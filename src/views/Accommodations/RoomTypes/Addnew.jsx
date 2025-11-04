@@ -1,5 +1,4 @@
-import { Modal, Button, InputNumber } from 'antd';
-import { Col, Row, Input, Select } from 'antd';
+import { Modal, Button, InputNumber, Form, Input, Select, Col, Row } from 'antd';
 import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
@@ -9,10 +8,11 @@ import axiosIntance from '../../../api/axiosInstance';
 const { TextArea } = Input;
 
 export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId }) {
-    const [roomType, setRoomType] = useState({});
+    const [form] = Form.useForm();
     const [listStatus, setListStatus] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
+    const [coverImgFile, setCoverImgFile] = useState(null);
 
     useEffect(() => {
         setupAddnewForm();
@@ -43,7 +43,8 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             formData.append('ExtraAdultPrice', roomTypeRequest.ExtraAdultPrice);
             formData.append('ExtraChildrenPrice', roomTypeRequest.ExtraChildrenPrice);
             formData.append('Status', roomTypeRequest.Status);
-            formData.append('CoverImgFile', roomTypeRequest.CoverImgFile);
+            // cover image file comes from local state
+            if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
             formData.append('Amenities', amenities);
             formData.append('AccommodationId', accommodationId);
             listInfoImage?.forEach((file) => {
@@ -58,7 +59,9 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             if (res.success) {
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal
-                setRoomType({});
+                form.resetFields();
+                setCoverImgFile(null);
+                setListInfoImage([]);
             } else {
                 console.error('Error adding new room type:', res.message);
             }
@@ -70,7 +73,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
     };
 
     const handleOk = () => {
-        onAddnewRoomType(roomType);
+        form.submit();
     };
 
     return (
@@ -97,111 +100,81 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                 xxl: '40%'
             }}
         >
-            <Row gutter={[24, 24]}>
-                <Col span={24} style={{ textAlign: 'center' }}>
-                    <div className="mb-3 d-flex justify-content-center">
-                        <ImagesUC onChange={(_, file) => setRoomType({ ...roomType, CoverImgFile: file })} />
-                    </div>
-                    <span>Hình đại diện</span>
-                </Col>
-                <Col span={8}>
-                    <span>Tên</span>
-                    <Input value={roomType.Name} onChange={(e) => setRoomType({ ...roomType, Name: e.target.value })} />
-                </Col>
-                <Col span={8}>
-                    <span>Số lượng người lớn</span>
-                    <InputNumber
-                        min={0}
-                        className="w-100"
-                        value={roomType.MaxAdult}
-                        onChange={(val) => setRoomType({ ...roomType, MaxAdult: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Số lượng trẻ em</span>
-                    <InputNumber
-                        min={0}
-                        className="w-100"
-                        value={roomType.MaxChildren}
-                        onChange={(val) => setRoomType({ ...roomType, MaxChildren: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Số lượng phòng</span>
-                    <InputNumber
-                        min={0}
-                        className="w-100"
-                        value={roomType.Quantity}
-                        onChange={(val) => setRoomType({ ...roomType, Quantity: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Giá phòng</span>
-                    <InputNumber
-                        min={0}
-                        className="w-100"
-                        value={roomType.Price}
-                        onChange={(val) => setRoomType({ ...roomType, Price: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Phụ phí người lớn</span>
-                    <InputNumber
-                        min={0}
-                        className="w-100"
-                        value={roomType.ExtraAdultPrice}
-                        onChange={(val) => setRoomType({ ...roomType, ExtraAdultPrice: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Phụ phí trẻ em</span>
-                    <InputNumber
-                        min={0}
-                        className="w-100"
-                        value={roomType.ExtraChildrenPrice}
-                        onChange={(val) => setRoomType({ ...roomType, ExtraChildrenPrice: val })}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Tiện ích</span>
-                    <Select
-                        mode="multiple"
-                        value={roomType.Amenity}
-                        allowClear
-                        className="w-100"
-                        options={listAmenity?.map((item) => ({
-                            label: item.name,
-                            value: item.id
-                        }))}
-                        onChange={(val) => {
-                            setRoomType({ ...roomType, Amenity: val });
-                        }}
-                    />
-                </Col>
-                <Col span={8}>
-                    <span>Trạng thái</span>
-                    <Select
-                        value={roomType.Status}
-                        allowClear
-                        className="w-100"
-                        options={listStatus?.map((item) => ({
-                            label: item.value,
-                            value: item.key
-                        }))}
-                        onChange={(val) => setRoomType({ ...roomType, Status: val })}
-                    />
-                </Col>
-                <Col span={24}>
-                    <span>Hình ảnh khác</span>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                        <Gallery
-                            onChange={(_, listNewImage) => {
-                                setListInfoImage([...listNewImage]);
-                            }}
-                        />
-                    </div>
-                </Col>
-            </Row>
+            <Form form={form} layout="vertical" onFinish={onAddnewRoomType} initialValues={{ Status: undefined }}>
+                <Row gutter={[24]}>
+                    <Col span={24} style={{ textAlign: 'center', marginBottom: 16 }}>
+                        <div className="mb-3 d-flex justify-content-center">
+                            <ImagesUC onChange={(_, file) => setCoverImgFile(file)} />
+                        </div>
+                        <span>Hình đại diện</span>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="Name" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
+                            <Input />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="MaxAdult" label="Số lượng người lớn" rules={[{ type: 'number', min: 0 }]}> 
+                            <InputNumber min={0} className="w-100" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="MaxChildren" label="Số lượng trẻ em" rules={[{ type: 'number', min: 0 }]}> 
+                            <InputNumber min={0} className="w-100" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="Quantity" label="Số lượng phòng" rules={[{ type: 'number', min: 0 }]}> 
+                            <InputNumber min={0} className="w-100" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="Price" label="Giá phòng" rules={[{ type: 'number', min: 0 }]}> 
+                            <InputNumber min={0} className="w-100" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn" rules={[{ type: 'number', min: 0 }]}> 
+                            <InputNumber min={0} className="w-100" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em" rules={[{ type: 'number', min: 0 }]}> 
+                            <InputNumber min={0} className="w-100" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="Amenity" label="Tiện ích">
+                            <Select mode="multiple" allowClear className="w-100" options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))} />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="Status" label="Trạng thái">
+                            <Select allowClear className="w-100" options={listStatus?.map((item) => ({ label: item.value, value: item.key }))} />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={24}>
+                        <span>Hình ảnh khác</span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                            <Gallery
+                                onChange={(_, listNewImage) => {
+                                    setListInfoImage([...listNewImage]);
+                                }}
+                            />
+                        </div>
+                    </Col>
+                </Row>
+            </Form>
         </Modal>
     );
 }

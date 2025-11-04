@@ -5,4 +5,8 @@ export default class Constants {
         Active: 1,
         Inactive: 0
     };
+
+    static FeatureCode = {
+        AccommodationAmenity: 'AccommodationAmenity'
+    }
 }

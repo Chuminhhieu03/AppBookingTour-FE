@@ -1,32 +1,30 @@
 import { lazy } from 'react';
 
 // project-imports
-import AdminLayout from '../layout/AdminLayout/AdminLayout';
 import Loadable from 'components/Loadable';
 import ProtectedRoute from 'components/auth/ProtectedRoute';
+import CustomerLayout from 'layout/CustomerLayout/CustomerLayout';
 
 // render - bootstrap table pages
-const BootstrapTableBasic = Loadable(lazy(() => import('views/Customers/Accommodations/Default')));
+const AccommodationCustomerDefault = Loadable(lazy(() => import('views/Customers/Accommodations/Default')));
 
-// ==============================|| TABLES ROUTING ||============================== //
-
-const TablesRoutes = {
+const AccommodationCustomerRoutes = {
     path: '/',
     children: [
         {
             path: '/',
             element: (
                 <ProtectedRoute>
-                    <AdminLayout />
+                    <CustomerLayout />
                 </ProtectedRoute>
             ),
             children: [
                 {
-                    path: 'tables/bootstrap-table',
+                    path: 'accommodations',
                     children: [
                         {
-                            path: 'basic-table',
-                            element: <BootstrapTableBasic />
+                            path: 'default',
+                            element: <AccommodationCustomerDefault />
                         }
                     ]
                 }
@@ -35,4 +33,4 @@ const TablesRoutes = {
     ]
 };
 
-export default TablesRoutes;
+export default AccommodationCustomerRoutes;
