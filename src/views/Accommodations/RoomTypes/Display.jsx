@@ -71,7 +71,10 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                 </Col>
                 <Col span={8}>
                     <span>Giá phòng</span>
-                    <Input value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomTypeDisplay.price)} readOnly />
+                    <Input
+                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomTypeDisplay.price)}
+                        readOnly
+                    />
                 </Col>
                 <Col span={8}>
                     <span>Phụ phí người lớn</span>
@@ -83,7 +86,9 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                 <Col span={8}>
                     <span>Phụ phí trẻ em</span>
                     <Input
-                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomTypeDisplay.extraChildrenPrice)}
+                        value={Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+                            roomTypeDisplay.extraChildrenPrice
+                        )}
                         readOnly
                     />
                 </Col>

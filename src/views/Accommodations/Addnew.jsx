@@ -167,7 +167,7 @@ export default function Addnew() {
                                     value: item.id
                                 }))}
                                 onChange={(val) => {
-                                    setAccommodation({ ...accommodation, Amenity: val })
+                                    setAccommodation({ ...accommodation, Amenity: val });
                                 }}
                             />
                         </Col>

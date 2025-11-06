@@ -8,7 +8,7 @@ import DiscountFilter from '../../DTO/Discounts/SearchDiscounts/SearchDiscountFi
 import Constants from '../../Constants/Constants';
 import Utility from '../../utils/Utility';
 import LoadingModal from '../../components/LoadingModal';
-import axiosIntance from '../../api/axiosInstance'
+import axiosIntance from '../../api/axiosInstance';
 
 export default function Default() {
     const [query, setQuery] = React.useState(new SearchDiscountQuery());
