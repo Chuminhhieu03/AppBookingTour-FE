@@ -1,10 +1,13 @@
-import { Col, Row, Button, Space, Input, Select, Table, Tag, message, Modal } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { Col, Row, Button, Space, Input, Select, Table, Tag, message, Modal, Card, List, Typography } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined, EyeOutlined, BellOutlined, ClearOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import MainCard from 'components/MainCard';
 import LoadingModal from '../../../components/LoadingModal';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
+
+const { Text } = Typography;
 
 export default function TourTypeDefault() {
     const navigate = useNavigate();
@@ -18,6 +21,16 @@ export default function TourTypeDefault() {
 
     // Filters
     const [filterName, setFilterName] = useState('');
+
+    // SignalR states
+    const [connection, setConnection] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [isConnected, setIsConnected] = useState(false);
+
+    // Clear messages function
+    const clearMessages = () => {
+        setMessages([]);
+    };
 
     const fetchTourTypes = async (params = {}) => {
         setLoading(true);
@@ -113,6 +126,85 @@ export default function TourTypeDefault() {
         });
     };
 
+    // SignalR connection effect
+    useEffect(() => {
+        // Khởi tạo kết nối SignalR
+        const newConnection = new HubConnectionBuilder()
+            .withUrl('http://localhost:5000/notificationHub')
+            .withAutomaticReconnect()
+            .configureLogging(LogLevel.Information)
+            .build();
+
+        setConnection(newConnection);
+
+        // Bắt đầu kết nối
+        const startConnection = async () => {
+            try {
+                await newConnection.start();
+                console.log('SignalR Connected');
+                setIsConnected(true);
+
+                // Thiết lập các event listeners
+                newConnection.on('ReceiveWelcomeMessage', (welcomeMessage) => {
+                    console.log('Received welcome message:', welcomeMessage);
+                    const newMessage = {
+                        id: Date.now(),
+                        type: 'welcome',
+                        content: welcomeMessage,
+                        timestamp: new Date().toISOString()
+                    };
+                    setMessages((prevMessages) => [newMessage, ...prevMessages]);
+                    message.success(`Welcome: ${welcomeMessage}`);
+                });
+
+                newConnection.on('ReceiveNotification', (notification) => {
+                    console.log('Received notification:', notification);
+                    const newMessage = {
+                        id: Date.now(),
+                        type: notification.type || 'notification',
+                        content: notification.content,
+                        timestamp: notification.timestamp
+                    };
+                    setMessages((prevMessages) => [newMessage, ...prevMessages]);
+                    message.info(`Notification: ${notification.content}`);
+                });
+
+                // Handle connection state changes
+                newConnection.onreconnecting(() => {
+                    console.log('SignalR Reconnecting...');
+                    setIsConnected(false);
+                    message.warning('Đang kết nối lại...');
+                });
+
+                newConnection.onreconnected(() => {
+                    console.log('SignalR Reconnected');
+                    setIsConnected(true);
+                    message.success('Đã kết nối lại thành công!');
+                });
+
+                newConnection.onclose(() => {
+                    console.log('SignalR Disconnected');
+                    setIsConnected(false);
+                });
+            } catch (error) {
+                console.error('SignalR Connection Error:', error);
+                setIsConnected(false);
+                message.error('Không thể kết nối đến server thông báo');
+            }
+        };
+
+        startConnection();
+
+        // Cleanup function
+        return () => {
+            if (newConnection) {
+                newConnection.stop().then(() => {
+                    console.log('SignalR Connection Stopped');
+                });
+            }
+        };
+    }, []);
+
     useEffect(() => {
         fetchTourTypes();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,8 +276,8 @@ export default function TourTypeDefault() {
     ];
 
     return (
-        <Row>
-            <Col span={24}>
+        <Row gutter={[16, 16]}>
+            <Col span={18}>
                 <MainCard
                     title="Danh sách loại tour"
                     secondary={
@@ -241,6 +333,68 @@ export default function TourTypeDefault() {
                 </MainCard>
 
                 {loading && <LoadingModal />}
+            </Col>
+            
+            <Col span={6}>
+                <MainCard
+                    title={
+                        <Space>
+                            <BellOutlined />
+                            Thông báo thời gian thực
+                            <Tag color={isConnected ? 'green' : 'red'}>
+                                {isConnected ? 'Đã kết nối' : 'Ngắt kết nối'}
+                            </Tag>
+                        </Space>
+                    }
+                    secondary={
+                        messages.length > 0 && (
+                            <Button 
+                                size="small" 
+                                icon={<ClearOutlined />} 
+                                onClick={clearMessages}
+                                title="Xóa tất cả tin nhắn"
+                            >
+                                Xóa
+                            </Button>
+                        )
+                    }
+                >
+                    <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        {messages.length === 0 ? (
+                            <Text type="secondary">Chưa có thông báo nào...</Text>
+                        ) : (
+                            <List
+                                dataSource={messages}
+                                renderItem={(item) => (
+                                    <List.Item key={item.id}>
+                                        <Card 
+                                            size="small" 
+                                            style={{ width: '100%' }}
+                                            bodyStyle={{ padding: '8px 12px' }}
+                                        >
+                                            <div>
+                                                <Tag 
+                                                    color={item.type === 'welcome' ? 'blue' : 'green'}
+                                                    style={{ marginBottom: '4px' }}
+                                                >
+                                                    {item.type === 'welcome' ? 'Chào mừng' : 'Thông báo'}
+                                                </Tag>
+                                                <div>
+                                                    <Text>{item.content}</Text>
+                                                </div>
+                                                <div style={{ marginTop: '4px' }}>
+                                                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                                                        {new Date(item.timestamp).toLocaleString('vi-VN')}
+                                                    </Text>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    </List.Item>
+                                )}
+                            />
+                        )}
+                    </div>
+                </MainCard>
             </Col>
         </Row>
     );
