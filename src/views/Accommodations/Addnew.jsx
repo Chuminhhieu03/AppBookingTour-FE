@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
 
 const { TextArea } = Input;
 
@@ -24,8 +24,7 @@ export default function Addnew() {
 
     const setupAddnewForm = async () => {
         try {
-            const response = await axiosIntance.post('/Accommodation/setup-addnew', {});
-            const res = response.data;
+            const res = await accommodationAPI.setupAddnew();
             setListStatus(res.listStatus);
             setListType(res.listType);
             setListCity(res.listCity);
@@ -58,12 +57,7 @@ export default function Addnew() {
                 formData.append('InfoImgFile', file);
             });
 
-            const response = await axiosIntance.post('/Accommodation', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            const res = response.data;
+            const res = await accommodationAPI.create(formData);
             const accommodationRes = res.accommodation;
             form.resetFields();
             setCoverImgFile(null);

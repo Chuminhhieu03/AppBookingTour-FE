@@ -10,7 +10,7 @@ import Gallery from '../components/basic/Gallery';
 import AddNewRoomType from './RoomTypes/Addnew';
 import RoomTypeDisplay from './RoomTypes/Display';
 import RoomTypeEdit from './RoomTypes/Edit';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
 
 const { TextArea } = Input;
 
@@ -38,8 +38,7 @@ export default function Edit() {
     const setupEditForm = async () => {
         LoadingModal.showLoading();
         try {
-            const response = await axiosIntance.post(`/Accommodation/setup-edit/${id}`, {});
-            const res = response.data;
+            const res = await accommodationAPI.setupEdit(id);
             setListStatus(res.listStatus ?? []);
             setListType(res.listType ?? []);
             setListCity(res.listCity ?? []);
@@ -98,12 +97,7 @@ export default function Edit() {
             (accommodation.ListNewInfoImage || []).forEach((file) => {
                 formData.append('ListNewInfoImage', file);
             });
-            const response = await axiosIntance.put(`/Accommodation/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            const res = response.data;
+            const res = await accommodationAPI.update(id, formData);
             if (res.success) {
                 window.location.href = `/admin/service/accommodation/display/${id}`;
             } else {

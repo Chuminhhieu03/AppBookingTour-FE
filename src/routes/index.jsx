@@ -12,11 +12,8 @@ import DiscountRoute from './DiscountRoute';
 import AccommodationRoute from './AccommodationRoute';
 import ChangePasswordRoute from './ChangePasswordRoute';
 import BlogPostRoute from './BlogPostRoute';
-<<<<<<< HEAD
 import AccommodationCustomerRoutes from './Customers/AccommodationCustomerRout';
-=======
 import ComboRoute from './ComboRoute';
->>>>>>> 36a8720e41e015b461ebfa16b95b35e6f1a665e2
 import TourRoute from './TourRoute';
 
 const router = createBrowserRouter(
@@ -32,11 +29,8 @@ const router = createBrowserRouter(
         AccommodationRoute,
         ChangePasswordRoute,
         BlogPostRoute,
-<<<<<<< HEAD
         AccommodationCustomerRoutes,
-=======
         ComboRoute,
->>>>>>> 36a8720e41e015b461ebfa16b95b35e6f1a665e2
         TourRoute
     ],
     {
