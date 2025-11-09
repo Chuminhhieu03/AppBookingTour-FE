@@ -16,4 +16,19 @@ export default class Utility {
     static convertStringToDate(dateString) {
         return dayjs(dateString);
     }
+
+    // Format price to Vietnamese currency
+    static formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
+    // Format duration days to "X ngày Y đêm"
+    static formatDuration(days) {
+        if (days <= 0) return '0 ngày';
+        const nights = days - 1;
+        return nights > 0 ? `${days} ngày ${nights} đêm` : `${days} ngày`;
+    }
 }
