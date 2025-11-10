@@ -21,10 +21,10 @@ export default function Display() {
     const [selectedRoomType, setSelectedRoomType] = useState(null);
 
     useEffect(() => {
-        setupDisplayForm();
+        getAccommodationById();
     }, []);
 
-    const setupDisplayForm = async () => {
+    const getAccommodationById = async () => {
         try {
             LoadingModal.showLoading();
             const res = await accommodationAPI.getById(id);
@@ -93,9 +93,10 @@ export default function Display() {
                             <span>Tiện ích</span>
                             <Input value={accommodation.amenityName} readOnly />
                         </Col>
-                        <Col span={8} className="d-flex align-items-center gap-2">
+                        <Col span={8}>
                             <span>Hạng sao</span>
-                            <Rate value={accommodation.starRating} readOnly />
+                            <br />
+                            <Rate className='mt-2' value={accommodation.starRating} readOnly />
                         </Col>
                         <Col span={24}>
                             <span>Hình ảnh khác</span>
@@ -103,9 +104,9 @@ export default function Display() {
                                 <Gallery listImage={accommodation.listInfoImage} viewOnly />
                             </div>
                         </Col>
-                        <Col span={24}>
+                        <Col span={24} >
                             <span>Quy định</span>
-                            <TextArea value={accommodation.rules} readOnly />
+                            <TextArea value={accommodation.regulation} readOnly />
                         </Col>
                         <Col span={24}>
                             <span>Mô tả</span>

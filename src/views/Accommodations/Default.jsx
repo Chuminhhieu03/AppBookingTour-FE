@@ -6,16 +6,17 @@ import MainCard from 'components/MainCard';
 import Constants from '../../Constants/Constants';
 import LoadingModal from '../../components/LoadingModal';
 import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import cityAPI from '../../api/city/cityAPI';
 import Utility from '../../Utils/Utility';
 
 export default function Default() {
     const [query, setQuery] = React.useState({});
     const [filter, setFilter] = React.useState({});
     const [listAccommodation, setListAccommodation] = React.useState([]);
-    const [listStatus, setListStatus] = React.useState([]);
     const [listType, setListType] = React.useState([]);
     const [listCity, setListCity] = React.useState([]);
     const [isReset, setIsReset] = React.useState(false);
+    const [totalCount, setTotalCount] = React.useState(0);
 
     const columns = [
         {
@@ -37,8 +38,9 @@ export default function Default() {
         },
         {
             title: 'Loại',
-            dataIndex: 'typeName',
-            key: 'typeName'
+            dataIndex: 'type',
+            key: 'type',
+            render: (_, record) => Utility.getLabelByValue(Constants.AccommodationTypeOptions, record.type)
         },
         {
             title: 'Thành phố',
@@ -60,7 +62,7 @@ export default function Default() {
             dataIndex: 'isActive',
             key: 'isActive',
             align: 'center',
-            render: (value, record) => {
+            render: (_, record) => {
                 return record.isActive === Constants.Status.Active ? (
                     <Tag color="green">{Utility.getLabelByValue(Constants.StatusOptions, record.isActive)}</Tag>
                 ) : (
@@ -78,8 +80,8 @@ export default function Default() {
     ];
 
     useEffect(() => {
+        getListCity();
         searchData();
-        setupDefault();
     }, []);
 
     useEffect(() => {
@@ -88,14 +90,13 @@ export default function Default() {
         }
     }, [filter, query, isReset]);
 
-    const setupDefault = async () => {
+    const getListCity = async () => {
         try {
-            const res = await accommodationAPI.setupDefault();
-            setListStatus(res.listStatus);
-            setListType(res.listType);
-            setListCity(res.listCity);
-        } catch (error) {
-            console.error('Error fetching setup default:', error);
+            const res = await cityAPI.getListCity();
+            setListCity(res.data);
+        }
+        catch (error) {
+            console.error('Error fetching list of cities:', error);
         }
     };
 
@@ -107,6 +108,7 @@ export default function Default() {
             request.searchAccommodationFilter = { ...filter };
             const res = await accommodationAPI.search(request);
             setListAccommodation(res.listAccommodation);
+            setTotalCount(res.totalCount);
             setIsReset(false);
         } catch (error) {
             console.error('Error fetching accommodations:', error);
@@ -167,10 +169,7 @@ export default function Default() {
                                     value={filter.Type}
                                     allowClear
                                     style={{ flex: 1 }}
-                                    options={listType?.map((item) => ({
-                                        label: item.value,
-                                        value: item.key
-                                    }))}
+                                    options={Constants.AccommodationTypeOptions}
                                     onChange={(val) => {
                                         filter.Type = val;
                                         setFilter({ ...filter });
@@ -224,7 +223,7 @@ export default function Default() {
                             </Row>
                         </Col>
                     </Row>
-                    <h6 className="mb-3">Tổng số bản ghi: {listAccommodation?.length}</h6>
+                    <h6 className="mb-3">Tổng số bản ghi: {totalCount}</h6>
                     <Table
                         dataSource={listAccommodation}
                         columns={columns}
@@ -232,6 +231,7 @@ export default function Default() {
                         bordered
                         pagination={{
                             pageSize: Constants.DEFAULT_PAGE_SIZE,
+                            total: totalCount,
                             onChange: (page) => {
                                 searchData(page - 1);
                                 query.PageIndex = page - 1;

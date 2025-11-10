@@ -3,27 +3,26 @@ import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../../components/LoadingModal';
-import axiosIntance from '../../../api/axiosInstance';
+import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
+import Constants from '../../../Constants/Constants';
+import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI';
 
 const { TextArea } = Input;
 
 export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId }) {
     const [form] = Form.useForm();
-    const [listStatus, setListStatus] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
 
     useEffect(() => {
-        setupAddnewForm();
+        getListRoomTypeAmenity();
     }, []);
 
-    const setupAddnewForm = async () => {
+    const getListRoomTypeAmenity = async () => {
         try {
-            const response = await axiosIntance.post('/RoomType/setup-addnew', {});
-            const res = response.data;
-            setListStatus(res.listStatus);
-            setListAmenity(res.listAmenity);
+            const res = await systemParameterAPI.getByFeatureCode(Constants.FeatureCode.RoomTypeAmenity);
+            setListAmenity(res.data);
         } catch (error) {
             console.error('Error fetching setup addnew for room type:', error);
         }
@@ -50,12 +49,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             listInfoImage?.forEach((file) => {
                 formData.append('InfoImgFile', file);
             });
-            const response = await axiosIntance.post('/RoomType', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            const res = response.data;
+            const res = await roomTypeAPI.create(formData);
             if (res.success) {
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal
@@ -135,19 +129,37 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
 
                     <Col span={8}>
                         <Form.Item name="Price" label="Giá phòng" rules={[{ type: 'number', min: 0 }]}> 
-                            <InputNumber min={0} className="w-100" />
+                            <InputNumber 
+                                min={0} 
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                        />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
                         <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn" rules={[{ type: 'number', min: 0 }]}> 
-                            <InputNumber min={0} className="w-100" />
+                            <InputNumber 
+                                min={0} 
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                            />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
                         <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em" rules={[{ type: 'number', min: 0 }]}> 
-                            <InputNumber min={0} className="w-100" />
+                            <InputNumber 
+                                min={0} 
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                            />
                         </Form.Item>
                     </Col>
 
@@ -159,7 +171,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
 
                     <Col span={8}>
                         <Form.Item name="Status" label="Trạng thái">
-                            <Select allowClear className="w-100" options={listStatus?.map((item) => ({ label: item.value, value: item.key }))} />
+                            <Select allowClear className="w-100" options={Constants.StatusOptions} />
                         </Form.Item>
                     </Col>
 

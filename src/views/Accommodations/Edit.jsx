@@ -11,14 +11,15 @@ import AddNewRoomType from './RoomTypes/Addnew';
 import RoomTypeDisplay from './RoomTypes/Display';
 import RoomTypeEdit from './RoomTypes/Edit';
 import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import cityAPI from '../../api/city/cityAPI';
+import systemParameterAPI from '../../api/systemParameters/systemParameterAPI';
+import Constants from '../../Constants/Constants';
 
 const { TextArea } = Input;
 
 export default function Edit() {
     const [form] = Form.useForm();
     const [accommodation, setAccommodation] = useState({});
-    const [listStatus, setListStatus] = useState([]);
-    const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
@@ -33,20 +34,34 @@ export default function Edit() {
 
     useEffect(() => {
         setupEditForm();
+        getListAccommodationAmenity();
+        getListCity();
     }, []);
+
+    const getListAccommodationAmenity = async () => {
+        try {
+            const res = await systemParameterAPI.getByFeatureCode(Constants.FeatureCode.AccommodationAmenity);
+            setListAmenity(res.data);
+        } catch (error) {
+            console.error('Error fetching accommodation amenities:', error);
+        }
+    };
+
+    const getListCity = async () => {
+        try {
+            const res = await cityAPI.getListCity();
+            setListCity(res.data);
+        } catch (error) {
+            console.error('Error fetching list of cities:', error);
+        }
+    }
 
     const setupEditForm = async () => {
         LoadingModal.showLoading();
         try {
-            const res = await accommodationAPI.setupEdit(id);
-            setListStatus(res.listStatus ?? []);
-            setListType(res.listType ?? []);
-            setListCity(res.listCity ?? []);
-            setListAmenity(res.listAmenity ?? []);
+            const res = await accommodationAPI.getById(id);
             const accommodationRes = res.accommodation;
-            accommodationRes.isActive = Number(accommodationRes.isActive);
             accommodationRes.amenity = accommodationRes.amenities?.split(', ').map(Number) ?? [];
-            console.log('accommodationRes', accommodationRes);
             setAccommodation(accommodationRes ?? {});
             setCoverImgFile(null);
             // populate form fields
@@ -55,7 +70,7 @@ export default function Edit() {
                 Type: accommodationRes.type,
                 CityId: accommodationRes.cityId ?? accommodationRes.city?.id,
                 Address: accommodationRes.address,
-                IsActive: Number(accommodationRes.isActive),
+                IsActive: accommodationRes.isActive,
                 Amenity: accommodationRes.amenity,
                 StarRating: accommodationRes.starRating,
                 Description: accommodationRes.description,
@@ -74,7 +89,6 @@ export default function Edit() {
         LoadingModal.showLoading();
         try {
             const accommodationValues = { ...values };
-            accommodationValues.IsActive = Boolean(values.IsActive ?? values.isActive ?? accommodation.isActive);
             const amenities = (values.Amenity || values.amenity || accommodation.amenity || []).join(', ');
             const formData = new FormData();
             formData.append('Code', accommodation.code ?? '');
@@ -149,7 +163,8 @@ export default function Edit() {
         setSelectedRoomTypeForEdit(roomType);
         setIsRoomTypeEditModalOpen(true);
     };
-
+    
+    console.log('accommodation', accommodation.isActive) 
     return (
         <Row>
             <Col span={24}>
@@ -171,7 +186,7 @@ export default function Edit() {
                         </Space>
                     }
                 >
-                <Form form={form} layout="vertical" onFinish={onEditAccommodation} initialValues={{ StarRating: 0 }}>
+                <Form form={form} layout="vertical" onFinish={onEditAccommodation} initialValues={{ isActive: accommodation.isActive }}>
                     <Row gutter={[24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
@@ -195,7 +210,7 @@ export default function Edit() {
 
                         <Col span={8}>
                             <Form.Item name="Type" label="Loại" rules={[{ required: true, message: 'Vui lòng chọn loại' }]}>
-                                <Select allowClear className="w-100" options={listType?.map((item) => ({ label: item.value, value: item.key }))} />
+                                <Select allowClear className="w-100" options={Constants.AccommodationTypeOptions} />
                             </Form.Item>
                         </Col>
 
@@ -213,7 +228,7 @@ export default function Edit() {
 
                         <Col span={8}>
                             <Form.Item name="IsActive" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
-                                <Select allowClear className="w-100" options={listStatus?.map((item) => ({ label: item.value, value: item.key }))} />
+                                <Select allowClear className="w-100" options={Constants.StatusOptions} />
                             </Form.Item>
                         </Col>
 
@@ -224,8 +239,7 @@ export default function Edit() {
                         </Col>
 
                         <Col span={8} className="d-flex align-items-center gap-2">
-                            <span>Hạng sao</span>
-                            <Form.Item name="StarRating">
+                            <Form.Item name="StarRating" label="Hạng sao" className="w-100">
                                 <Rate />
                             </Form.Item>
                         </Col>

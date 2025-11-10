@@ -8,7 +8,14 @@ export default class Constants {
     };
 
     static FeatureCode = {
-        AccommodationAmenity: 'AccommodationAmenity'
+        AccommodationAmenity: 'AccommodationAmenity',
+        RoomTypeAmenity: 'RoomTypeAmenity'
+    }
+
+    static AccommodationType = {
+        Hotel: 1,
+        Resort: 2,
+        Homestay: 3
     }
 
     static ItemType = {
@@ -36,6 +43,18 @@ export default class Constants {
         { value: this.Status.Inactive, label: 'Không hoạt động' }
     ];
 
+    static AccommodationTypeOptions = [
+        { value: this.AccommodationType.Hotel, label: 'Khách sạn' },
+        { value: this.AccommodationType.Resort, label: 'Resort' },
+        { value: this.AccommodationType.Homestay, label: 'Homestay' }
+    ];
+    
+    // Color
+    static StatusColor = [
+        { value: this.Status.Active, label: 'green' },
+        { value: this.Status.Inactive, label: 'red' }
+    ];
+    
     static ItemTypeOptions = [
         { value: this.ItemType.Tour, label: 'Tour' },
         { value: this.ItemType.Accommodation, label: 'Cơ sở lưu trú' },
