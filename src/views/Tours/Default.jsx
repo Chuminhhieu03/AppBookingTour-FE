@@ -8,6 +8,8 @@ import tourCategoryAPI from '../../api/tour/tourCategoryAPI';
 import tourTypeAPI from '../../api/tour/tourTypeAPI';
 import cityAPI from '../../api/city/cityAPI';
 import LoadingModal from '../../components/LoadingModal';
+import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 export default function TourDefault() {
     const navigate = useNavigate();
@@ -248,7 +250,10 @@ export default function TourDefault() {
             dataIndex: 'isActive',
             key: 'isActive',
             align: 'center',
-            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>)
+            render: (value) => {
+                const label = Utility.getLabelByValue(Constants.StatusOptions, value);
+                return <Tag color={Utility.getTagColor('status', value)}>{label}</Tag>;
+            }
         },
         {
             title: 'Hành động',
@@ -396,8 +401,11 @@ export default function TourDefault() {
                                 placeholder="Chọn trạng thái"
                                 style={{ width: '100%' }}
                             >
-                                <Select.Option value={true}>Hoạt động</Select.Option>
-                                <Select.Option value={false}>Ngừng hoạt động</Select.Option>
+                                {Constants.StatusOptions.map((option) => (
+                                    <Select.Option key={option.value.toString()} value={option.value}>
+                                        {option.label}
+                                    </Select.Option>
+                                ))}
                             </Select>
                         </Col>
                     </Row>

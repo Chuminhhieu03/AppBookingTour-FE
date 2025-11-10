@@ -12,6 +12,7 @@ import tourTypeAPI from '../../api/tour/tourTypeAPI';
 import cityAPI from '../../api/city/cityAPI';
 import TourItineraryTable from './TourItineraries/TourItineraryTable';
 import TourDepartureTable from './TourDepartures/TourDepartureTable';
+import Constants from 'Constants/Constants';
 
 const { TextArea } = Input;
 
@@ -419,13 +420,7 @@ export default function TourEdit() {
                                     label="Trạng thái"
                                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
                                 >
-                                    <Select
-                                        placeholder="Chọn trạng thái"
-                                        options={[
-                                            { label: 'Hoạt động', value: true },
-                                            { label: 'Ngừng hoạt động', value: false }
-                                        ]}
-                                    />
+                                    <Select placeholder="Chọn trạng thái" options={Constants.StatusOptions} />
                                 </Form.Item>
                             </Col>
 

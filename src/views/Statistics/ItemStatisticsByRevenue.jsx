@@ -4,7 +4,7 @@ import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import statisticsAPI from 'api/statistics/statisticsAPI';
 import MainCard from 'components/MainCard';
-import { ITEM_TYPE_OPTIONS } from 'constant/itemTypeEnum';
+import Constants from 'Constants/Constants';
 import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
@@ -12,42 +12,49 @@ const { Option } = Select;
 
 const ItemStatisticsByRevenue = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    const [filters, setFilters] = useState({
+
+    // Internal state for form inputs (controlled components)
+    const [internalFilters, setInternalFilters] = useState({
         itemType: null,
         startDate: null,
         endDate: null
     });
 
-    // Initialize filters from URL params and auto search
+    // Effect to handle URL search params changes and API calls
     useEffect(() => {
         const urlStartDate = searchParams.get('startDate');
         const urlEndDate = searchParams.get('endDate');
         const urlItemType = searchParams.get('itemType');
 
+        // Check if all required params exist
         if (urlStartDate && urlEndDate && urlItemType) {
-            const newFilters = {
+            setInternalFilters({
                 itemType: parseInt(urlItemType),
                 startDate: dayjs(urlStartDate),
                 endDate: dayjs(urlEndDate)
-            };
-            setFilters(newFilters);
+            });
 
-            // Auto-search with URL parameters
-            handleAutoSearch(newFilters);
+            // Call API with URL parameters
+            handleApiCall({
+                itemType: parseInt(urlItemType),
+                startDate: urlStartDate,
+                endDate: urlEndDate
+            });
+        } else {
+            setData([]);
+            setInternalFilters({
+                itemType: null,
+                startDate: null,
+                endDate: null
+            });
         }
     }, [searchParams]);
 
-    // Auto search function for URL parameters
-    const handleAutoSearch = async (searchFilters) => {
-        const params = {
-            itemType: searchFilters.itemType,
-            startDate: searchFilters.startDate.format('YYYY-MM-DD'),
-            endDate: searchFilters.endDate.format('YYYY-MM-DD')
-        };
-
+    // API call function
+    const handleApiCall = async (params) => {
         try {
             setLoading(true);
             const response = await statisticsAPI.getItemStatisticsByRevenue(params);
@@ -67,65 +74,54 @@ const ItemStatisticsByRevenue = () => {
         }
     };
 
-    // Handle filter changes
+    // Handle internal filter changes (form inputs)
     const handleItemTypeChange = (value) => {
-        setFilters((prev) => ({
+        setInternalFilters((prev) => ({
             ...prev,
             itemType: value
         }));
     };
 
     const handleDateRangeChange = (dates) => {
-        setFilters((prev) => ({
+        setInternalFilters((prev) => ({
             ...prev,
             startDate: dates ? dates[0] : null,
             endDate: dates ? dates[1] : null
         }));
     };
 
-    // Handle search
-    const handleSearch = async () => {
-        if (!filters.itemType || !filters.startDate || !filters.endDate) {
+    // Handle search button click - update URL params
+    const handleSearch = () => {
+        if (!internalFilters.itemType || !internalFilters.startDate || !internalFilters.endDate) {
             message.error('Vui lòng nhập đầy đủ thông tin: Loại sản phẩm, Ngày bắt đầu và Ngày kết thúc');
             return;
         }
 
-        const params = {
-            itemType: filters.itemType,
-            startDate: filters.startDate.format('YYYY-MM-DD'),
-            endDate: filters.endDate.format('YYYY-MM-DD')
+        // Update URL search params - this will trigger useEffect
+        const newParams = {
+            itemType: internalFilters.itemType.toString(),
+            startDate: internalFilters.startDate.format('YYYY-MM-DD'),
+            endDate: internalFilters.endDate.format('YYYY-MM-DD')
         };
 
-        try {
-            setLoading(true);
-            const response = await statisticsAPI.getItemStatisticsByRevenue(params);
-
-            if (response.success && response.data) {
-                setData(response.data.items || []);
-            } else {
-                message.error(response.message || 'Có lỗi xảy ra khi lấy dữ liệu');
-                setData([]);
-            }
-        } catch (error) {
-            console.error('Error fetching statistics:', error);
-            message.error('Có lỗi xảy ra khi lấy dữ liệu');
-            setData([]);
-        } finally {
-            setLoading(false);
-        }
+        setSearchParams(newParams);
     };
 
     // Handle view details
     const handleViewDetails = (record) => {
-        if (!filters.startDate || !filters.endDate || !filters.itemType) {
+        const urlStartDate = searchParams.get('startDate');
+        const urlEndDate = searchParams.get('endDate');
+        const urlItemType = searchParams.get('itemType');
+
+        if (!urlStartDate || !urlEndDate || !urlItemType) {
             message.error('Vui lòng thực hiện thống kê trước khi xem chi tiết');
             return;
         }
 
         const params = new URLSearchParams({
-            startDate: filters.startDate.format('YYYY-MM-DD'),
-            endDate: filters.endDate.format('YYYY-MM-DD'),
-            itemType: filters.itemType.toString(),
+            startDate: urlStartDate,
+            endDate: urlEndDate,
+            itemType: urlItemType,
             itemId: record.itemId.toString()
         });
 
@@ -211,13 +207,13 @@ const ItemStatisticsByRevenue = () => {
                     <Row gutter={[16, 16]} className="mb-4">
                         <Col span={4}>
                             <Select
-                                value={filters.itemType}
+                                value={internalFilters.itemType}
                                 onChange={handleItemTypeChange}
                                 allowClear
                                 placeholder="Chọn loại sản phẩm"
                                 style={{ width: '100%' }}
                             >
-                                {ITEM_TYPE_OPTIONS.map((option) => (
+                                {Constants.ItemTypeOptions.map((option) => (
                                     <Option key={option.value} value={option.value}>
                                         {option.label}
                                     </Option>
@@ -228,7 +224,11 @@ const ItemStatisticsByRevenue = () => {
                             <RangePicker
                                 format="DD/MM/YYYY"
                                 placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
-                                value={filters.startDate && filters.endDate ? [filters.startDate, filters.endDate] : null}
+                                value={
+                                    internalFilters.startDate && internalFilters.endDate
+                                        ? [internalFilters.startDate, internalFilters.endDate]
+                                        : null
+                                }
                                 onChange={handleDateRangeChange}
                                 style={{ width: '100%' }}
                             />
@@ -256,7 +256,10 @@ const ItemStatisticsByRevenue = () => {
                         loading={loading}
                         pagination={false}
                         locale={{
-                            emptyText: 'Không có dữ liệu phù hợp với điều kiện tìm kiếm'
+                            emptyText:
+                                searchParams.get('startDate') && searchParams.get('endDate') && searchParams.get('itemType')
+                                    ? 'Không có dữ liệu phù hợp với điều kiện tìm kiếm'
+                                    : 'Vui lòng chọn điều kiện lọc và nhấn "Thống kê" để xem dữ liệu'
                         }}
                     />
                 </MainCard>

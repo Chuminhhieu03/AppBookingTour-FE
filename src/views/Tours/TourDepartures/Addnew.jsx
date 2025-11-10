@@ -6,6 +6,7 @@ import MainCard from '../../../components/MainCard';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import dayjs from 'dayjs';
+import Constants from 'Constants/Constants';
 
 const { Option } = Select;
 
@@ -256,10 +257,12 @@ export default function TourDepartureAddnew() {
                                         }
                                     ]}
                                 >
-                                    <Select placeholder="Chọn trạng thái" defaultValue={1}>
-                                        <Option value={1}>Có sẵn</Option>
-                                        <Option value={2}>Hết chỗ</Option>
-                                        <Option value={3}>Đã hủy</Option>
+                                    <Select placeholder="Chọn trạng thái" defaultValue={Constants.TourDepartureStatus.Available}>
+                                        {Constants.TourDepartureStatusOptions.map((option) => (
+                                            <Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Option>
+                                        ))}
                                     </Select>
                                 </Form.Item>
                             </Col>

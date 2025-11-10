@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
+import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 export default function TourDepartureTable({ tourId, isEditMode = false, title = 'Danh sách lịch khởi hành', tourData = null }) {
     const navigate = useNavigate();
@@ -117,8 +119,8 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
             onHeaderCell: () => ({ style: { textAlign: 'center' } }),
             render: (status) => (
                 <div style={{ textAlign: 'center' }}>
-                    <Tag color={status === 'Available' ? 'green' : status === 'Full' ? 'red' : status === 'Cancelled' ? 'gray' : 'orange'}>
-                        {status === 'Available' ? 'Còn chỗ' : status === 'Full' ? 'Hết chỗ' : status === 'Cancelled' ? 'Đã hủy' : status}
+                    <Tag color={Utility.getTagColor('tourDepartureStatus', status)}>
+                        {Utility.getLabelByValue(Constants.TourDepartureStatusOptions, status)}
                     </Tag>
                 </div>
             )

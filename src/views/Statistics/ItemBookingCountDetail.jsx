@@ -4,7 +4,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import statisticsAPI from 'api/statistics/statisticsAPI';
 import MainCard from 'components/MainCard';
-import { ITEM_TYPE } from 'constant/itemTypeEnum';
+import Constants from 'Constants/Constants';
 import dayjs from 'dayjs';
 
 const ItemBookingCountDetail = () => {
@@ -87,10 +87,10 @@ const ItemBookingCountDetail = () => {
     const getDetailColumnTitle = () => {
         const itemTypeValue = parseInt(itemType);
         switch (itemTypeValue) {
-            case ITEM_TYPE.TOUR: // Tour
-            case ITEM_TYPE.COMBO: // Combo
+            case Constants.ItemType.Tour:
+            case Constants.ItemType.Combo:
                 return 'Ngày khởi hành';
-            case ITEM_TYPE.ACCOMMODATION: // Accommodation
+            case Constants.ItemType.Accommodation:
                 return 'Tên loại phòng';
             default:
                 return 'Tên lựa chọn';

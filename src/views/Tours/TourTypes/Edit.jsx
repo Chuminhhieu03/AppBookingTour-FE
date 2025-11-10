@@ -6,6 +6,7 @@ import MainCard from '../../../components/MainCard';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import ImagesUC from '../../components/basic/ImagesUC';
+import Constants from 'Constants/Constants';
 
 const { TextArea } = Input;
 
@@ -139,25 +140,13 @@ export default function TourTypeEdit() {
 
                             <Col span={8}>
                                 <Form.Item name="priceLevel" label="Loại mức giá">
-                                    <Select
-                                        placeholder="Chọn loại mức giá (tùy chọn)"
-                                        options={[
-                                            { label: 'Tiết kiệm', value: 1 },
-                                            { label: 'Tiêu chuẩn', value: 2 },
-                                            { label: 'Cao cấp', value: 3 }
-                                        ]}
-                                    />
+                                    <Select allowClear placeholder="Chọn loại mức giá (tùy chọn)" options={Constants.PriceLevelOptions} />
                                 </Form.Item>
                             </Col>
 
                             <Col span={8}>
                                 <Form.Item name="isActive" label="Trạng thái">
-                                    <Select
-                                        options={[
-                                            { label: 'Hoạt động', value: true },
-                                            { label: 'Ngừng hoạt động', value: false }
-                                        ]}
-                                    />
+                                    <Select options={Constants.StatusOptions} />
                                 </Form.Item>
                             </Col>
 

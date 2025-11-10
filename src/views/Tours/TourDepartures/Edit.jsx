@@ -6,6 +6,7 @@ import MainCard from '../../../components/MainCard';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import dayjs from 'dayjs';
+import Constants from 'Constants/Constants';
 
 const { Option } = Select;
 
@@ -20,6 +21,7 @@ export default function TourDepartureEdit() {
         if (departureId) {
             fetchDeparture();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [departureId]);
 
     const fetchDeparture = async () => {
@@ -142,16 +144,6 @@ export default function TourDepartureEdit() {
                                         {
                                             required: true,
                                             message: 'Vui lòng chọn ngày khởi hành!'
-                                        },
-                                        {
-                                            validator: (_, value) => {
-                                                if (!value) return Promise.resolve();
-                                                const tomorrow = dayjs().add(1, 'day');
-                                                if (value.isBefore(tomorrow, 'day')) {
-                                                    return Promise.reject(new Error('Ngày khởi hành phải từ ngày mai trở đi!'));
-                                                }
-                                                return Promise.resolve();
-                                            }
                                         }
                                     ]}
                                 >
@@ -159,9 +151,7 @@ export default function TourDepartureEdit() {
                                         style={{ width: '100%' }}
                                         format="DD/MM/YYYY"
                                         placeholder="Chọn ngày khởi hành"
-                                        disabledDate={(current) => {
-                                            return current && current.isBefore(dayjs().add(1, 'day'), 'day');
-                                        }}
+                                        disabled={true}
                                     />
                                 </Form.Item>
                             </Col>
@@ -176,48 +166,31 @@ export default function TourDepartureEdit() {
                                         }
                                     ]}
                                 >
-                                    <TimePicker style={{ width: '100%' }} format="HH:mm" placeholder="Chọn giờ khởi hành" minuteStep={15} />
+                                    <TimePicker
+                                        style={{ width: '100%' }}
+                                        format="HH:mm"
+                                        placeholder="Chọn giờ khởi hành"
+                                        minuteStep={15}
+                                        disabled={true}
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={6}>
                                 <Form.Item
                                     label="Ngày kết thúc"
                                     name="returnDate"
-                                    dependencies={['departureDate']}
                                     rules={[
                                         {
                                             required: true,
                                             message: 'Vui lòng chọn ngày kết thúc!'
-                                        },
-                                        ({ getFieldValue }) => ({
-                                            validator: (_, value) => {
-                                                if (!value) return Promise.resolve();
-                                                const departureDate = getFieldValue('departureDate');
-                                                if (departureDate && value.isBefore(departureDate, 'day')) {
-                                                    return Promise.reject(new Error('Ngày kết thúc phải sau ngày khởi hành!'));
-                                                }
-                                                if (departureDate && value.isSame(departureDate, 'day')) {
-                                                    return Promise.reject(new Error('Ngày kết thúc phải sau ngày khởi hành!'));
-                                                }
-                                                return Promise.resolve();
-                                            }
-                                        })
+                                        }
                                     ]}
                                 >
                                     <DatePicker
                                         style={{ width: '100%' }}
                                         format="DD/MM/YYYY"
                                         placeholder="Chọn ngày kết thúc"
-                                        disabledDate={(current) => {
-                                            const departureDate = form.getFieldValue('departureDate');
-                                            if (departureDate) {
-                                                return (
-                                                    current &&
-                                                    (current.isBefore(departureDate, 'day') || current.isSame(departureDate, 'day'))
-                                                );
-                                            }
-                                            return current && current.isBefore(dayjs().add(1, 'day'), 'day');
-                                        }}
+                                        disabled={true}
                                     />
                                 </Form.Item>
                             </Col>
@@ -232,7 +205,13 @@ export default function TourDepartureEdit() {
                                         }
                                     ]}
                                 >
-                                    <TimePicker style={{ width: '100%' }} format="HH:mm" placeholder="Chọn giờ trở về" minuteStep={15} />
+                                    <TimePicker
+                                        style={{ width: '100%' }}
+                                        format="HH:mm"
+                                        placeholder="Chọn giờ trở về"
+                                        minuteStep={15}
+                                        disabled={true}
+                                    />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -318,9 +297,11 @@ export default function TourDepartureEdit() {
                                     ]}
                                 >
                                     <Select placeholder="Chọn trạng thái">
-                                        <Option value={1}>Có sẵn</Option>
-                                        <Option value={2}>Hết chỗ</Option>
-                                        <Option value={3}>Đã hủy</Option>
+                                        {Constants.TourDepartureStatusOptions.map((option) => (
+                                            <Option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </Option>
+                                        ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
