@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import LoadingModal from '../../../components/LoadingModal';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
+import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 export default function TourTypeDefault() {
     const navigate = useNavigate();
@@ -146,7 +148,10 @@ export default function TourTypeDefault() {
             key: 'isActive',
             align: 'center',
             width: 200,
-            render: (value) => (value ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Ngừng hoạt động</Tag>)
+            render: (value) => {
+                const label = Utility.getLabelByValue(Constants.StatusOptions, value);
+                return <Tag color={Utility.getTagColor('status', value)}>{label}</Tag>;
+            }
         },
         {
             title: 'Ngày tạo',

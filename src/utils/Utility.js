@@ -36,4 +36,37 @@ export default class Utility {
         const item = list.find((i) => i.value === value || i.key === value);
         return item ? item.label : '';
     }
+
+    // Get tag color for status displays
+    static getTagColor(type, value) {
+        switch (type) {
+            case 'tourDepartureStatus':
+                switch (value) {
+                    case 1: // Available
+                    case 'Available':
+                        return 'green';
+                    case 2: // Full
+                    case 'Full':
+                        return 'red';
+                    case 3: // Cancelled
+                    case 'Cancelled':
+                        return 'gray';
+                    default:
+                        return 'orange';
+                }
+            case 'status':
+                switch (value) {
+                    case true:
+                    case 'Active':
+                        return 'green';
+                    case false:
+                    case 'Inactive':
+                        return 'red';
+                    default:
+                        return 'default';
+                }
+            default:
+                return 'default';
+        }
+    }
 }

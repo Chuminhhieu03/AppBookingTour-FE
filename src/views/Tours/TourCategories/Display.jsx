@@ -6,6 +6,8 @@ import MainCard from '../../../components/MainCard';
 import tourCategoryAPI from '../../../api/tour/tourCategoryAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import ImagesUC from '../../components/basic/ImagesUC';
+import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 const { TextArea } = Input;
 
@@ -78,10 +80,7 @@ export default function TourCategoryDisplay() {
                         </Col>
                         <Col span={8}>
                             <span>Trạng thái</span>
-                            <Select value={category.isActive} disabled style={{ width: '100%' }}>
-                                <Select.Option value={true}>Hoạt động</Select.Option>
-                                <Select.Option value={false}>Ngừng hoạt động</Select.Option>
-                            </Select>
+                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, category.isActive)} readOnly />
                         </Col>
                         <Col span={8}>
                             <span>Ngày tạo</span>

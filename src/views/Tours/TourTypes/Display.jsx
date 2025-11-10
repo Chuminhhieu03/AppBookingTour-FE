@@ -6,6 +6,8 @@ import MainCard from '../../../components/MainCard';
 import tourTypeAPI from '../../../api/tour/tourTypeAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import ImagesUC from '../../components/basic/ImagesUC';
+import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 const { TextArea } = Input;
 
@@ -75,23 +77,18 @@ export default function TourTypeDisplay() {
                         <Col span={8}>
                             <span>Loại mức giá</span>
                             <Input
-                                value={
-                                    tourType.priceLevel === 1
-                                        ? 'Tiết kiệm'
-                                        : tourType.priceLevel === 2
-                                          ? 'Tiêu chuẩn'
-                                          : tourType.priceLevel === 3
-                                            ? 'Cao cấp'
-                                            : 'Chưa xác định'
-                                }
+                                value={Utility.getLabelByValue(Constants.PriceLevelOptions, tourType.priceLevel) || 'Chưa xác định'}
                                 readOnly
                             />
                         </Col>
                         <Col span={8}>
                             <span>Trạng thái</span>
                             <Select value={tourType.isActive} disabled style={{ width: '100%' }}>
-                                <Select.Option value={true}>Hoạt động</Select.Option>
-                                <Select.Option value={false}>Ngừng hoạt động</Select.Option>
+                                {Constants.StatusOptions.map((option) => (
+                                    <Select.Option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </Select.Option>
+                                ))}
                             </Select>
                         </Col>
                         <Col span={8}>
