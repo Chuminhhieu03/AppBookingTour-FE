@@ -3,7 +3,7 @@ import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
-import axiosIntance from '../../api/axiosInstance';
+import discountAPI from '../../api/discount/discountAPI';
 
 const { TextArea } = Input;
 
@@ -30,8 +30,7 @@ export default function Addnew() {
             request.Discount = { ...discount };
             request.Discount.StartEffectedDtg = discount.StartEffectedDtg?.toDate().toISOString();
             request.Discount.EndEffectedDtg = discount.EndEffectedDtg?.toDate().toISOString();
-            const response = await axiosIntance.post('/Discount', request);
-            const res = response.data;
+            const res = await discountAPI.create(request);
             const discountRes = res.discount;
             if (res.success) {
                 window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
@@ -65,11 +64,11 @@ export default function Addnew() {
                     <Row gutter={[24, 24]}>
                         <Col span={8}>
                             <span>Mã</span>
-                            <Input value={discount.Code} onChange={(e) => setDiscount({ ...discount, Code: e.target.value })} />
+                            <Input maxLength={256} value={discount.Code} onChange={(e) => setDiscount({ ...discount, Code: e.target.value })} />
                         </Col>
                         <Col span={8}>
                             <span>Tên mã giảm giá</span>
-                            <Input value={discount.Name} onChange={(e) => setDiscount({ ...discount, Name: e.target.value })} />
+                            <Input maxLength={256} value={discount.Name} onChange={(e) => setDiscount({ ...discount, Name: e.target.value })} />
                         </Col>
                         <Col span={8}>
                             <span>Giá trị giảm (%)</span>
@@ -104,6 +103,7 @@ export default function Addnew() {
                             <InputNumber
                                 value={discount.TotalQuantity}
                                 min={0}
+                                maxLength={9}
                                 className="w-100"
                                 onChange={(val) => setDiscount({ ...discount, TotalQuantity: val })}
                             />

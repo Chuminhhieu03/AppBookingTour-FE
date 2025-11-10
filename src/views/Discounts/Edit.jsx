@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
 import Utility from '../../utils/Utility';
+import discountAPI from '../../api/discount/discountAPI';
 import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
@@ -35,8 +36,7 @@ export default function Edit() {
         const request = { ...discount };
         request.startEffectedDtg = discount.startEffectedDtg?.toDate().toISOString();
         request.endEffectedDtg = discount.endEffectedDtg?.toDate().toISOString();
-        const response = await axiosIntance.put(`/Discount/${id}`, request);
-        const res = response.data;
+        const res = await discountAPI.update(id, request);
         const discountRes = res.discount ?? {};
         if (res.success) {
             window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
@@ -65,11 +65,11 @@ export default function Edit() {
                     <Row gutter={[24, 24]}>
                         <Col span={8}>
                             <span>Mã</span>
-                            <Input value={discount.code} onChange={(e) => setDiscount({ ...discount, code: e.target.value })} />
+                            <Input maxLength={256} value={discount.code} onChange={(e) => setDiscount({ ...discount, code: e.target.value })} />
                         </Col>
                         <Col span={8}>
                             <span>Tên mã giảm giá</span>
-                            <Input value={discount.name} onChange={(e) => setDiscount({ ...discount, name: e.target.value })} />
+                            <Input maxLength={256} value={discount.name} onChange={(e) => setDiscount({ ...discount, name: e.target.value })} />
                         </Col>
                         <Col span={8}>
                             <span>Giá trị giảm (%)</span>
@@ -104,6 +104,7 @@ export default function Edit() {
                             <InputNumber
                                 value={discount.totalQuantity}
                                 min={0}
+                                maxLength={9}
                                 className="w-100"
                                 onChange={(val) => setDiscount({ ...discount, totalQuantity: val })}
                             />

@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import Constants from '../../Constants/Constants';
 import LoadingModal from '../../components/LoadingModal';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import Utility from '../../Utils/Utility';
 
 export default function Default() {
     const [query, setQuery] = React.useState({});
@@ -56,19 +57,19 @@ export default function Default() {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'statusName',
-            key: 'statusName',
+            dataIndex: 'isActive',
+            key: 'isActive',
             align: 'center',
             render: (value, record) => {
-                return Number(record.isActive) === Constants.Status.Active ? (
-                    <Tag color="green">{value}</Tag>
+                return record.isActive === Constants.Status.Active ? (
+                    <Tag color="green">{Utility.getLabelByValue(Constants.StatusOptions, record.isActive)}</Tag>
                 ) : (
-                    <Tag color="red">{value}</Tag>
+                    <Tag color="red">{Utility.getLabelByValue(Constants.StatusOptions, record.isActive)}</Tag>
                 );
             }
         },
         {
-            title: 'Chức năng',
+            title: 'Hành động',
             key: 'actions',
             align: 'center',
             width: 100,
@@ -89,8 +90,7 @@ export default function Default() {
 
     const setupDefault = async () => {
         try {
-            const response = await axiosIntance.post('/Accommodation/setup-default', {});
-            const res = response.data;
+            const res = await accommodationAPI.setupDefault();
             setListStatus(res.listStatus);
             setListType(res.listType);
             setListCity(res.listCity);
@@ -105,11 +105,7 @@ export default function Default() {
             const request = { ...query };
             request.PageIndex = pageIndex;
             request.searchAccommodationFilter = { ...filter };
-            if (request.searchAccommodationFilter.IsActive) {
-                request.searchAccommodationFilter.IsActive = Boolean(request.searchAccommodationFilter.IsActive);
-            }
-            const response = await axiosIntance.post('/Accommodation/search', request);
-            const res = response.data;
+            const res = await accommodationAPI.search(request);
             setListAccommodation(res.listAccommodation);
             setIsReset(false);
         } catch (error) {
@@ -207,10 +203,7 @@ export default function Default() {
                                     value={filter.IsActive}
                                     allowClear
                                     style={{ flex: 1 }}
-                                    options={listStatus?.map((item) => ({
-                                        label: item.value,
-                                        value: item.key
-                                    }))}
+                                    options={Constants.StatusOptions}
                                     onChange={(val) => {
                                         filter.IsActive = val;
                                         setFilter({ ...filter });

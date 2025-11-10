@@ -20,9 +20,8 @@ export default function Display() {
     const setupDisplayForm = async () => {
         try {
             LoadingModal.showLoading();
-            const response = await axiosIntance.get(`/Discount/${id}`);
-            setDiscount(response.data.discount ?? {});
-            setDiscount(res.discount ?? {});
+            const response = await discountAPI.getById(id);
+            setDiscount(response.discount ?? {});
         } catch (error) {
             console.error('Error fetching discount details:', error);
         } finally {

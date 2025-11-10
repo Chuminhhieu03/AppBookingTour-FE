@@ -8,7 +8,9 @@ import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
 import RoomTypeDisplay from './RoomTypes/Display';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import Utility from '../../Utils/Utility';
+import Constants from '../../Constants/Constants';
 
 const { TextArea } = Input;
 
@@ -25,8 +27,7 @@ export default function Display() {
     const setupDisplayForm = async () => {
         try {
             LoadingModal.showLoading();
-            const response = await axiosIntance.get(`/Accommodation/${id}`);
-            const res = response.data;
+            const res = await accommodationAPI.getById(id);
             setAccommodation(res.accommodation ?? {});
         } catch (error) {
             console.error('Error fetching accommodation details:', error);
@@ -86,7 +87,7 @@ export default function Display() {
                         </Col>
                         <Col span={8}>
                             <span>Trạng thái</span>
-                            <Input value={accommodation.statusName} readOnly />
+                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, accommodation.isActive)} readOnly />
                         </Col>
                         <Col span={8}>
                             <span>Tiện ích</span>

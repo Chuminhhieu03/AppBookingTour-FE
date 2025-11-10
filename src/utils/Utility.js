@@ -31,4 +31,9 @@ export default class Utility {
         const nights = days - 1;
         return nights > 0 ? `${days} ngày ${nights} đêm` : `${days} ngày`;
     }
+
+    static getLabelByValue(list, value) {
+        const item = list.find((i) => i.value === value || i.key === value);
+        return item ? item.label : '';
+    }
 }

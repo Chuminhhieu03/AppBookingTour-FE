@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, Select, Rate, Upload } from 'antd';
+import { Col, Row, Button, Space, Input, Select, Rate, Upload, Form } from 'antd';
 import { CloseOutlined, CheckOutlined, UploadOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -10,16 +10,18 @@ import Gallery from '../components/basic/Gallery';
 import AddNewRoomType from './RoomTypes/Addnew';
 import RoomTypeDisplay from './RoomTypes/Display';
 import RoomTypeEdit from './RoomTypes/Edit';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
 
 const { TextArea } = Input;
 
 export default function Edit() {
+    const [form] = Form.useForm();
     const [accommodation, setAccommodation] = useState({});
     const [listStatus, setListStatus] = useState([]);
     const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
+    const [coverImgFile, setCoverImgFile] = useState(null);
     const { id } = useParams();
     const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false);
 
@@ -36,8 +38,7 @@ export default function Edit() {
     const setupEditForm = async () => {
         LoadingModal.showLoading();
         try {
-            const response = await axiosIntance.post(`/Accommodation/setup-edit/${id}`, {});
-            const res = response.data;
+            const res = await accommodationAPI.setupEdit(id);
             setListStatus(res.listStatus ?? []);
             setListType(res.listType ?? []);
             setListCity(res.listCity ?? []);
@@ -47,43 +48,56 @@ export default function Edit() {
             accommodationRes.amenity = accommodationRes.amenities?.split(', ').map(Number) ?? [];
             console.log('accommodationRes', accommodationRes);
             setAccommodation(accommodationRes ?? {});
+            setCoverImgFile(null);
+            // populate form fields
+            form.setFieldsValue({
+                Name: accommodationRes.name,
+                Type: accommodationRes.type,
+                CityId: accommodationRes.cityId ?? accommodationRes.city?.id,
+                Address: accommodationRes.address,
+                IsActive: Number(accommodationRes.isActive),
+                Amenity: accommodationRes.amenity,
+                StarRating: accommodationRes.starRating,
+                Description: accommodationRes.description,
+                Regulation: accommodationRes.regulation,
+                CoverImageUrl: accommodationRes.coverImgUrl
+            });
+            // existing info images
+            setAccommodation((prev) => ({ ...prev, listInfoImage: accommodationRes.listInfoImage || [] }));
         } catch (error) {
             console.error('Error fetching accommodation details for edit:', error);
         }
         LoadingModal.hideLoading();
     };
 
-    const onEditAccommodation = async (accommodation) => {
+    const onEditAccommodation = async (values) => {
         LoadingModal.showLoading();
         try {
+            const accommodationValues = { ...values };
+            accommodationValues.IsActive = Boolean(values.IsActive ?? values.isActive ?? accommodation.isActive);
+            const amenities = (values.Amenity || values.amenity || accommodation.amenity || []).join(', ');
             const formData = new FormData();
-            const accommodationRequest = { ...accommodation };
-            accommodationRequest.isActive = Boolean(accommodation.isActive);
-            accommodationRequest.amenity = accommodation.amenity?.join(', ');
-            formData.append('Code', accommodationRequest.code);
-            formData.append('CityId', accommodationRequest.cityId);
-            formData.append('Type', accommodationRequest.type);
-            formData.append('Name', accommodationRequest.name);
-            formData.append('Address', accommodationRequest.address);
-            formData.append('StarRating', accommodationRequest.starRating);
-            formData.append('Description', accommodationRequest.description ?? '');
-            formData.append('Regulation', accommodationRequest.regulation ?? '');
-            formData.append('Amenities', accommodationRequest.amenity ?? '');
-            formData.append('IsActive', accommodationRequest.isActive);
-            formData.append('CoverImgUrl', accommodationRequest.coverImgUrl ?? '');
-            formData.append('CoverImgFile', accommodationRequest.coverImgFile);
-            accommodationRequest.listInfoImage?.forEach((file) => {
-                formData.append('ListInfoImageId', file.id);
+            formData.append('Code', accommodation.code ?? '');
+            formData.append('CityId', accommodationValues.CityId ?? accommodation.cityId ?? accommodation.city?.id ?? '');
+            formData.append('Type', accommodationValues.Type ?? accommodation.type ?? '');
+            formData.append('Name', accommodationValues.Name ?? accommodation.name ?? '');
+            formData.append('Address', accommodationValues.Address ?? accommodation.address ?? '');
+            formData.append('StarRating', accommodationValues.StarRating ?? accommodation.starRating ?? 0);
+            formData.append('Description', accommodationValues.Description ?? accommodation.description ?? '');
+            formData.append('Regulation', accommodationValues.Regulation ?? accommodation.regulation ?? '');
+            formData.append('Amenities', amenities ?? '');
+            formData.append('IsActive', accommodationValues.IsActive);
+            formData.append('CoverImgUrl', accommodation.coverImgUrl ?? '');
+            if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
+            // existing images ids
+            (accommodation.listInfoImage || []).forEach((file) => {
+                if (file && file.id) formData.append('ListInfoImageId', file.id);
             });
-            accommodationRequest.ListNewInfoImage?.forEach((file) => {
+            // new uploaded images stored in accommodation.ListNewInfoImage
+            (accommodation.ListNewInfoImage || []).forEach((file) => {
                 formData.append('ListNewInfoImage', file);
             });
-            const response = await axiosIntance.put(`/Accommodation/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            const res = response.data;
+            const res = await accommodationAPI.update(id, formData);
             if (res.success) {
                 window.location.href = `/admin/service/accommodation/display/${id}`;
             } else {
@@ -143,12 +157,7 @@ export default function Edit() {
                     title="Chỉnh sửa cơ sở lưu trú"
                     secondary={
                         <Space>
-                            <Button
-                                type="primary"
-                                shape="round"
-                                icon={<CheckOutlined />}
-                                onClick={() => onEditAccommodation(accommodation)}
-                            >
+                            <Button type="primary" shape="round" icon={<CheckOutlined />} onClick={() => form.submit()}>
                                 Lưu
                             </Button>
                             <Button
@@ -162,94 +171,65 @@ export default function Edit() {
                         </Space>
                     }
                 >
-                    <Row gutter={[24, 24]}>
+                <Form form={form} layout="vertical" onFinish={onEditAccommodation} initialValues={{ StarRating: 0 }}>
+                    <Row gutter={[24]}>
                         <Col span={24} style={{ textAlign: 'center' }}>
                             <div className="mb-3 d-flex justify-content-center">
                                 <ImagesUC
                                     imageUrl={accommodation.coverImgUrl}
-                                    onChange={(imgUrl, file) =>
-                                        setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl })
-                                    }
+                                    onChange={(imgUrl, file) => {
+                                        setCoverImgFile(file);
+                                        setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl });
+                                        form.setFieldsValue({ CoverImageUrl: imgUrl });
+                                    }}
                                 />
                             </div>
                             <span>Hình đại diện</span>
                         </Col>
+
                         <Col span={8}>
-                            <span>Tên</span>
-                            <Input
-                                value={accommodation.name}
-                                onChange={(e) => setAccommodation({ ...accommodation, name: e.target.value })}
-                            />
+                            <Form.Item name="Name" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
+                                <Input />
+                            </Form.Item>
                         </Col>
+
                         <Col span={8}>
-                            <span>Loại</span>
-                            <Select
-                                value={accommodation.type}
-                                allowClear
-                                className="w-100"
-                                options={listType?.map((item) => ({
-                                    label: item.value,
-                                    value: item.key
-                                }))}
-                                onChange={(val) => setAccommodation({ ...accommodation, type: val })}
-                            />
+                            <Form.Item name="Type" label="Loại" rules={[{ required: true, message: 'Vui lòng chọn loại' }]}>
+                                <Select allowClear className="w-100" options={listType?.map((item) => ({ label: item.value, value: item.key }))} />
+                            </Form.Item>
                         </Col>
+
                         <Col span={8}>
-                            <span>Thành phố</span>
-                            <Select
-                                value={accommodation.cityId}
-                                allowClear
-                                className="w-100"
-                                options={listCity?.map((item) => ({
-                                    label: item.name,
-                                    value: item.id
-                                }))}
-                                onChange={(val) => setAccommodation({ ...accommodation, cityId: val })}
-                            />
+                            <Form.Item name="CityId" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
+                                <Select allowClear className="w-100" options={listCity?.map((item) => ({ label: item.name, value: item.id }))} />
+                            </Form.Item>
                         </Col>
+
                         <Col span={8}>
-                            <span>Địa chỉ chi tiết</span>
-                            <Input
-                                value={accommodation.address}
-                                onChange={(e) => setAccommodation({ ...accommodation, address: e.target.value })}
-                            />
+                            <Form.Item name="Address" label="Địa chỉ chi tiết">
+                                <Input />
+                            </Form.Item>
                         </Col>
+
                         <Col span={8}>
-                            <span>Trạng thái</span>
-                            <Select
-                                value={accommodation.isActive}
-                                allowClear
-                                className="w-100"
-                                options={listStatus?.map((item) => ({
-                                    label: item.value,
-                                    value: item.key
-                                }))}
-                                onChange={(val) => setAccommodation({ ...accommodation, isActive: val })}
-                            />
+                            <Form.Item name="IsActive" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
+                                <Select allowClear className="w-100" options={listStatus?.map((item) => ({ label: item.value, value: item.key }))} />
+                            </Form.Item>
                         </Col>
+
                         <Col span={8}>
-                            <span>Tiện ích</span>
-                            <Select
-                                mode="multiple"
-                                value={accommodation.amenity}
-                                allowClear
-                                className="w-100"
-                                options={listAmenity?.map((item) => ({
-                                    label: item.name,
-                                    value: item.id
-                                }))}
-                                onChange={(val) => {
-                                    setAccommodation({ ...accommodation, amenity: val });
-                                }}
-                            />
+                            <Form.Item name="Amenity" label="Tiện ích">
+                                <Select mode="multiple" allowClear className="w-100" options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))} />
+                            </Form.Item>
                         </Col>
+
                         <Col span={8} className="d-flex align-items-center gap-2">
                             <span>Hạng sao</span>
-                            <Rate
-                                value={accommodation.starRating}
-                                onChange={(val) => setAccommodation({ ...accommodation, starRating: val })}
-                            />
+                            <Form.Item name="StarRating">
+                                <Rate />
+                            </Form.Item>
                         </Col>
+
                         <Col span={24}>
                             <span>Hình ảnh khác</span>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
@@ -265,23 +245,20 @@ export default function Edit() {
                                 />
                             </div>
                         </Col>
+
                         <Col span={24}>
-                            <span>Quy định</span>
-                            <TextArea
-                                value={accommodation.regulation}
-                                onChange={(e) => setAccommodation({ ...accommodation, regulation: e.target.value })}
-                            />
+                            <Form.Item name="Regulation" label="Quy định">
+                                <TextArea />
+                            </Form.Item>
                         </Col>
+
                         <Col span={24}>
-                            <span>Mô tả</span>
-                            <TextArea
-                                value={accommodation.description}
-                                allowClear
-                                className="w-100"
-                                onChange={(e) => setAccommodation({ ...accommodation, description: e.target.value })}
-                            />
+                            <Form.Item name="Description" label="Mô tả">
+                                <TextArea allowClear className="w-100" />
+                            </Form.Item>
                         </Col>
                     </Row>
+                </Form>
                     <Row className="mt-5">
                         <Col span={12}>
                             <span>Danh sách các loại phòng</span>
