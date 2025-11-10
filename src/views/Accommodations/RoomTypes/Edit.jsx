@@ -3,21 +3,42 @@ import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../../components/LoadingModal';
-import axiosIntance from '../../../api/axiosInstance';
+import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
+import Constants from '../../../Constants/Constants';
+import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI';
 
 const { TextArea } = Input;
 
 export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommodationId }) {
     const [form] = Form.useForm();
     const [roomTypeEdit, setRoomTypeEdit] = useState(roomType || {});
-    const [listStatus, setListStatus] = useState([]);
     const [listInfoImage, setListInfoImage] = useState(roomType?.listInfoImage || []);
     const [listAmenity, setListAmenity] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
 
     useEffect(() => {
-        setupEditForm();
+        getListRoomTypeAmenity();
+        getRoomTypeById(roomType?.id);
     }, []);
+
+    const getListRoomTypeAmenity = async () => {
+        try {
+            const res = await systemParameterAPI.getByFeatureCode(Constants.FeatureCode.RoomTypeAmenity);
+            setListAmenity(res.data);
+        }
+        catch (error) {
+            console.error('Error fetching setup data:', error);
+        }
+    }
+
+    const getRoomTypeById = async (id) => {
+        try {
+            const res = await  roomTypeAPI.getById(id);
+            setRoomTypeEdit(res.roomType || {});
+        } catch (error) {
+            console.error('Error fetching setup data:', error);
+        }
+    };
 
     useEffect(() => {
         // Populate form when roomType prop changes
@@ -39,17 +60,6 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             CoverImageUrl: rt.coverImageUrl
         });
     }, [roomType, form]);
-
-    const setupEditForm = async () => {
-        try {
-            const response = await axiosIntance.post('/RoomType/setup-addnew', {});
-            const res = response.data;
-            setListStatus(res.listStatus || []);
-            setListAmenity(res.listAmenity || []);
-        } catch (error) {
-            console.error('Error fetching setup data:', error);
-        }
-    };
 
     const onEditRoomType = async (roomTypeData) => {
         LoadingModal.showLoading();
@@ -80,12 +90,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                 if (!file.id) formData.append('ListNewInfoImage', file);
             });
             const idToPut = roomTypeData.Id ?? roomTypeEdit.id;
-            const response = await axiosIntance.put(`/RoomType/${idToPut}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            const res = response.data;
+            const res = await roomTypeAPI.update(idToPut, formData);
             if (res.success) {
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal
@@ -172,19 +177,37 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
                     <Col span={8}>
                         <Form.Item name="Price" label="Giá phòng">
-                            <InputNumber min={0} className="w-100" />
+                            <InputNumber 
+                                min={0} 
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                            />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
                         <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn">
-                            <InputNumber min={0} className="w-100" />
+                            <InputNumber 
+                                min={0} 
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                            />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
                         <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em">
-                            <InputNumber min={0} className="w-100" />
+                            <InputNumber 
+                                min={0} 
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                            />
                         </Form.Item>
                     </Col>
 
@@ -196,7 +219,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
                     <Col span={8}>
                         <Form.Item name="Status" label="Trạng thái">
-                            <Select allowClear className="w-100" options={listStatus?.map((item) => ({ label: item.value, value: item.key }))} />
+                            <Select allowClear className="w-100" options={Constants.StatusOptions} />
                         </Form.Item>
                     </Col>
 

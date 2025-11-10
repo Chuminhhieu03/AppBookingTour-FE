@@ -2,6 +2,8 @@ import { Button, Space, Table, Tag } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { render } from 'sass';
+import Utility from '../../../Utils/Utility';
+import Constants from '../../../Constants/Constants';
 
 const PAGE_SIZE = 5;
 
@@ -57,7 +59,7 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             dataIndex: 'statusName',
             align: 'center',
             key: 'statusName',
-            render: (_, record) => <Tag color={record.statusColor}>{record.statusName}</Tag>
+            render: (_, record) => <Tag color={Utility.getLabelByValue(Constants.StatusColor, record.status)}>{Utility.getLabelByValue(Constants.StatusOptions, record.status)}</Tag>
         },
         !viewOnly && {
             title: 'Chức năng',

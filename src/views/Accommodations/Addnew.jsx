@@ -6,29 +6,38 @@ import LoadingModal from '../../components/LoadingModal';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
 import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import cityAPI from '../../api/city/cityAPI';
+import systemParameterAPI from '../../api/systemParameters/systemParameterAPI';
+import Constants from '../../Constants/Constants';
 
 const { TextArea } = Input;
 
 export default function Addnew() {
     const [form] = Form.useForm();
-    const [listStatus, setListStatus] = useState([]);
-    const [listType, setListType] = useState([]);
     const [listCity, setListCity] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
 
     useEffect(() => {
-        setupAddnewForm();
+        getListAccommodationAmenity();
+        getListCity();
     }, []);
 
-    const setupAddnewForm = async () => {
+    const getListCity = async () => {
         try {
-            const res = await accommodationAPI.setupAddnew();
-            setListStatus(res.listStatus);
-            setListType(res.listType);
-            setListCity(res.listCity);
-            setListAmenity(res.listAmenity);
+            const res = await cityAPI.getListCity();
+            setListCity(res.data);
+        }
+        catch (error) {
+            console.error('Error fetching list of cities:', error);
+        }
+    };
+
+    const getListAccommodationAmenity = async () => {
+        try {
+            const res = await systemParameterAPI.getByFeatureCode(Constants.FeatureCode.AccommodationAmenity);
+            setListAmenity(res.data);
         } catch (error) {
             console.error('Error fetching setup addnew data:', error);
         }
@@ -39,7 +48,7 @@ export default function Addnew() {
         try {
             const accommodationRequest = { ...values };
             // ensure boolean and amenities string
-            accommodationRequest.IsActive = Boolean(values.IsActive ?? values.isActive);
+            accommodationRequest.IsActive = values.IsActive;
             const amenities = (values.Amenity || values.amenity || []).join(', ');
             const formData = new FormData();
             formData.append('CityId', accommodationRequest.CityId ?? accommodationRequest.cityId);
@@ -103,7 +112,7 @@ export default function Addnew() {
 
                             <Col span={8}>
                                 <Form.Item name="Type" label="Loại" rules={[{ required: true, message: 'Vui lòng chọn loại' }]}>
-                                    <Select allowClear className="w-100" options={listType?.map((item) => ({ label: item.value, value: item.key }))} />
+                                    <Select allowClear className="w-100" options={Constants.AccommodationTypeOptions} />
                                 </Form.Item>
                             </Col>
 
@@ -121,7 +130,7 @@ export default function Addnew() {
 
                             <Col span={8}>
                                 <Form.Item name="IsActive" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
-                                    <Select allowClear className="w-100" options={listStatus?.map((item) => ({ label: item.value, value: item.key }))} />
+                                    <Select allowClear className="w-100" options={Constants.StatusOptions} />
                                 </Form.Item>
                             </Col>
 
@@ -132,8 +141,7 @@ export default function Addnew() {
                             </Col>
 
                             <Col span={8} className="d-flex align-items-center gap-2">
-                                <span>Hạng sao</span>
-                                <Form.Item name="StarRating">
+                                <Form.Item name="StarRating" label="Hạng sao" className="w-100">
                                     <Rate />
                                 </Form.Item>
                             </Col>
