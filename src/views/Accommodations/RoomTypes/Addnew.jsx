@@ -110,39 +110,27 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="MaxAdult" label="Số lượng người lớn" rules={[{ type: 'number', min: 0 }]}> 
+                        <Form.Item name="MaxAdult" label="Số lượng người lớn" rules={[{ type: 'number', min: 0 }]}>
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="MaxChildren" label="Số lượng trẻ em" rules={[{ type: 'number', min: 0 }]}> 
+                        <Form.Item name="MaxChildren" label="Số lượng trẻ em" rules={[{ type: 'number', min: 0 }]}>
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Quantity" label="Số lượng phòng" rules={[{ type: 'number', min: 0 }]}> 
+                        <Form.Item name="Quantity" label="Số lượng phòng" rules={[{ type: 'number', min: 0 }]}>
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Price" label="Giá phòng" rules={[{ type: 'number', min: 0 }]}> 
-                            <InputNumber 
-                                min={0} 
-                                className="w-100"
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                                maxLength={15}
-                        />
-                        </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-                        <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn" rules={[{ type: 'number', min: 0 }]}> 
-                            <InputNumber 
-                                min={0} 
+                        <Form.Item name="Price" label="Giá phòng" rules={[{ type: 'number', min: 0 }]}>
+                            <InputNumber
+                                min={0}
                                 className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -152,9 +140,21 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em" rules={[{ type: 'number', min: 0 }]}> 
-                            <InputNumber 
-                                min={0} 
+                        <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn" rules={[{ type: 'number', min: 0 }]}>
+                            <InputNumber
+                                min={0}
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                maxLength={15}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em" rules={[{ type: 'number', min: 0 }]}>
+                            <InputNumber
+                                min={0}
                                 className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -165,7 +165,12 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
 
                     <Col span={8}>
                         <Form.Item name="Amenity" label="Tiện ích">
-                            <Select mode="multiple" allowClear className="w-100" options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))} />
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                className="w-100"
+                                options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
+                            />
                         </Form.Item>
                     </Col>
 

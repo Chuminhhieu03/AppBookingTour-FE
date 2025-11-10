@@ -24,6 +24,7 @@ export default function TourDepartureAddnew() {
             form.setFieldsValue({
                 priceAdult: tourData.priceAdult,
                 priceChildren: tourData.priceChildren,
+                availableSlots: tourData.maxParticipants,
                 status: 1
             });
         } else {

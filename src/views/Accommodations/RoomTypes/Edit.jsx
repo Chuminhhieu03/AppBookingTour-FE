@@ -25,15 +25,14 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
         try {
             const res = await systemParameterAPI.getByFeatureCode(Constants.FeatureCode.RoomTypeAmenity);
             setListAmenity(res.data);
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error fetching setup data:', error);
         }
-    }
+    };
 
     const getRoomTypeById = async (id) => {
         try {
-            const res = await  roomTypeAPI.getById(id);
+            const res = await roomTypeAPI.getById(id);
             setRoomTypeEdit(res.roomType || {});
         } catch (error) {
             console.error('Error fetching setup data:', error);
@@ -177,8 +176,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
                     <Col span={8}>
                         <Form.Item name="Price" label="Giá phòng">
-                            <InputNumber 
-                                min={0} 
+                            <InputNumber
+                                min={0}
                                 className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -189,8 +188,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
                     <Col span={8}>
                         <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn">
-                            <InputNumber 
-                                min={0} 
+                            <InputNumber
+                                min={0}
                                 className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -201,8 +200,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
                     <Col span={8}>
                         <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em">
-                            <InputNumber 
-                                min={0} 
+                            <InputNumber
+                                min={0}
                                 className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                 parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
@@ -213,7 +212,12 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
 
                     <Col span={8}>
                         <Form.Item name="Amenity" label="Tiện ích">
-                            <Select mode="multiple" allowClear className="w-100" options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))} />
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                className="w-100"
+                                options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
+                            />
                         </Form.Item>
                     </Col>
 

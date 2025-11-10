@@ -7,6 +7,7 @@ import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import dayjs from 'dayjs';
 import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 const { Option } = Select;
 
@@ -126,28 +127,25 @@ export default function TourDepartureDisplay() {
 
                     {/* Hàng 3: Số chỗ còn trống | Trạng thái | Hướng dẫn viên */}
                     <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <span>Số chỗ còn trống</span>
                             <InputNumber value={departure.availableSlots} readOnly style={{ width: '100%' }} />
                         </Col>
-                        <Col span={8}>
-                            <span>Trạng thái</span>
-                            <Select value={departure.status} disabled style={{ width: '100%' }}>
-                                {Constants.TourDepartureStatusOptions.map((option) => (
-                                    <Option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </Option>
-                                ))}
-                            </Select>
+                        <Col span={6}>
+                            <span>Số chỗ đã đặt</span>
+                            <InputNumber value={departure.bookedSlots} disabled style={{ width: '100%' }} />
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
+                            <span>Trạng thái</span>
+                            <Input
+                                value={Utility.getLabelByValue(Constants.TourDepartureStatusOptions, departure.status)}
+                                readOnly
+                                style={{ width: '100%' }}
+                            />
+                        </Col>
+                        <Col span={6}>
                             <span>Hướng dẫn viên phụ trách</span>
-                            <Select value={departure.guideId} disabled style={{ width: '100%' }}>
-                                <Option value="guide-1">Nguyễn Văn A</Option>
-                                <Option value="guide-2">Trần Thị B</Option>
-                                <Option value="guide-3">Lê Văn C</Option>
-                                <Option value="guide-4">Phạm Thị D</Option>
-                            </Select>
+                            <Input value={departure.guideName} readOnly style={{ width: '100%' }} />
                         </Col>
                     </Row>
                 </MainCard>

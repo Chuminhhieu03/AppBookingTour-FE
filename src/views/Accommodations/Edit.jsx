@@ -54,7 +54,7 @@ export default function Edit() {
         } catch (error) {
             console.error('Error fetching list of cities:', error);
         }
-    }
+    };
 
     const setupEditForm = async () => {
         LoadingModal.showLoading();
@@ -163,8 +163,8 @@ export default function Edit() {
         setSelectedRoomTypeForEdit(roomType);
         setIsRoomTypeEditModalOpen(true);
     };
-    
-    console.log('accommodation', accommodation.isActive) 
+
+    console.log('accommodation', accommodation.isActive);
     return (
         <Row>
             <Col span={24}>
@@ -186,93 +186,106 @@ export default function Edit() {
                         </Space>
                     }
                 >
-                <Form form={form} layout="vertical" onFinish={onEditAccommodation} initialValues={{ isActive: accommodation.isActive }}>
-                    <Row gutter={[24]}>
-                        <Col span={24} style={{ textAlign: 'center' }}>
-                            <div className="mb-3 d-flex justify-content-center">
-                                <ImagesUC
-                                    imageUrl={accommodation.coverImgUrl}
-                                    onChange={(imgUrl, file) => {
-                                        setCoverImgFile(file);
-                                        setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl });
-                                        form.setFieldsValue({ CoverImageUrl: imgUrl });
-                                    }}
-                                />
-                            </div>
-                            <span>Hình đại diện</span>
-                        </Col>
+                    <Form form={form} layout="vertical" onFinish={onEditAccommodation} initialValues={{ isActive: accommodation.isActive }}>
+                        <Row gutter={[24]}>
+                            <Col span={24} style={{ textAlign: 'center' }}>
+                                <div className="mb-3 d-flex justify-content-center">
+                                    <ImagesUC
+                                        imageUrl={accommodation.coverImgUrl}
+                                        onChange={(imgUrl, file) => {
+                                            setCoverImgFile(file);
+                                            setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl });
+                                            form.setFieldsValue({ CoverImageUrl: imgUrl });
+                                        }}
+                                    />
+                                </div>
+                                <span>Hình đại diện</span>
+                            </Col>
 
-                        <Col span={8}>
-                            <Form.Item name="Name" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8}>
+                                <Form.Item name="Name" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
+                                    <Input />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={8}>
-                            <Form.Item name="Type" label="Loại" rules={[{ required: true, message: 'Vui lòng chọn loại' }]}>
-                                <Select allowClear className="w-100" options={Constants.AccommodationTypeOptions} />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8}>
+                                <Form.Item name="Type" label="Loại" rules={[{ required: true, message: 'Vui lòng chọn loại' }]}>
+                                    <Select allowClear className="w-100" options={Constants.AccommodationTypeOptions} />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={8}>
-                            <Form.Item name="CityId" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
-                                <Select allowClear className="w-100" options={listCity?.map((item) => ({ label: item.name, value: item.id }))} />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8}>
+                                <Form.Item name="CityId" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
+                                    <Select
+                                        allowClear
+                                        className="w-100"
+                                        options={listCity?.map((item) => ({ label: item.name, value: item.id }))}
+                                    />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={8}>
-                            <Form.Item name="Address" label="Địa chỉ chi tiết">
-                                <Input />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8}>
+                                <Form.Item name="Address" label="Địa chỉ chi tiết">
+                                    <Input />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={8}>
-                            <Form.Item name="IsActive" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
-                                <Select allowClear className="w-100" options={Constants.StatusOptions} />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8}>
+                                <Form.Item
+                                    name="IsActive"
+                                    label="Trạng thái"
+                                    rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
+                                >
+                                    <Select allowClear className="w-100" options={Constants.StatusOptions} />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={8}>
-                            <Form.Item name="Amenity" label="Tiện ích">
-                                <Select mode="multiple" allowClear className="w-100" options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))} />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8}>
+                                <Form.Item name="Amenity" label="Tiện ích">
+                                    <Select
+                                        mode="multiple"
+                                        allowClear
+                                        className="w-100"
+                                        options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
+                                    />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={8} className="d-flex align-items-center gap-2">
-                            <Form.Item name="StarRating" label="Hạng sao" className="w-100">
-                                <Rate />
-                            </Form.Item>
-                        </Col>
+                            <Col span={8} className="d-flex align-items-center gap-2">
+                                <Form.Item name="StarRating" label="Hạng sao" className="w-100">
+                                    <Rate />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={24}>
-                            <span>Hình ảnh khác</span>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                                <Gallery
-                                    listImage={accommodation.listInfoImage}
-                                    onChange={(listOldImage, listNewImage) =>
-                                        setAccommodation({
-                                            ...accommodation,
-                                            listInfoImage: listOldImage,
-                                            ListNewInfoImage: listNewImage
-                                        })
-                                    }
-                                />
-                            </div>
-                        </Col>
+                            <Col span={24}>
+                                <span>Hình ảnh khác</span>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                                    <Gallery
+                                        listImage={accommodation.listInfoImage}
+                                        onChange={(listOldImage, listNewImage) =>
+                                            setAccommodation({
+                                                ...accommodation,
+                                                listInfoImage: listOldImage,
+                                                ListNewInfoImage: listNewImage
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </Col>
 
-                        <Col span={24}>
-                            <Form.Item name="Regulation" label="Quy định">
-                                <TextArea />
-                            </Form.Item>
-                        </Col>
+                            <Col span={24}>
+                                <Form.Item name="Regulation" label="Quy định">
+                                    <TextArea />
+                                </Form.Item>
+                            </Col>
 
-                        <Col span={24}>
-                            <Form.Item name="Description" label="Mô tả">
-                                <TextArea allowClear className="w-100" />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
+                            <Col span={24}>
+                                <Form.Item name="Description" label="Mô tả">
+                                    <TextArea allowClear className="w-100" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Form>
                     <Row className="mt-5">
                         <Col span={12}>
                             <span>Danh sách các loại phòng</span>

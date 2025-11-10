@@ -1,6 +1,6 @@
 export default class Constants {
     public static readonly DEFAULT_PAGE_SIZE: number = 20;
-    
+
     // Bộ giá trị
     static Status = {
         Active: true,
@@ -10,13 +10,13 @@ export default class Constants {
     static FeatureCode = {
         AccommodationAmenity: 'AccommodationAmenity',
         RoomTypeAmenity: 'RoomTypeAmenity'
-    }
+    };
 
     static AccommodationType = {
         Hotel: 1,
         Resort: 2,
         Homestay: 3
-    }
+    };
 
     static ItemType = {
         Tour: 1,
@@ -36,7 +36,6 @@ export default class Constants {
         Premium: 3
     };
 
-
     // Options cho bộ lọc và các thành phần giao diện
     static StatusOptions = [
         { value: this.Status.Active, label: 'Hoạt động' },
@@ -48,13 +47,13 @@ export default class Constants {
         { value: this.AccommodationType.Resort, label: 'Resort' },
         { value: this.AccommodationType.Homestay, label: 'Homestay' }
     ];
-    
+
     // Color
     static StatusColor = [
         { value: this.Status.Active, label: 'green' },
         { value: this.Status.Inactive, label: 'red' }
     ];
-    
+
     static ItemTypeOptions = [
         { value: this.ItemType.Tour, label: 'Tour' },
         { value: this.ItemType.Accommodation, label: 'Cơ sở lưu trú' },

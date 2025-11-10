@@ -18,7 +18,7 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
 
     const getRoomTypeById = async (id) => {
         try {
-            const res = await  roomTypeAPI.getById(id);
+            const res = await roomTypeAPI.getById(id);
             setRoomTypeDisplay(res.roomType || {});
         } catch (error) {
             console.error('Error fetching setup data:', error);

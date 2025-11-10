@@ -34,7 +34,7 @@ const discountAPI = {
     delete: async (id) => {
         const response = await axiosInstance.delete(`/Discount/${id}`);
         return response.data;
-    },
+    }
 };
 
 export { discountAPI };

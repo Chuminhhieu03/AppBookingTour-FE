@@ -64,11 +64,19 @@ export default function Addnew() {
                     <Row gutter={[24, 24]}>
                         <Col span={8}>
                             <span>Mã</span>
-                            <Input maxLength={256} value={discount.Code} onChange={(e) => setDiscount({ ...discount, Code: e.target.value })} />
+                            <Input
+                                maxLength={256}
+                                value={discount.Code}
+                                onChange={(e) => setDiscount({ ...discount, Code: e.target.value })}
+                            />
                         </Col>
                         <Col span={8}>
                             <span>Tên mã giảm giá</span>
-                            <Input maxLength={256} value={discount.Name} onChange={(e) => setDiscount({ ...discount, Name: e.target.value })} />
+                            <Input
+                                maxLength={256}
+                                value={discount.Name}
+                                onChange={(e) => setDiscount({ ...discount, Name: e.target.value })}
+                            />
                         </Col>
                         <Col span={8}>
                             <span>Giá trị giảm (%)</span>

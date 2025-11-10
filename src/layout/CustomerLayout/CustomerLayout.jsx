@@ -10,7 +10,7 @@ export default function CustomerLayout() {
         <div>
             <Header />
             <LoadingModal />
-            <div className="pc-container" style={{marginLeft: 0}}>
+            <div className="pc-container" style={{ marginLeft: 0 }}>
                 <div className="pc-content">
                     {/* <Breadcrumbs /> */}
                     <NavigationScroll>

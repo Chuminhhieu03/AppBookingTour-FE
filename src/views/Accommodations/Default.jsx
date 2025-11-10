@@ -94,8 +94,7 @@ export default function Default() {
         try {
             const res = await cityAPI.getListCity();
             setListCity(res.data);
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error fetching list of cities:', error);
         }
     };

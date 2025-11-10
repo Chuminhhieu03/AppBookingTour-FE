@@ -28,8 +28,7 @@ export default function Addnew() {
         try {
             const res = await cityAPI.getListCity();
             setListCity(res.data);
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error fetching list of cities:', error);
         }
     };
@@ -118,7 +117,13 @@ export default function Addnew() {
 
                             <Col span={8}>
                                 <Form.Item name="CityId" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
-                                    <Select showSearch optionFilterProp="label" allowClear className="w-100" options={listCity?.map((item) => ({ label: item.name, value: item.id }))} />
+                                    <Select
+                                        showSearch
+                                        optionFilterProp="label"
+                                        allowClear
+                                        className="w-100"
+                                        options={listCity?.map((item) => ({ label: item.name, value: item.id }))}
+                                    />
                                 </Form.Item>
                             </Col>
 
@@ -129,14 +134,23 @@ export default function Addnew() {
                             </Col>
 
                             <Col span={8}>
-                                <Form.Item name="IsActive" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
+                                <Form.Item
+                                    name="IsActive"
+                                    label="Trạng thái"
+                                    rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
+                                >
                                     <Select allowClear className="w-100" options={Constants.StatusOptions} />
                                 </Form.Item>
                             </Col>
 
                             <Col span={8}>
                                 <Form.Item name="Amenity" label="Tiện ích">
-                                    <Select mode="multiple" allowClear className="w-100" options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))} />
+                                    <Select
+                                        mode="multiple"
+                                        allowClear
+                                        className="w-100"
+                                        options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
+                                    />
                                 </Form.Item>
                             </Col>
 

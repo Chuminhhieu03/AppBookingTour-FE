@@ -120,7 +120,7 @@ export default function Default() {
                 }
             }
         });
-    }
+    };
 
     const searchData = async (pageIndex = 0) => {
         try {

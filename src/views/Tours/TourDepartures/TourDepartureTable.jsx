@@ -70,7 +70,8 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
                 ? {
                       duration: tourData.durationDays,
                       priceAdult: tourData.basePriceAdult,
-                      priceChildren: tourData.basePriceChild
+                      priceChildren: tourData.basePriceChild,
+                      maxParticipants: tourData.maxParticipants
                   }
                 : null
         });
