@@ -1,6 +1,12 @@
 import axiosInstance from '../axiosInstance';
 
 const statisticsAPI = {
+    // GET overview statistics
+    getOverviewStatistics: async () => {
+        const response = await axiosInstance.get('/statistics/overview');
+        return response.data;
+    },
+
     // GET list item statistics by revenue
     getItemStatisticsByRevenue: async (params) => {
         const response = await axiosInstance.get('/statistics/item-revenue', { params });

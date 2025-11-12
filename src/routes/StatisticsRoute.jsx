@@ -4,6 +4,7 @@ import ProtectedRoute from 'components/auth/ProtectedRoute';
 import AdminLayout from '../layout/AdminLayout/AdminLayout';
 
 // ==== STATISTICS COMPONENTS ====
+const StatisticsOverview = Loadable(lazy(() => import('views/Statistics/StatisticsOverview')));
 const ItemStatisticsByRevenue = Loadable(lazy(() => import('views/Statistics/ItemStatisticsByRevenue')));
 const ItemRevenueDetail = Loadable(lazy(() => import('views/Statistics/ItemRevenueDetail')));
 const ItemStatisticsByBookingCount = Loadable(lazy(() => import('views/Statistics/ItemStatisticsByBookingCount')));
@@ -24,6 +25,10 @@ const StatisticsRoute = {
                 {
                     path: 'statistics',
                     children: [
+                        {
+                            path: 'overview',
+                            element: <StatisticsOverview />
+                        },
                         {
                             path: 'item-revenue',
                             element: <ItemStatisticsByRevenue />
