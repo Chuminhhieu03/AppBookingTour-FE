@@ -3,13 +3,13 @@ const statistics = {
     title: 'Statistics',
     type: 'group',
     children: [
-        // {
-        //     id: 'statistics-overview',
-        //     title: 'Thống kê tổng quan',
-        //     type: 'item',
-        //     icon: <i className="ph ph-chart-bar" />,
-        //     url: '/admin/statistics/overview'
-        // },
+        {
+            id: 'statistics-overview',
+            title: 'Thống kê tổng quan',
+            type: 'item',
+            icon: <i className="ph ph-chart-bar" />,
+            url: '/admin/statistics/overview'
+        },
         {
             id: 'item-statistics-by-revenue',
             title: 'Thống kê sản phẩm theo doanh thu',
