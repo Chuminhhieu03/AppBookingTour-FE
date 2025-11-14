@@ -192,16 +192,18 @@ export default function AccommodationCustomerDefault() {
     };
 
     const getListAmenity = async () => {
-        const response = await axiosInstance.post('/SystemParameters/get-by-feature-code', {"FeatureCode": Constants.FeatureCode.AccommodationAmenity});
+        const response = await axiosInstance.post('/SystemParameters/get-by-feature-code', {
+            FeatureCode: Constants.FeatureCode.AccommodationAmenity
+        });
         const res = response.data;
         setListAmenity(res.data);
-    }
+    };
 
     const getListCity = async () => {
         const response = await axiosInstance.get('/cities/get-list');
         const res = response.data;
         setListCity(res.data);
-    }
+    };
 
     return (
         <>
@@ -213,7 +215,9 @@ export default function AccommodationCustomerDefault() {
                 <Row gutter={[8, 8]} align="middle" className="flex-nowrap bg-white shadow-sm mb-4 p-3" style={{ margin: '0 116px' }}>
                     {/* Location */}
                     <Col flex="1" style={{ borderRight: '1px solid #e9e9e9', paddingRight: 12 }}>
-                        <div className="small fw-bold mb-1">Địa điểm <span className="text-danger">*</span></div>
+                        <div className="small fw-bold mb-1">
+                            Địa điểm <span className="text-danger">*</span>
+                        </div>
                         <Space.Compact block style={{ width: '100%' }}>
                             <Select
                                 showSearch
@@ -232,7 +236,7 @@ export default function AccommodationCustomerDefault() {
                     </Col>
 
                     {/* Check-in */}
-                    <Col flex="1" className='ps-3' style={{ borderRight: '1px solid #e9e9e9', paddingRight: 12 }}>
+                    <Col flex="1" className="ps-3" style={{ borderRight: '1px solid #e9e9e9', paddingRight: 12 }}>
                         <div className="small fw-bold mb-1">Nhận phòng</div>
                         <Space.Compact block style={{ width: '100%' }}>
                             <DatePicker
@@ -249,7 +253,7 @@ export default function AccommodationCustomerDefault() {
                     </Col>
 
                     {/* Check-out */}
-                    <Col flex="1" className='ps-3'>
+                    <Col flex="1" className="ps-3">
                         <div className="small fw-bold mb-1">Trả phòng</div>
                         <Space.Compact block style={{ width: '100%' }}>
                             <DatePicker

@@ -96,7 +96,7 @@ export default function Display() {
                         <Col span={8}>
                             <span>Hạng sao</span>
                             <br />
-                            <Rate className='mt-2' value={accommodation.starRating} readOnly />
+                            <Rate className="mt-2" value={accommodation.starRating} readOnly />
                         </Col>
                         <Col span={24}>
                             <span>Hình ảnh khác</span>
@@ -104,7 +104,7 @@ export default function Display() {
                                 <Gallery listImage={accommodation.listInfoImage} viewOnly />
                             </div>
                         </Col>
-                        <Col span={24} >
+                        <Col span={24}>
                             <span>Quy định</span>
                             <TextArea value={accommodation.regulation} readOnly />
                         </Col>

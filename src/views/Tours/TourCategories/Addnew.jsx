@@ -6,6 +6,7 @@ import MainCard from '../../../components/MainCard';
 import tourCategoryAPI from '../../../api/tour/tourCategoryAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import ImagesUC from '../../components/basic/ImagesUC';
+import Constants from 'Constants/Constants';
 
 const { TextArea } = Input;
 
@@ -132,12 +133,7 @@ export default function TourCategoryAddnew() {
 
                             <Col span={8}>
                                 <Form.Item name="isActive" label="Trạng thái">
-                                    <Select
-                                        options={[
-                                            { label: 'Hoạt động', value: true },
-                                            { label: 'Ngừng hoạt động', value: false }
-                                        ]}
-                                    />
+                                    <Select options={Constants.StatusOptions} />
                                 </Form.Item>
                             </Col>
 

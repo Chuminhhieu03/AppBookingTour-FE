@@ -86,7 +86,11 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             dataIndex: 'statusName',
             align: 'center',
             key: 'statusName',
-            render: (_, record) => <Tag color={Utility.getLabelByValue(Constants.StatusColor, record.status)}>{Utility.getLabelByValue(Constants.StatusOptions, record.status)}</Tag>
+            render: (_, record) => (
+                <Tag color={Utility.getLabelByValue(Constants.StatusColor, record.status)}>
+                    {Utility.getLabelByValue(Constants.StatusOptions, record.status)}
+                </Tag>
+            )
         },
         !viewOnly && {
             title: 'Chức năng',
