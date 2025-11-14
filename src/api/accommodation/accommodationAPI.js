@@ -27,6 +27,11 @@ const accommodationAPI = {
             }
         });
         return response.data;
+    },
+
+    delete: async (id) => {
+        const response = await axiosInstance.delete(`/Accommodation/${id}`);
+        return response.data;
     }
 };
 

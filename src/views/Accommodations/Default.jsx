@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select } from 'antd';
+import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, Modal, message } from 'antd';
 import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined, CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
@@ -13,7 +13,6 @@ export default function Default() {
     const [query, setQuery] = React.useState({});
     const [filter, setFilter] = React.useState({});
     const [listAccommodation, setListAccommodation] = React.useState([]);
-    const [listType, setListType] = React.useState([]);
     const [listCity, setListCity] = React.useState([]);
     const [isReset, setIsReset] = React.useState(false);
     const [totalCount, setTotalCount] = React.useState(0);
@@ -22,7 +21,7 @@ export default function Default() {
         {
             title: 'STT',
             key: 'index',
-            render: (_, __, index) => (filter.PageIndex ?? 0) * Constants.DEFAULT_PAGE_SIZE + index + 1
+            render: (_, __, index) => (query.PageIndex ?? 0) * Constants.DEFAULT_PAGE_SIZE + index + 1
         },
         {
             title: 'Mã',
@@ -75,7 +74,11 @@ export default function Default() {
             key: 'actions',
             align: 'center',
             width: 100,
-            render: (_, record) => <Button type="link" icon={<DeleteOutlined />} />
+            render: (_, record) => (
+                <Space size="small">
+                    <Button type="link" size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+                </Space>
+            )
         }
     ];
 
@@ -94,8 +97,7 @@ export default function Default() {
         try {
             const res = await cityAPI.getListCity();
             setListCity(res.data);
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error fetching list of cities:', error);
         }
     };
@@ -115,6 +117,40 @@ export default function Default() {
         } finally {
             LoadingModal.hideLoading();
         }
+    };
+
+    const handleDelete = async (id) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa cơ sở lưu trú này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    const response = await accommodationAPI.delete(id);
+                    if (response.success) {
+                        message.success('Xóa cơ sở lưu trú thành công');
+
+                        const currentPage = query.PageIndex ?? 0;
+
+                        if (listAccommodation.length === 1 && currentPage > 0) {
+                            searchData(currentPage - 1);
+                            query.PageIndex = currentPage - 1;
+                        } else {
+                            searchData(currentPage);
+                        }
+
+                        setQuery({ ...query });
+                    } else {
+                        message.error(response.message || 'Không thể xóa cơ sở lưu trú');
+                    }
+                } catch (error) {
+                    console.error('Error deleting accommodation:', error);
+                    message.error('Đã xảy ra lỗi khi xóa cơ sở lưu trú');
+                }
+            }
+        });
     };
 
     const onReset = () => {
@@ -230,6 +266,7 @@ export default function Default() {
                         rowKey={(record) => record.id}
                         bordered
                         pagination={{
+                            current: (query.PageIndex ?? 0) + 1,
                             pageSize: Constants.DEFAULT_PAGE_SIZE,
                             total: totalCount,
                             onChange: (page) => {

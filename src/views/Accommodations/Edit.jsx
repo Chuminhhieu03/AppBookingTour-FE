@@ -163,6 +163,10 @@ export default function Edit() {
         setSelectedRoomTypeForEdit(roomType);
         setIsRoomTypeEditModalOpen(true);
     };
+
+    const handleRoomTypeDeleteClick = () => {
+        setupEditForm(); // Refresh the form data after successful room type deletion
+    };
     
     console.log('accommodation', accommodation.isActive) 
     return (
@@ -289,6 +293,7 @@ export default function Edit() {
                                 listRoomType={accommodation.listRoomType}
                                 onRoomTypeClick={handleRoomTypeDisplayClick}
                                 onRoomTypeEditClick={handleRoomTypeEditClick}
+                                onRoomTypeDeleteClick={handleRoomTypeDeleteClick}
                             />
                         </Col>
                     </Row>

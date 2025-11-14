@@ -4,13 +4,12 @@ import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import discountAPI from '../../api/discount/discountAPI';
+import Constants from '../../Constants/Constants';
 
 const { TextArea } = Input;
 
 export default function Addnew() {
     const [discount, setDiscount] = useState({});
-    const [listStatus, setListStatus] = useState([]);
-    const [listServiceType, setListServiceType] = useState([]);
 
     useEffect(() => {
         setupAddnewForm();
@@ -118,10 +117,7 @@ export default function Addnew() {
                                 value={discount.ServiceType}
                                 allowClear
                                 className="w-100"
-                                options={listServiceType?.map((item) => ({
-                                    label: item.value,
-                                    value: item.key
-                                }))}
+                                options={Constants.ServiceTypeOptions}
                                 onChange={(val) => {
                                     setDiscount({ ...discount, ServiceType: val });
                                 }}
@@ -133,10 +129,7 @@ export default function Addnew() {
                                 value={discount.Status}
                                 allowClear
                                 className="w-100"
-                                options={listStatus?.map((item) => ({
-                                    label: item.value,
-                                    value: item.key
-                                }))}
+                                options={Constants.StatusOptions}
                                 onChange={(val) => setDiscount({ ...discount, Status: val })}
                             />
                         </Col>

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Utility from '../../../Utils/Utility';
 import Constants from '../../../Constants/Constants';
 import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
+import RoomInventoryTable from './RoomInventories/RoomInventoryTable';
 
 const { TextArea } = Input;
 
@@ -104,6 +105,12 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
                         <Gallery listImage={roomTypeDisplay.listInfoImage} viewOnly />
                     </div>
+                </Col>
+                <Col span={24}>
+                    <RoomInventoryTable
+                        editable={false}
+                        value={roomTypeDisplay.listRoomInventories || []}
+                    />
                 </Col>
             </Row>
         </Modal>

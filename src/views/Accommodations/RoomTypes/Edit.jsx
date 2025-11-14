@@ -6,6 +6,7 @@ import LoadingModal from '../../../components/LoadingModal';
 import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
 import Constants from '../../../Constants/Constants';
 import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI';
+import RoomInventoryTable from './RoomInventories/RoomInventoryTable';
 
 const { TextArea } = Input;
 
@@ -74,26 +75,22 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             formData.append('Price', roomTypeData.Price ?? roomTypeEdit.price);
             formData.append('ExtraAdultPrice', roomTypeData.ExtraAdultPrice ?? roomTypeEdit.extraAdultPrice);
             formData.append('ExtraChildrenPrice', roomTypeData.ExtraChildrenPrice ?? roomTypeEdit.extraChildrenPrice);
-            formData.append('Status', roomTypeData.Status ?? roomTypeEdit.status);
+            formData.append('Status', Number(roomTypeData.Status) ?? Number(roomTypeEdit.status));
             formData.append('AccommodationId', accommodationId);
             formData.append('Amenities', amenities);
             formData.append('CoverImageUrl', roomTypeData.CoverImageUrl ?? roomTypeEdit.coverImageUrl ?? '');
-            // cover image file comes from local state if changed
             if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
-            // existing list info image ids from form state
             (roomTypeData.ListInfoImage || roomTypeEdit.listInfoImage || []).forEach((file) => {
                 if (file && file.id) formData.append('ListInfoImageId', file.id);
             });
-            // new uploaded info images
             listInfoImage?.forEach((file) => {
-                // assume files without id are new files
                 if (!file.id) formData.append('ListNewInfoImage', file);
             });
             const idToPut = roomTypeData.Id ?? roomTypeEdit.id;
             const res = await roomTypeAPI.update(idToPut, formData);
             if (res.success) {
-                onOk(true); // Signal success to parent
-                onCancel(); // Close the modal
+                onOk(true); 
+                onCancel(); 
                 form.resetFields();
                 setRoomTypeEdit({});
                 setListInfoImage([]);
@@ -222,7 +219,6 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                             <Select allowClear className="w-100" options={Constants.StatusOptions} />
                         </Form.Item>
                     </Col>
-
                     <Col span={24}>
                         <span>Hình ảnh khác</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
@@ -234,6 +230,19 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                                 }}
                             />
                         </div>
+                    </Col>
+                    <Col span={24}>
+                        <RoomInventoryTable
+                            editable={true}
+                            value={roomTypeEdit.listRoomInventory || []}
+                            roomTypeId={roomTypeEdit.id}
+                            onChange={(newListRoomInventory) => {
+                                setRoomTypeEdit((prev) => ({
+                                    ...prev,
+                                    listRoomInventory: newListRoomInventory
+                                }));
+                            }}
+                        />
                     </Col>
                 </Row>
             </Form>

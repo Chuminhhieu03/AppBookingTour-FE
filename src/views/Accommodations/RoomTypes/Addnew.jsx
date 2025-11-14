@@ -41,7 +41,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             formData.append('Price', roomTypeRequest.Price);
             formData.append('ExtraAdultPrice', roomTypeRequest.ExtraAdultPrice);
             formData.append('ExtraChildrenPrice', roomTypeRequest.ExtraChildrenPrice);
-            formData.append('Status', roomTypeRequest.Status);
+            formData.append('Status', Number(roomTypeRequest.Status));
             // cover image file comes from local state
             if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
             formData.append('Amenities', amenities);

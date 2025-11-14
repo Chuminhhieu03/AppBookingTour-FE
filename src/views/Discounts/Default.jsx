@@ -6,10 +6,10 @@ import MainCard from 'components/MainCard';
 import SearchDiscountQuery from '../../DTO/Discounts/SearchDiscounts/SearchDiscountQuery';
 import DiscountFilter from '../../DTO/Discounts/SearchDiscounts/SearchDiscountFilter';
 import Constants from '../../Constants/Constants';
-import Utility from '../../utils/Utility';
 import LoadingModal from '../../components/LoadingModal';
 import axiosIntance from '../../api/axiosInstance';
 import discountAPI from '../../api/discount/discountAPI';
+import Utility from '../../Utils/Utility';
 
 export default function Default() {
     const [query, setQuery] = React.useState(new SearchDiscountQuery());
@@ -62,12 +62,10 @@ export default function Default() {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'statusName',
-            key: 'statusName',
+            dataIndex: 'status',
+            key: 'status',
             align: 'center',
-            render: (value, record) => {
-                return record.status === Constants.Status.Active ? <Tag color="green">{value}</Tag> : <Tag color="red">{value}</Tag>;
-            }
+            render: (_, record) => <Tag color={Utility.getLabelByValue(Constants.StatusColor, Boolean(record.status))}>{Utility.getLabelByValue(Constants.StatusOptions, Boolean(record.status))}</Tag>
         },
         {
             title: 'Hành động',
@@ -120,7 +118,7 @@ export default function Default() {
                 }
             }
         });
-    }
+    };
 
     const searchData = async (pageIndex = 0) => {
         try {

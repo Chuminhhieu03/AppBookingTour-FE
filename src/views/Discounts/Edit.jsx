@@ -4,16 +4,15 @@ import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
-import Utility from '../../utils/Utility';
 import discountAPI from '../../api/discount/discountAPI';
+import Constants from '../../Constants/Constants';
+import Utility from '../../Utils/Utility';
 import axiosIntance from '../../api/axiosInstance';
 
 const { TextArea } = Input;
 
 export default function Edit() {
     const [discount, setDiscount] = useState({});
-    const [listStatus, setListStatus] = useState([]);
-    const [listServiceType, setListServiceType] = useState([]);
     const { id } = useParams();
 
     useEffect(() => {
@@ -23,25 +22,30 @@ export default function Edit() {
     const setupEditForm = async () => {
         const response = await axiosIntance.post(`/Discount/setup-edit/${id}`);
         const res = response.data;
-        setListStatus(res.listStatus);
-        setListServiceType(res.listServiceType);
         const discountRes = res.discount ?? {};
         discountRes.startEffectedDtg = Utility.convertStringToDate(discountRes.startEffectedDtg);
         discountRes.endEffectedDtg = Utility.convertStringToDate(discountRes.endEffectedDtg);
+        discountRes.status = Boolean(discountRes.status);
         setDiscount(discountRes);
     };
 
     const onEditDiscount = async (discount) => {
         LoadingModal.showLoading();
-        const request = { ...discount };
-        request.startEffectedDtg = discount.startEffectedDtg?.toDate().toISOString();
-        request.endEffectedDtg = discount.endEffectedDtg?.toDate().toISOString();
-        const res = await discountAPI.update(id, request);
-        const discountRes = res.discount ?? {};
-        if (res.success) {
-            window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
-        } else {
-            alert(`Lỗi khi chỉnh sửa mã giảm giá:\n${res.message}`);
+        try {
+            const request = { ...discount };
+            request.startEffectedDtg = discount.startEffectedDtg?.toDate().toISOString();
+            request.endEffectedDtg = discount.endEffectedDtg?.toDate().toISOString();
+            request.status = Number(discount.status);
+            const res = await discountAPI.update(id, request);
+            const discountRes = res.discount ?? {};
+            if (res.success) {
+                window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
+            } else {
+                alert(`Lỗi khi chỉnh sửa mã giảm giá:\n${res.message}`);
+            }
+        }
+        catch (error) {
+            alert('Error editing discount:', error);
         }
         LoadingModal.hideLoading();
     };
@@ -119,10 +123,7 @@ export default function Edit() {
                                 value={discount.serviceType}
                                 allowClear
                                 className="w-100"
-                                options={listServiceType?.map((item) => ({
-                                    label: item.value,
-                                    value: item.key
-                                }))}
+                                options={Constants.ServiceTypeOptions}
                                 onChange={(val) => {
                                     setDiscount({ ...discount, serviceType: val });
                                 }}
@@ -134,10 +135,7 @@ export default function Edit() {
                                 value={discount.status}
                                 allowClear
                                 className="w-100"
-                                options={listStatus?.map((item) => ({
-                                    label: item.value,
-                                    value: item.key
-                                }))}
+                                options={Constants.StatusOptions}
                                 onChange={(val) => setDiscount({ ...discount, status: val })}
                             />
                         </Col>
