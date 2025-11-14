@@ -32,9 +32,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
     };
 
     const updateRoomInventory = (id, field, val) => {
-        const updated = listRoomInventory.map((item) =>
-            item.id === id ? { ...item, [field]: val } : item
-        );
+        const updated = listRoomInventory.map((item) => (item.id === id ? { ...item, [field]: val } : item));
         setListRoomInventory(updated);
         onChange?.(updated);
     };
@@ -202,9 +200,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                         <DatePicker
                             value={newRow.date ? dayjs(newRow.date) : null}
                             format="DD/MM/YYYY"
-                            onChange={(date) =>
-                                setNewRow({ ...newRow, date: date?.format('YYYY-MM-DD') })
-                            }
+                            onChange={(date) => setNewRow({ ...newRow, date: date?.format('YYYY-MM-DD') })}
                         />
                     ) : (
                         <span>{value ? dayjs(value).format('DD/MM/YYYY') : ''}</span>
@@ -216,9 +212,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                         <DatePicker
                             value={value ? dayjs(value) : null}
                             format="DD/MM/YYYY"
-                            onChange={(date) =>
-                                updateRoomInventory(record.id, 'date', date?.format('YYYY-MM-DD'))
-                            }
+                            onChange={(date) => updateRoomInventory(record.id, 'date', date?.format('YYYY-MM-DD'))}
                         />
                     );
                 }
@@ -323,16 +317,8 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                     <Space>
                         {isEditing ? (
                             <>
-                                <Button
-                                    icon={<SaveOutlined />}
-                                    type="link"
-                                    onClick={() => handleSave(record.id)}
-                                />
-                                <Button
-                                    icon={<CloseOutlined />}
-                                    type="link"
-                                    onClick={() => handleCancel()}
-                                />
+                                <Button icon={<SaveOutlined />} type="link" onClick={() => handleSave(record.id)} />
+                                <Button icon={<CloseOutlined />} type="link" onClick={() => handleCancel()} />
                             </>
                         ) : (
                             <>

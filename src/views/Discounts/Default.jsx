@@ -65,7 +65,11 @@ export default function Default() {
             dataIndex: 'status',
             key: 'status',
             align: 'center',
-            render: (_, record) => <Tag color={Utility.getLabelByValue(Constants.StatusColor, Boolean(record.status))}>{Utility.getLabelByValue(Constants.StatusOptions, Boolean(record.status))}</Tag>
+            render: (_, record) => (
+                <Tag color={Utility.getLabelByValue(Constants.StatusColor, Boolean(record.status))}>
+                    {Utility.getLabelByValue(Constants.StatusOptions, Boolean(record.status))}
+                </Tag>
+            )
         },
         {
             title: 'Hành động',

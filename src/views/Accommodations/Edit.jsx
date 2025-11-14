@@ -167,7 +167,7 @@ export default function Edit() {
     const handleRoomTypeDeleteClick = () => {
         setupEditForm(); // Refresh the form data after successful room type deletion
     };
-    
+
     return (
         <Row>
             <Col span={24}>

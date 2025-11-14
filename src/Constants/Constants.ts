@@ -40,7 +40,7 @@ export default class Constants {
         Accomodation: 1,
         Tour: 2,
         Combo: 3
-    }
+    };
 
     // Options cho bộ lọc và các thành phần giao diện
     static StatusOptions = [
@@ -59,7 +59,7 @@ export default class Constants {
         { value: this.ServiceType.Tour, label: 'Tour' },
         { value: this.ServiceType.Combo, label: 'Combo' }
     ];
-    
+
     // Color
     static StatusColor = [
         { value: this.Status.Active, label: 'green' },

@@ -43,8 +43,7 @@ export default function Edit() {
             } else {
                 alert(`Lỗi khi chỉnh sửa mã giảm giá:\n${res.message}`);
             }
-        }
-        catch (error) {
+        } catch (error) {
             alert('Error editing discount:', error);
         }
         LoadingModal.hideLoading();

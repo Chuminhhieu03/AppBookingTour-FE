@@ -88,8 +88,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const idToPut = roomTypeData.Id ?? roomTypeEdit.id;
             const res = await roomTypeAPI.update(idToPut, formData);
             if (res.success) {
-                onOk(true); 
-                onCancel(); 
+                onOk(true);
+                onCancel();
                 form.resetFields();
                 setRoomTypeEdit({});
                 setListInfoImage([]);

@@ -107,10 +107,7 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                     </div>
                 </Col>
                 <Col span={24}>
-                    <RoomInventoryTable
-                        editable={false}
-                        value={roomTypeDisplay.listRoomInventories || []}
-                    />
+                    <RoomInventoryTable editable={false} value={roomTypeDisplay.listRoomInventories || []} />
                 </Col>
             </Row>
         </Modal>

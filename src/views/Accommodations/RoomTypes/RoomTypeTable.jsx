@@ -51,7 +51,11 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             dataIndex: 'name',
             key: 'name',
             render: (name, record) => (
-                <Button type="link" onClick={() => viewOnly ? onRoomTypeClick(record) : onRoomTypeEditClick(record)} style={{ padding: 0 }}>
+                <Button
+                    type="link"
+                    onClick={() => (viewOnly ? onRoomTypeClick(record) : onRoomTypeEditClick(record))}
+                    style={{ padding: 0 }}
+                >
                     {name}
                 </Button>
             )
