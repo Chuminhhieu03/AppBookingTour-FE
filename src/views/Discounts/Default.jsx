@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, Modal, message } from 'antd';
-import { SearchOutlined, ReloadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import SearchDiscountQuery from '../../DTO/Discounts/SearchDiscounts/SearchDiscountQuery';
@@ -16,13 +16,14 @@ export default function Default() {
     const [filter, setFilter] = React.useState(new DiscountFilter());
     const [listDiscount, setListDiscount] = React.useState([]);
     const [listStatus, setListStatus] = React.useState([]);
-    const [isReset, setIsReset] = React.useState(false);
+    const [total, setTotal] = React.useState(0);
+    const [currentPage, setCurrentPage] = React.useState(1);
 
     const columns = [
         {
             title: 'STT',
             key: 'index',
-            render: (_, __, index) => (filter.PageIndex ?? 0) * Constants.DEFAULT_PAGE_SIZE + index + 1
+            render: (_, __, index) => (currentPage - 1) * Constants.DEFAULT_PAGE_SIZE + index + 1
         },
         {
             title: 'Mã',
@@ -84,20 +85,22 @@ export default function Default() {
     ];
 
     useEffect(() => {
-        searchData();
+        searchData(0);
         setupDefault();
     }, []);
 
-    useEffect(() => {
-        if (filter && query && isReset) {
-            searchData(0);
-        }
-    }, [filter, query, isReset]);
-
     const setupDefault = async () => {
-        const response = await axiosIntance.post('/Discount/setup-default', {});
-        const res = response.data;
-        setListStatus(res.listStatus);
+        try {
+            const response = await axiosIntance.post('/Discount/setup-default', {});
+            if (response.data.success) {
+                setListStatus(response.data.listStatus);
+            } else {
+                message.error('Không thể tải danh sách trạng thái.');
+            }
+        } catch (error) {
+            console.error('Error setting up default:', error);
+            message.error('Đã xảy ra lỗi khi tải danh sách trạng thái.');
+        }
     };
 
     const handleDelete = async (id) => {
@@ -112,12 +115,12 @@ export default function Default() {
                     const response = await discountAPI.delete(id);
                     if (response.success) {
                         message.success('Xóa mã giảm giá thành công');
-                        searchData();
+                        searchData(currentPage - 1);
                     } else {
                         message.error(response.message || 'Không thể xóa mã giảm giá');
                     }
                 } catch (error) {
-                    console.error('Error deleting blog post:', error);
+                    console.error('Error deleting discount:', error);
                     message.error('Đã xảy ra lỗi khi xóa mã giảm giá');
                 }
             }
@@ -127,26 +130,37 @@ export default function Default() {
     const searchData = async (pageIndex = 0) => {
         try {
             LoadingModal.showLoading();
-            const request = { ...query };
-            request.PageIndex = pageIndex;
-            request.PageSize = Constants.DEFAULT_PAGE_SIZE;
-            request.DiscountFilter = { ...filter };
+            const request = {
+                PageIndex: pageIndex,
+                PageSize: Constants.DEFAULT_PAGE_SIZE,
+                DiscountFilter: { ...filter }
+            };
             const res = await discountAPI.search(request);
-            setListDiscount(res.listDiscount);
-            setIsReset(false);
+            if (res.success) {
+                setListDiscount(res.listDiscount ?? []);
+                setTotal(res.meta?.totalCount ?? res.listDiscount?.length ?? 0);
+                setCurrentPage(pageIndex + 1);
+            } else {
+                message.error(res.message || 'Không thể tải danh sách mã giảm giá');
+            }
         } catch (error) {
             console.error('Error fetching discounts:', error);
+            message.error('Đã xảy ra lỗi khi tải danh sách mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }
     };
 
     const onReset = () => {
-        const newFilter = new DiscountFilter();
-        const newQuery = new SearchDiscountQuery();
-        setFilter(newFilter);
-        setQuery(newQuery);
-        setIsReset(!isReset);
+        setFilter(new DiscountFilter());
+        setQuery(new SearchDiscountQuery());
+        setCurrentPage(1);
+        searchData(0);
+    };
+
+    const handleTableChange = (pagination) => {
+        setCurrentPage(pagination.current);
+        searchData(pagination.current - 1);
     };
 
     return (
@@ -166,10 +180,7 @@ export default function Default() {
                                 <span>Mã</span>
                                 <Input
                                     value={filter.Code}
-                                    onChange={(e) => {
-                                        filter.Code = e.target.value;
-                                        setFilter({ ...filter });
-                                    }}
+                                    onChange={(e) => setFilter({ ...filter, Code: e.target.value })}
                                 />
                             </Flex>
                         </Col>
@@ -179,10 +190,7 @@ export default function Default() {
                                 <Input
                                     style={{ flex: 1 }}
                                     value={filter.Name}
-                                    onChange={(e) => {
-                                        filter.Name = e.target.value;
-                                        setFilter({ ...filter });
-                                    }}
+                                    onChange={(e) => setFilter({ ...filter, Name: e.target.value })}
                                 />
                             </Flex>
                         </Col>
@@ -197,39 +205,36 @@ export default function Default() {
                                         label: item.value,
                                         value: item.key
                                     }))}
-                                    onChange={(val) => {
-                                        filter.Status = val;
-                                        setFilter({ ...filter });
-                                    }}
+                                    onChange={(val) => setFilter({ ...filter, Status: val })}
                                 />
                             </Flex>
                         </Col>
                         <Col span={6}>
                             <Row justify="end">
                                 <Space>
-                                    <Button type="primary" icon={<SearchOutlined />} shape="round" onClick={() => searchData()}>
+                                    <Button type="primary" icon={<SearchOutlined />} shape="round" onClick={() => searchData(0)}>
                                         Tìm kiếm
                                     </Button>
-                                    <Button type="primary" icon={<ReloadOutlined />} shape="round" onClick={() => onReset()}>
+                                    <Button type="primary" icon={<ReloadOutlined />} shape="round" onClick={onReset}>
                                         Reset
                                     </Button>
                                 </Space>
                             </Row>
                         </Col>
                     </Row>
-                    <h6 className="mb-3">Tổng số bản ghi: {listDiscount?.length}</h6>
+                    <h6 className="mb-3">Tổng số bản ghi: {total}</h6>
                     <Table
                         dataSource={listDiscount}
                         columns={columns}
                         rowKey={(record) => record.id}
                         bordered
                         pagination={{
+                            current: currentPage,
                             pageSize: Constants.DEFAULT_PAGE_SIZE,
-                            onChange: (page) => {
-                                searchData(page - 1);
-                                query.PageIndex = page - 1;
-                                setQuery({ ...query });
-                            }
+                            total: total,
+                            onChange: (page, pageSize) => handleTableChange({ current: page, pageSize }),
+                            showSizeChanger: false,
+                            showTotal: (total, range) => `${range[0]}-${range[1]} của ${total}`
                         }}
                     />
                 </MainCard>

@@ -36,12 +36,6 @@ export default class Constants {
         Premium: 3
     };
 
-    static ServiceType = {
-        Accomodation: 1,
-        Tour: 2,
-        Combo: 3
-    };
-
     // Options cho bộ lọc và các thành phần giao diện
     static StatusOptions = [
         { value: this.Status.Active, label: 'Hoạt động' },
@@ -55,9 +49,9 @@ export default class Constants {
     ];
 
     static ServiceTypeOptions = [
-        { value: this.ServiceType.Accomodation, label: 'Cơ sở lưu trú' },
-        { value: this.ServiceType.Tour, label: 'Tour' },
-        { value: this.ServiceType.Combo, label: 'Combo' }
+        { value: this.ItemType.Accommodation, label: 'Cơ sở lưu trú' },
+        { value: this.ItemType.Tour, label: 'Tour' },
+        { value: this.ItemType.Combo, label: 'Combo' }
     ];
 
     // Color

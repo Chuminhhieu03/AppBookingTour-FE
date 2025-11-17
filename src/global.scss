@@ -52,3 +52,12 @@
     transform: rotate(360deg);
   }
 }
+
+.ant-modal-mask {
+    z-index: 3000 !important;
+}
+
+/* Cho modal nằm trên tất cả */
+.ant-modal-wrap {
+    z-index: 3001 !important;
+}

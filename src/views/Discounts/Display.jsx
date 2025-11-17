@@ -22,7 +22,8 @@ export default function Display() {
         try {
             LoadingModal.showLoading();
             const response = await discountAPI.getById(id);
-            setDiscount(response.discount ?? {});
+            const discount = response.discount || {};
+            setDiscount(discount);
         } catch (error) {
             console.error('Error fetching discount details:', error);
         } finally {

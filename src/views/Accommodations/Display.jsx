@@ -11,6 +11,7 @@ import RoomTypeDisplay from './RoomTypes/Display';
 import accommodationAPI from '../../api/accommodation/accommodationAPI';
 import Utility from '../../Utils/Utility';
 import Constants from '../../Constants/Constants';
+import AssignDiscountButton from '../components/basic/AssignDiscountButton';
 
 const { TextArea } = Input;
 
@@ -53,6 +54,10 @@ export default function Display() {
                     title="Chi tiết cơ sở lưu trú"
                     secondary={
                         <Space>
+                            <AssignDiscountButton
+                                entityId={accommodation.id}
+                                entityType={Constants.ItemType.Accommodation}
+                            />
                             <Button type="primary" href={`/admin/service/accommodation/edit/${id}`} shape="round" icon={<EditOutlined />}>
                                 Chỉnh sửa
                             </Button>
