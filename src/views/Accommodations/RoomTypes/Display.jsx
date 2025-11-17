@@ -3,8 +3,10 @@ import { Col, Row, Input, Select } from 'antd';
 import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
-import LoadingModal from '../../../components/LoadingModal';
-import axiosIntance from '../../../api/axiosInstance';
+import Utility from '../../../Utils/Utility';
+import Constants from '../../../Constants/Constants';
+import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
+import RoomInventoryTable from './RoomInventories/RoomInventoryTable';
 
 const { TextArea } = Input;
 
@@ -12,14 +14,12 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
     const [roomTypeDisplay, setRoomTypeDisplay] = useState(roomType || {});
 
     useEffect(() => {
-        setRoomTypeDisplay(roomType || {});
-        setupDisplayForm(roomType.id);
+        getRoomTypeById(roomType.id);
     }, [roomType]);
 
-    const setupDisplayForm = async () => {
+    const getRoomTypeById = async (id) => {
         try {
-            const response = await axiosIntance.get(`/RoomType/${roomType.id}`);
-            const res = response.data;
+            const res = await roomTypeAPI.getById(id);
             setRoomTypeDisplay(res.roomType || {});
         } catch (error) {
             console.error('Error fetching setup data:', error);
@@ -98,13 +98,16 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                 </Col>
                 <Col span={8}>
                     <span>Trạng thái</span>
-                    <Input value={roomTypeDisplay.statusName} readOnly />
+                    <Input value={Utility.getLabelByValue(Constants.StatusOptions, roomTypeDisplay.status)} readOnly />
                 </Col>
                 <Col span={24}>
                     <span>Hình ảnh khác</span>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
                         <Gallery listImage={roomTypeDisplay.listInfoImage} viewOnly />
                     </div>
+                </Col>
+                <Col span={24}>
+                    <RoomInventoryTable editable={false} value={roomTypeDisplay.listRoomInventories || []} />
                 </Col>
             </Row>
         </Modal>

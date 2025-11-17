@@ -6,7 +6,7 @@ import Loadable from 'components/Loadable';
 import ProtectedRoute from 'components/auth/ProtectedRoute';
 
 // render - bootstrap table pages
-const BootstrapTableBasic = Loadable(lazy(() => import('views/table/bootstrap-table/BasicTable')));
+const BootstrapTableBasic = Loadable(lazy(() => import('views/Customers/Accommodations/Default')));
 
 // ==============================|| TABLES ROUTING ||============================== //
 

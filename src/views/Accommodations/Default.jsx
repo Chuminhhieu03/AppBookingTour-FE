@@ -1,26 +1,27 @@
 import React, { useEffect } from 'react';
-import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select } from 'antd';
+import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, Modal, message } from 'antd';
 import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined, CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import Constants from '../../Constants/Constants';
 import LoadingModal from '../../components/LoadingModal';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import cityAPI from '../../api/city/cityAPI';
+import Utility from '../../Utils/Utility';
 
 export default function Default() {
     const [query, setQuery] = React.useState({});
     const [filter, setFilter] = React.useState({});
     const [listAccommodation, setListAccommodation] = React.useState([]);
-    const [listStatus, setListStatus] = React.useState([]);
-    const [listType, setListType] = React.useState([]);
     const [listCity, setListCity] = React.useState([]);
     const [isReset, setIsReset] = React.useState(false);
+    const [totalCount, setTotalCount] = React.useState(0);
 
     const columns = [
         {
             title: 'STT',
             key: 'index',
-            render: (_, __, index) => (filter.PageIndex ?? 0) * Constants.DEFAULT_PAGE_SIZE + index + 1
+            render: (_, __, index) => (query.PageIndex ?? 0) * Constants.DEFAULT_PAGE_SIZE + index + 1
         },
         {
             title: 'Mã',
@@ -36,8 +37,9 @@ export default function Default() {
         },
         {
             title: 'Loại',
-            dataIndex: 'typeName',
-            key: 'typeName'
+            dataIndex: 'type',
+            key: 'type',
+            render: (_, record) => Utility.getLabelByValue(Constants.AccommodationTypeOptions, record.type)
         },
         {
             title: 'Thành phố',
@@ -56,29 +58,33 @@ export default function Default() {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'statusName',
-            key: 'statusName',
+            dataIndex: 'isActive',
+            key: 'isActive',
             align: 'center',
-            render: (value, record) => {
-                return Number(record.isActive) === Constants.Status.Active ? (
-                    <Tag color="green">{value}</Tag>
+            render: (_, record) => {
+                return record.isActive === Constants.Status.Active ? (
+                    <Tag color="green">{Utility.getLabelByValue(Constants.StatusOptions, record.isActive)}</Tag>
                 ) : (
-                    <Tag color="red">{value}</Tag>
+                    <Tag color="red">{Utility.getLabelByValue(Constants.StatusOptions, record.isActive)}</Tag>
                 );
             }
         },
         {
-            title: 'Chức năng',
+            title: 'Hành động',
             key: 'actions',
             align: 'center',
             width: 100,
-            render: (_, record) => <Button type="link" icon={<DeleteOutlined />} />
+            render: (_, record) => (
+                <Space size="small">
+                    <Button type="link" size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
+                </Space>
+            )
         }
     ];
 
     useEffect(() => {
+        getListCity();
         searchData();
-        setupDefault();
     }, []);
 
     useEffect(() => {
@@ -87,15 +93,12 @@ export default function Default() {
         }
     }, [filter, query, isReset]);
 
-    const setupDefault = async () => {
+    const getListCity = async () => {
         try {
-            const response = await axiosIntance.post('/Accommodation/setup-default', {});
-            const res = response.data;
-            setListStatus(res.listStatus);
-            setListType(res.listType);
-            setListCity(res.listCity);
+            const res = await cityAPI.getListCity();
+            setListCity(res.data);
         } catch (error) {
-            console.error('Error fetching setup default:', error);
+            console.error('Error fetching list of cities:', error);
         }
     };
 
@@ -105,18 +108,49 @@ export default function Default() {
             const request = { ...query };
             request.PageIndex = pageIndex;
             request.searchAccommodationFilter = { ...filter };
-            if (request.searchAccommodationFilter.IsActive) {
-                request.searchAccommodationFilter.IsActive = Boolean(request.searchAccommodationFilter.IsActive);
-            }
-            const response = await axiosIntance.post('/Accommodation/search', request);
-            const res = response.data;
+            const res = await accommodationAPI.search(request);
             setListAccommodation(res.listAccommodation);
+            setTotalCount(res.totalCount);
             setIsReset(false);
         } catch (error) {
             console.error('Error fetching accommodations:', error);
         } finally {
             LoadingModal.hideLoading();
         }
+    };
+
+    const handleDelete = async (id) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa cơ sở lưu trú này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: async () => {
+                try {
+                    const response = await accommodationAPI.delete(id);
+                    if (response.success) {
+                        message.success('Xóa cơ sở lưu trú thành công');
+
+                        const currentPage = query.PageIndex ?? 0;
+
+                        if (listAccommodation.length === 1 && currentPage > 0) {
+                            searchData(currentPage - 1);
+                            query.PageIndex = currentPage - 1;
+                        } else {
+                            searchData(currentPage);
+                        }
+
+                        setQuery({ ...query });
+                    } else {
+                        message.error(response.message || 'Không thể xóa cơ sở lưu trú');
+                    }
+                } catch (error) {
+                    console.error('Error deleting accommodation:', error);
+                    message.error('Đã xảy ra lỗi khi xóa cơ sở lưu trú');
+                }
+            }
+        });
     };
 
     const onReset = () => {
@@ -171,10 +205,7 @@ export default function Default() {
                                     value={filter.Type}
                                     allowClear
                                     style={{ flex: 1 }}
-                                    options={listType?.map((item) => ({
-                                        label: item.value,
-                                        value: item.key
-                                    }))}
+                                    options={Constants.AccommodationTypeOptions}
                                     onChange={(val) => {
                                         filter.Type = val;
                                         setFilter({ ...filter });
@@ -207,10 +238,7 @@ export default function Default() {
                                     value={filter.IsActive}
                                     allowClear
                                     style={{ flex: 1 }}
-                                    options={listStatus?.map((item) => ({
-                                        label: item.value,
-                                        value: item.key
-                                    }))}
+                                    options={Constants.StatusOptions}
                                     onChange={(val) => {
                                         filter.IsActive = val;
                                         setFilter({ ...filter });
@@ -231,14 +259,16 @@ export default function Default() {
                             </Row>
                         </Col>
                     </Row>
-                    <h6 className="mb-3">Tổng số bản ghi: {listAccommodation?.length}</h6>
+                    <h6 className="mb-3">Tổng số bản ghi: {totalCount}</h6>
                     <Table
                         dataSource={listAccommodation}
                         columns={columns}
                         rowKey={(record) => record.id}
                         bordered
                         pagination={{
+                            current: (query.PageIndex ?? 0) + 1,
                             pageSize: Constants.DEFAULT_PAGE_SIZE,
+                            total: totalCount,
                             onChange: (page) => {
                                 searchData(page - 1);
                                 query.PageIndex = page - 1;

@@ -4,8 +4,9 @@ import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
-import Utility from '../../utils/Utility';
-import axiosIntance from '../../api/axiosInstance';
+import discountAPI from '../../api/discount/discountAPI';
+import Utility from '../../Utils/Utility';
+import Constants from '../../Constants/Constants';
 
 const { TextArea } = Input;
 
@@ -20,9 +21,9 @@ export default function Display() {
     const setupDisplayForm = async () => {
         try {
             LoadingModal.showLoading();
-            const response = await axiosIntance.get(`/Discount/${id}`);
-            setDiscount(response.data.discount ?? {});
-            setDiscount(res.discount ?? {});
+            const response = await discountAPI.getById(id);
+            const discount = response.discount || {};
+            setDiscount(discount);
         } catch (error) {
             console.error('Error fetching discount details:', error);
         } finally {
@@ -81,7 +82,7 @@ export default function Display() {
                         </Col>
                         <Col span={8}>
                             <span>Trạng thái</span>
-                            <Input value={discount.statusName} readOnly />
+                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, Boolean(discount.status))} readOnly />
                         </Col>
                         <Col span={24}>
                             <span>Mô tả</span>

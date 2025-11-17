@@ -8,7 +8,10 @@ import RoomTypeTable from './RoomTypes/RoomTypeTable';
 import ImagesUC from '../components/basic/ImagesUC';
 import Gallery from '../components/basic/Gallery';
 import RoomTypeDisplay from './RoomTypes/Display';
-import axiosIntance from '../../api/axiosInstance';
+import accommodationAPI from '../../api/accommodation/accommodationAPI';
+import Utility from '../../Utils/Utility';
+import Constants from '../../Constants/Constants';
+import AssignDiscountButton from '../components/basic/AssignDiscountButton';
 
 const { TextArea } = Input;
 
@@ -19,14 +22,13 @@ export default function Display() {
     const [selectedRoomType, setSelectedRoomType] = useState(null);
 
     useEffect(() => {
-        setupDisplayForm();
+        getAccommodationById();
     }, []);
 
-    const setupDisplayForm = async () => {
+    const getAccommodationById = async () => {
         try {
             LoadingModal.showLoading();
-            const response = await axiosIntance.get(`/Accommodation/${id}`);
-            const res = response.data;
+            const res = await accommodationAPI.getById(id);
             setAccommodation(res.accommodation ?? {});
         } catch (error) {
             console.error('Error fetching accommodation details:', error);
@@ -52,6 +54,10 @@ export default function Display() {
                     title="Chi tiết cơ sở lưu trú"
                     secondary={
                         <Space>
+                            <AssignDiscountButton
+                                entityId={accommodation.id}
+                                entityType={Constants.ItemType.Accommodation}
+                            />
                             <Button type="primary" href={`/admin/service/accommodation/edit/${id}`} shape="round" icon={<EditOutlined />}>
                                 Chỉnh sửa
                             </Button>
@@ -86,15 +92,16 @@ export default function Display() {
                         </Col>
                         <Col span={8}>
                             <span>Trạng thái</span>
-                            <Input value={accommodation.statusName} readOnly />
+                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, accommodation.isActive)} readOnly />
                         </Col>
                         <Col span={8}>
                             <span>Tiện ích</span>
                             <Input value={accommodation.amenityName} readOnly />
                         </Col>
-                        <Col span={8} className="d-flex align-items-center gap-2">
+                        <Col span={8}>
                             <span>Hạng sao</span>
-                            <Rate value={accommodation.starRating} readOnly />
+                            <br />
+                            <Rate className="mt-2" value={accommodation.starRating} readOnly />
                         </Col>
                         <Col span={24}>
                             <span>Hình ảnh khác</span>
@@ -104,7 +111,7 @@ export default function Display() {
                         </Col>
                         <Col span={24}>
                             <span>Quy định</span>
-                            <TextArea value={accommodation.rules} readOnly />
+                            <TextArea value={accommodation.regulation} readOnly />
                         </Col>
                         <Col span={24}>
                             <span>Mô tả</span>

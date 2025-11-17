@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 
 export default class Utility {
     static formatDate(dateString) {
-        const date = new Date(dateString);
+        const date = new Date(dateString+"Z");
         const dd = String(date.getDate()).padStart(2, '0');
         const mm = String(date.getMonth() + 1).padStart(2, '0');
         const yyyy = date.getFullYear();
@@ -14,7 +14,7 @@ export default class Utility {
     }
 
     static convertStringToDate(dateString) {
-        return dayjs(dateString);
+        return dayjs(dateString+"Z");
     }
 
     // Format price to Vietnamese currency
@@ -30,5 +30,43 @@ export default class Utility {
         if (days <= 0) return '0 ngày';
         const nights = days - 1;
         return nights > 0 ? `${days} ngày ${nights} đêm` : `${days} ngày`;
+    }
+
+    static getLabelByValue(list, value) {
+        const item = list.find((i) => i.value === value || i.key === value);
+        return item ? item.label : '';
+    }
+
+    // Get tag color for status displays
+    static getTagColor(type, value) {
+        switch (type) {
+            case 'tourDepartureStatus':
+                switch (value) {
+                    case 1: // Available
+                    case 'Available':
+                        return 'green';
+                    case 2: // Full
+                    case 'Full':
+                        return 'red';
+                    case 3: // Cancelled
+                    case 'Cancelled':
+                        return 'gray';
+                    default:
+                        return 'orange';
+                }
+            case 'status':
+                switch (value) {
+                    case true:
+                    case 'Active':
+                        return 'green';
+                    case false:
+                    case 'Inactive':
+                        return 'red';
+                    default:
+                        return 'default';
+                }
+            default:
+                return 'default';
+        }
     }
 }

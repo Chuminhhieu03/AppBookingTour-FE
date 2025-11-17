@@ -9,6 +9,8 @@ import Gallery from '../components/basic/Gallery';
 import tourAPI from '../../api/tour/tourAPI';
 import TourItineraryTable from './TourItineraries/TourItineraryTable';
 import TourDepartureTable from './TourDepartures/TourDepartureTable';
+import Constants from 'Constants/Constants';
+import Utility from 'utils/Utility';
 
 const { TextArea } = Input;
 
@@ -125,7 +127,7 @@ export default function TourDisplay() {
                         </Col>
                         <Col span={6}>
                             <span>Trạng thái</span>
-                            <Input value={tour.isActive ? 'Hoạt động' : 'Ngừng hoạt động'} readOnly />
+                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, tour.isActive)} readOnly />
                         </Col>
 
                         <Col span={24}>
