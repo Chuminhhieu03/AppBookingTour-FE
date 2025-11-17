@@ -54,10 +54,7 @@ export default function Display() {
                     title="Chi tiết cơ sở lưu trú"
                     secondary={
                         <Space>
-                            <AssignDiscountButton
-                                entityId={accommodation.id}
-                                entityType={Constants.ItemType.Accommodation}
-                            />
+                            <AssignDiscountButton entityId={accommodation.id} entityType={Constants.ItemType.Accommodation} />
                             <Button type="primary" href={`/admin/service/accommodation/edit/${id}`} shape="round" icon={<EditOutlined />}>
                                 Chỉnh sửa
                             </Button>

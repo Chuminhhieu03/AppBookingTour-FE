@@ -35,6 +35,13 @@ const service = {
                     url: '/admin/service/tour-type'
                 }
             ]
+        },
+        {
+            id: 'combo',
+            title: 'Combo',
+            type: 'item',
+            icon: <i className="ph ph-article" />,
+            url: '/admin/service/combo'
         }
     ]
 };

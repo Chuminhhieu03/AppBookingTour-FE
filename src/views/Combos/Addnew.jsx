@@ -24,7 +24,7 @@ import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
 import comboAPI from 'api/combo/comboAPI';
 import cityAPI from 'api/city/cityAPI';
 import dayjs from 'dayjs';
-import { VEHICLE_OPTIONS, STATUS_OPTIONS } from '../../constant/comboEnum';
+import Constants from 'Constants/Constants';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -346,10 +346,10 @@ const CombosAddnew = () => {
                     </Col>
 
                     <Col xs={24} md={12}>
-                        <Form.Item label="Phương tiện" name="vehicle" rules={[{ required: true, message: 'Vui lòng chọn phương tiện' }]}>
+                        <Form.Item label="Trạng thái" name="isActive" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
                             <Radio.Group>
-                                {VEHICLE_OPTIONS.map((option) => (
-                                    <Radio.Button key={option.value} value={option.value}>
+                                {Constants.StatusOptions.map((option) => (
+                                    <Radio.Button key={option.value.toString()} value={option.value}>
                                         {option.label}
                                     </Radio.Button>
                                 ))}

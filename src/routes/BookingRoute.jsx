@@ -2,9 +2,9 @@ import Loadable from 'components/Loadable';
 import { lazy } from 'react';
 
 // Booking pages
-const CustomerBooking = Loadable(lazy(() => import('views/Bookings/CustomerBooking')));
-const BookingSuccess = Loadable(lazy(() => import('views/Bookings/BookingSuccess')));
-const BookingFailed = Loadable(lazy(() => import('views/Bookings/BookingFailed')));
+const CustomerBooking = Loadable(lazy(() => import('views/Customers/Bookings/CustomerBooking')));
+const BookingSuccess = Loadable(lazy(() => import('views/Customers/Bookings/BookingSuccess')));
+const BookingFailed = Loadable(lazy(() => import('views/Customers/Bookings/BookingFailed')));
 
 const BookingRoute = {
     path: '/',
