@@ -1,231 +1,346 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { message } from 'antd';
-import Button from 'react-bootstrap/Button';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Form from 'react-bootstrap/Form';
-import Image from 'react-bootstrap/Image';
-import Nav from 'react-bootstrap/Nav';
-import Stack from 'react-bootstrap/Stack';
-import MainCard from 'components/MainCard';
-import SimpleBarScroll from 'components/third-party/SimpleBar';
-import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import { Menu, Input, Badge, Dropdown, Button, Drawer, Space, Avatar, message, Select } from 'antd';
+import {
+    SearchOutlined,
+    BellOutlined,
+    UserOutlined,
+    MenuOutlined,
+    HomeOutlined,
+    GlobalOutlined,
+    ShopOutlined,
+    InfoCircleOutlined,
+    PhoneOutlined,
+    LoginOutlined,
+    LogoutOutlined,
+    SettingOutlined,
+    RocketOutlined
+} from '@ant-design/icons';
 import { logoutAsync } from 'features/auth/authSlice';
-import Img1 from 'assets/images/user/avatar-1.png';
-import Img2 from 'assets/images/user/avatar-2.png';
-import Img3 from 'assets/images/user/avatar-3.png';
-import Img4 from 'assets/images/user/avatar-4.png';
-import Img5 from 'assets/images/user/avatar-5.png';
+import LogoWhite from 'assets/images/logo-white.svg';
+import LogoDark from 'assets/images/logo-dark.svg';
 
-const notifications = [
-    {
-        id: 1,
-        avatar: Img1,
-        time: '2 min ago',
-        title: 'UI/UX Design',
-        description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        date: 'Today'
-    },
-    {
-        id: 2,
-        avatar: Img2,
-        time: '1 hour ago',
-        title: 'Message',
-        description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        date: 'Today'
-    },
-    {
-        id: 3,
-        avatar: Img3,
-        time: '2 hour ago',
-        title: 'Forms',
-        description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        date: 'Yesterday'
-    },
-    {
-        id: 4,
-        avatar: Img4,
-        time: '12 hour ago',
-        title: 'Challenge invitation',
-        description: 'Jonny aber invites you to join the challenge',
-        actions: true,
-        date: 'Yesterday'
-    },
-    {
-        id: 5,
-        avatar: Img5,
-        time: '5 hour ago',
-        title: 'Security',
-        description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-        date: 'Yesterday'
-    }
-];
+const { Search } = Input;
+const { Option } = Select;
 
-export default function Header() {
-    const { menuMaster } = useGetMenuMaster();
-    const drawerOpen = menuMaster?.isDashboardDrawerOpened;
-    const dispatch = useDispatch();
+const Header = () => {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const [searchType, setSearchType] = useState('all');
     const navigate = useNavigate();
-    const { user } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+    // Handle scroll for sticky header
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleLogout = async () => {
         try {
             await dispatch(logoutAsync()).unwrap();
-            message.success('Logout successfully!');
+            message.success('Đăng xuất thành công!');
             navigate('/login');
         } catch (error) {
-            message.error(error || 'Logout failed!');
+            message.error(error || 'Đăng xuất thất bại!');
         }
     };
 
-    const handleChangePassword = () => {
-        navigate('/admin/change-password');
+    const handleSearch = (value) => {
+        if (value.trim()) {
+            // Navigate to search page with query
+            navigate(`/search?q=${encodeURIComponent(value)}&type=${searchType}`);
+        }
     };
 
-    return (
-        <header className="pc-header">
-            <div className="header-wrapper">
-                <div className="me-auto pc-mob-drp">
-                    <Nav className="list-unstyled">
-                        <Nav.Item className="pc-h-item pc-sidebar-collapse">
-                            <Nav.Link
-                                as={Link}
-                                to="#"
-                                className="pc-head-link ms-0"
-                                id="sidebar-hide"
-                                onClick={() => {
-                                    handlerDrawerOpen(!drawerOpen);
-                                }}
-                            >
-                                <i className="ph ph-list" />
-                            </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item className="pc-h-item pc-sidebar-popup">
-                            <Nav.Link
-                                as={Link}
-                                to="#"
-                                className="pc-head-link ms-0"
-                                id="mobile-collapse"
-                                onClick={() => handlerDrawerOpen(!drawerOpen)}
-                            >
-                                <i className="ph ph-list" />
-                            </Nav.Link>
-                        </Nav.Item>
-                    </Nav>
-                </div>
-                <div className="ms-auto">
-                    <Nav className="list-unstyled">
-                        <Dropdown className="pc-h-item" align="end">
-                            <Dropdown.Toggle className="pc-head-link me-0 arrow-none" variant="link" id="notification-dropdown">
-                                <i className="ph ph-bell" />
-                                <span className="badge bg-success pc-h-badge">3</span>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="dropdown-notification pc-h-dropdown">
-                                <Dropdown.Header className="d-flex align-items-center justify-content-between">
-                                    <h5 className="m-0">Notifications</h5>
-                                    <Link className="btn btn-link btn-sm" to="#">
-                                        Mark all read
-                                    </Link>
-                                </Dropdown.Header>
-                                <SimpleBarScroll style={{ maxHeight: 'calc(100vh - 215px)' }}>
-                                    <div className="dropdown-body text-wrap position-relative">
-                                        {notifications.map((notification, index) => (
-                                            <React.Fragment key={notification.id}>
-                                                {index === 0 || notifications[index - 1].date !== notification.date ? (
-                                                    <p className="text-span">{notification.date}</p>
-                                                ) : null}
-                                                <MainCard className="mb-0">
-                                                    <Stack direction="horizontal" gap={3}>
-                                                        <Image
-                                                            className="img-radius avatar rounded-0"
-                                                            src={notification.avatar}
-                                                            alt="Generic placeholder image"
-                                                        />
-                                                        <div>
-                                                            <span className="float-end text-sm text-muted">{notification.time}</span>
-                                                            <h5 className="text-body mb-2">{notification.title}</h5>
-                                                            <p className="mb-0">{notification.description}</p>
-                                                            {notification.actions && (
-                                                                <div className="mt-2">
-                                                                    <Button variant="outline-secondary" size="sm" className="me-2">
-                                                                        Decline
-                                                                    </Button>
-                                                                    <Button variant="primary" size="sm">
-                                                                        Accept
-                                                                    </Button>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </Stack>
-                                                </MainCard>
-                                            </React.Fragment>
-                                        ))}
-                                    </div>
-                                </SimpleBarScroll>
-                                <div className="text-center py-2">
-                                    <Link to="#!" className="link-danger">
-                                        Clear all Notifications
-                                    </Link>
-                                </div>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <Dropdown className="pc-h-item" align="end">
-                            <Dropdown.Toggle
-                                className="pc-head-link arrow-none me-0"
-                                variant="link"
-                                id="user-profile-dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                            >
-                                <i className="ph ph-user-circle" />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="dropdown-user-profile pc-h-dropdown p-0 overflow-hidden">
-                                <Dropdown.Header className="bg-primary">
-                                    <Stack direction="horizontal" gap={3} className="my-2">
-                                        <div className="flex-shrink-0">
-                                            <Image src={Img2} alt="user-avatar" className="user-avatar wid-35" roundedCircle />
-                                        </div>
-                                        <Stack gap={1}>
-                                            <h6 className="text-white mb-0">{user?.fullName || 'User'}</h6>
-                                            <span className="text-white text-opacity-75">{user?.email || 'user@example.com'}</span>
-                                        </Stack>
-                                    </Stack>
-                                </Dropdown.Header>
-                                <div className="dropdown-body">
-                                    <div
-                                        className="profile-notification-scroll position-relative"
-                                        style={{ maxHeight: 'calc(100vh - 225px)' }}
-                                    >
-                                        <Dropdown.Item as={Link} to="#" className="justify-content-start">
-                                            <i className="ph ph-gear me-2" />
-                                            Settings
-                                        </Dropdown.Item>
-                                        <Dropdown.Item as={Link} to="#" className="justify-content-start">
-                                            <i className="ph ph-share-network me-2" />
-                                            Share
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={handleChangePassword}
-                                            className="justify-content-start"
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            <i className="ph ph-lock-key me-2" />
-                                            Change Password
-                                        </Dropdown.Item>
-                                        <div className="d-grid my-2">
-                                            <Button onClick={handleLogout}>
-                                                <i className="ph ph-sign-out align-middle me-2" />
-                                                Logout
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Nav>
-                </div>
-            </div>
-        </header>
+    // Menu items
+    const menuItems = [
+        {
+            key: 'home',
+            icon: <HomeOutlined />,
+            label: <Link to="/">Trang chủ</Link>
+        },
+        {
+            key: 'tours',
+            icon: <GlobalOutlined />,
+            label: <Link to="/tours">Tours</Link>
+        },
+        {
+            key: 'combos',
+            icon: <RocketOutlined />,
+            label: <Link to="/combos">Combos</Link>
+        },
+        {
+            key: 'accommodations',
+            icon: <ShopOutlined />,
+            label: <Link to="/accommodations">Khách sạn</Link>
+        },
+        {
+            key: 'about',
+            icon: <InfoCircleOutlined />,
+            label: <Link to="/about">Về chúng tôi</Link>
+        },
+        {
+            key: 'contact',
+            icon: <PhoneOutlined />,
+            label: <Link to="/contact">Liên hệ</Link>
+        }
+    ];
+
+    // User dropdown menu
+    const userMenuItems = isAuthenticated
+        ? [
+              {
+                  key: 'profile',
+                  icon: <UserOutlined />,
+                  label: 'Thông tin cá nhân',
+                  onClick: () => navigate('/profile')
+              },
+              {
+                  key: 'bookings',
+                  icon: <GlobalOutlined />,
+                  label: 'Booking của tôi',
+                  onClick: () => navigate('/my-bookings')
+              },
+              {
+                  key: 'settings',
+                  icon: <SettingOutlined />,
+                  label: 'Cài đặt',
+                  onClick: () => navigate('/settings')
+              },
+              {
+                  type: 'divider'
+              },
+              {
+                  key: 'logout',
+                  icon: <LogoutOutlined />,
+                  label: 'Đăng xuất',
+                  onClick: handleLogout,
+                  danger: true
+              }
+          ]
+        : [
+              {
+                  key: 'login',
+                  icon: <LoginOutlined />,
+                  label: 'Đăng nhập',
+                  onClick: () => navigate('/login')
+              },
+              {
+                  key: 'register',
+                  icon: <UserOutlined />,
+                  label: 'Đăng ký',
+                  onClick: () => navigate('/register')
+              }
+          ];
+
+    const selectBefore = (
+        <Select value={searchType} onChange={setSearchType} style={{ width: 120 }}>
+            <Option value="all">Tất cả</Option>
+            <Option value="tour">Tours</Option>
+            <Option value="combo">Combos</Option>
+            <Option value="accommodation">Khách sạn</Option>
+        </Select>
     );
-}
+
+    return (
+        <>
+            <header
+                style={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1000,
+                    background: scrolled ? 'rgba(255, 255, 255, 0.95)' : '#fff',
+                    boxShadow: scrolled ? '0 2px 8px rgba(0,0,0,0.1)' : '0 1px 2px rgba(0,0,0,0.05)',
+                    backdropFilter: scrolled ? 'blur(10px)' : 'none',
+                    transition: 'all 0.3s ease'
+                }}
+            >
+                {/* Top Banner - Optional promotional banner */}
+                {/* <div
+                    style={{
+                        background: 'linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)',
+                        color: '#fff',
+                        padding: '8px 0',
+                        textAlign: 'center',
+                        fontSize: '13px'
+                    }}
+                >
+                    🎉 Ưu đãi đặc biệt: Giảm 20% cho tour trong tháng này! Hotline: <strong>1900-xxxx</strong>
+                </div> */}
+
+                {/* Main Header */}
+                <div
+                    style={{
+                        maxWidth: '1400px',
+                        margin: '0 auto',
+                        padding: '0 24px'
+                    }}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            height: '72px'
+                        }}
+                    >
+                        {/* Logo */}
+                        <Link
+                            to="/"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                textDecoration: 'none'
+                            }}
+                        >
+                            <img
+                                src={LogoDark}
+                                alt="Logo"
+                                style={{ height: '40px', transition: 'transform 0.3s' }}
+                                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                            />
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span
+                                    style={{
+                                        fontSize: '24px',
+                                        fontWeight: 'bold',
+                                        color: '#1E88E5',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    Travel HHH
+                                </span>
+                                <span style={{ fontSize: '11px', color: '#64748B' }}>Khám phá Việt Nam</span>
+                            </div>
+                        </Link>
+
+                        {/* Desktop Menu */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '24px',
+                                flex: 1,
+                                justifyContent: 'center'
+                            }}
+                            className="desktop-only"
+                        >
+                            <Menu
+                                mode="horizontal"
+                                items={menuItems}
+                                style={{
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontSize: '15px',
+                                    fontWeight: 500
+                                }}
+                                selectedKeys={[]}
+                            />
+                        </div>
+
+                        {/* Search Bar - Desktop */}
+                        <div className="desktop-only" style={{ width: '300px', marginRight: '24px' }}>
+                            <Search
+                                placeholder="Tìm tour, combo, khách sạn..."
+                                allowClear
+                                enterButton={<SearchOutlined />}
+                                size="large"
+                                onSearch={handleSearch}
+                                addonBefore={selectBefore}
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+
+                        {/* Right Actions */}
+                        <Space size="large" style={{ display: 'flex', alignItems: 'center' }}>
+                            {/* Notifications */}
+                            {isAuthenticated && (
+                                <Badge count={3} size="small">
+                                    <Button
+                                        type="text"
+                                        icon={<BellOutlined style={{ fontSize: '20px' }} />}
+                                        style={{ border: 'none' }}
+                                        onClick={() => navigate('/notifications')}
+                                    />
+                                </Badge>
+                            )}
+
+                            {/* User Menu */}
+                            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
+                                <Button
+                                    type={isAuthenticated ? 'text' : 'primary'}
+                                    icon={
+                                        isAuthenticated ? (
+                                            <Avatar size="default" style={{ backgroundColor: '#1E88E5' }} icon={<UserOutlined />}>
+                                                {user?.fullName?.charAt(0) || 'U'}
+                                            </Avatar>
+                                        ) : (
+                                            <LoginOutlined />
+                                        )
+                                    }
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        border: 'none',
+                                        height: 'auto'
+                                    }}
+                                >
+                                    {!isAuthenticated && <span className="desktop-only">Đăng nhập</span>}
+                                </Button>
+                            </Dropdown>
+
+                            {/* Mobile Menu Button */}
+                            <Button
+                                className="mobile-only"
+                                type="text"
+                                icon={<MenuOutlined style={{ fontSize: '24px' }} />}
+                                onClick={() => setMobileMenuOpen(true)}
+                                style={{ border: 'none' }}
+                            />
+                        </Space>
+                    </div>
+
+                    {/* Mobile Search Bar */}
+                    <div className="mobile-only" style={{ paddingBottom: '16px' }}>
+                        <Search
+                            placeholder="Tìm kiếm..."
+                            allowClear
+                            enterButton={<SearchOutlined />}
+                            onSearch={handleSearch}
+                            addonBefore={selectBefore}
+                        />
+                    </div>
+                </div>
+            </header>
+
+            {/* Mobile Drawer Menu */}
+            <Drawer title="Menu" placement="right" onClose={() => setMobileMenuOpen(false)} open={mobileMenuOpen} width={280}>
+                <Menu mode="vertical" items={menuItems} style={{ border: 'none' }} onClick={() => setMobileMenuOpen(false)} />
+            </Drawer>
+
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .desktop-only {
+                        display: none !important;
+                    }
+                }
+                @media (min-width: 769px) {
+                    .mobile-only {
+                        display: none !important;
+                    }
+                }
+            `}</style>
+        </>
+    );
+};
+
+export default Header;

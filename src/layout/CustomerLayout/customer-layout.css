@@ -1,0 +1,229 @@
+/* Customer Layout Responsive Styles */
+
+/* Desktop only elements */
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+/* Mobile only elements */
+@media (min-width: 769px) {
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+/* Ant Design Menu customization for CustomerLayout */
+.customer-header-menu .ant-menu-horizontal {
+    border-bottom: none;
+}
+
+.customer-header-menu .ant-menu-item:hover,
+.customer-header-menu .ant-menu-item-selected {
+    color: #1E88E5 !important;
+    border-bottom-color: #1E88E5 !important;
+}
+
+.customer-header-menu .ant-menu-item::after {
+    border-bottom-color: #1E88E5 !important;
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Container padding for customer pages */
+.customer-content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+@media (max-width: 768px) {
+    .customer-content-container {
+        padding: 24px 16px;
+    }
+}
+
+/* Header logo animation */
+.customer-header-logo {
+    transition: transform 0.3s ease;
+}
+
+.customer-header-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Button hover effects */
+.customer-btn-primary {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.customer-btn-primary:hover {
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+}
+
+/* Card hover effects */
+.customer-tour-card {
+    transition: all 0.3s ease;
+}
+
+.customer-tour-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+}
+
+.gradient-secondary {
+    background: linear-gradient(135deg, #FF6B35 0%, #F44336 100%);
+}
+
+.gradient-accent {
+    background: linear-gradient(135deg, #52C41A 0%, #389E0D 100%);
+}
+
+/* Text colors */
+.text-primary {
+    color: #1E88E5;
+}
+
+.text-secondary {
+    color: #FF6B35;
+}
+
+.text-accent {
+    color: #52C41A;
+}
+
+.text-muted {
+    color: #64748B;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 576px) {
+    .ant-col-xs-24 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+    .ant-col-sm-12 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+/* Footer responsive adjustments */
+@media (max-width: 992px) {
+    .customer-footer-col {
+        margin-bottom: 32px;
+    }
+}
+
+/* Search bar enhancements */
+.customer-search-bar .ant-input-search-button {
+    background: #1E88E5;
+    border-color: #1E88E5;
+}
+
+.customer-search-bar .ant-input-search-button:hover {
+    background: #1565C0;
+    border-color: #1565C0;
+}
+
+/* Loading states */
+.customer-skeleton {
+    background: linear-gradient(90deg,
+            rgba(190, 190, 190, 0.2) 25%,
+            rgba(129, 129, 129, 0.24) 37%,
+            rgba(190, 190, 190, 0.2) 63%);
+    animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: -100% 0;
+    }
+
+    100% {
+        background-position: 100% 0;
+    }
+}
+
+/* Notification badge */
+.customer-notification-badge .ant-badge-count {
+    background: #FF6B35;
+}
+
+/* Sticky header transition */
+.customer-header-sticky {
+    transition: all 0.3s ease;
+}
+
+.customer-header-sticky.scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile menu drawer */
+.customer-mobile-drawer .ant-drawer-header {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    color: #fff;
+}
+
+.customer-mobile-drawer .ant-drawer-header .ant-drawer-title {
+    color: #fff;
+}
+
+.customer-mobile-drawer .ant-drawer-header .ant-drawer-close {
+    color: #fff;
+}
+
+/* Tour card price styles */
+.customer-tour-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FF6B35;
+}
+
+.customer-tour-price-original {
+    text-decoration: line-through;
+    color: #64748B;
+    font-size: 14px;
+}
+
+/* Rating styles */
+.customer-rating .ant-rate-star {
+    color: #FF6B35;
+}
+
+/* Tag styles for tour features */
+.customer-tag-hot {
+    background: linear-gradient(135deg, #FF6B35 0%, #F44336 100%);
+    color: #fff;
+    border: none;
+}
+
+.customer-tag-new {
+    background: linear-gradient(135deg, #52C41A 0%, #389E0D 100%);
+    color: #fff;
+    border: none;
+}
+
+.customer-tag-sale {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    color: #fff;
+    border: none;
+}
