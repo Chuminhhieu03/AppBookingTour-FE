@@ -65,7 +65,7 @@ const CombosAddnew = () => {
         const fetchCities = async () => {
             try {
                 setLoadingCities(true);
-                const response = await cityAPI.getAllCities();
+                const response = await cityAPI.getListCity();
                 if (response.success) {
                     setCities(response.data || []);
                 } else {
@@ -84,11 +84,27 @@ const CombosAddnew = () => {
         fetchCities();
     }, []);
 
+    // Helper function để chuyển tiếng Việt có dấu thành không dấu
+    const removeVietnameseTones = (str) => {
+        str = str.toLowerCase();
+        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
+        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
+        str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
+        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
+        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
+        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
+        str = str.replace(/đ/g, 'd');
+        // Loại bỏ ký tự đặc biệt
+        str = str.replace(/[^a-z0-9\s-]/g, '');
+        return str;
+    };
+
     // Auto-generate code from name
     const handleNameChange = (e) => {
         const name = e.target.value;
         if (name) {
-            const words = name
+            const nameWithoutTones = removeVietnameseTones(name);
+            const words = nameWithoutTones
                 .toUpperCase()
                 .split(' ')
                 .filter((w) => w.length > 0);
@@ -164,7 +180,8 @@ const CombosAddnew = () => {
                         returnDate: schedule.returnDate.toISOString(),
                         availableSlots: schedule.availableSlots,
                         basePriceAdult: schedule.basePriceAdult || values.basePriceAdult,
-                        basePriceChildren: schedule.basePriceChildren || values.basePriceChildren
+                        basePriceChildren: schedule.basePriceChildren || values.basePriceChildren,
+                        singleRoomSupplement: schedule.singleRoomSupplement || 0
                     })) || []
             };
 
@@ -654,6 +671,24 @@ const CombosAddnew = () => {
                                                         formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                                         parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                                                         placeholder="Giá mặc định"
+                                                        addonAfter="VNĐ"
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+
+                                            <Col xs={24} md={8}>
+                                                <Form.Item
+                                                    {...field}
+                                                    label="Phụ phí phòng đơn (tùy chọn)"
+                                                    name={[field.name, 'singleRoomSupplement']}
+                                                    extra="Để trống = 0đ"
+                                                >
+                                                    <InputNumber
+                                                        min={0}
+                                                        style={{ width: '100%' }}
+                                                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                        parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                                                        placeholder="0"
                                                         addonAfter="VNĐ"
                                                     />
                                                 </Form.Item>

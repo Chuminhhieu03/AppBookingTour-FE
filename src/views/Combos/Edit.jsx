@@ -81,7 +81,7 @@ const CombosEdit = () => {
     const fetchCities = async () => {
         try {
             setLoadingCities(true);
-            const response = await cityAPI.getAllCities();
+            const response = await cityAPI.getListCity();
             if (response.success) {
                 setCities(response.data || []);
             } else {
@@ -134,7 +134,8 @@ const CombosEdit = () => {
                             returnDate: schedule.returnDate ? dayjs(schedule.returnDate) : null,
                             availableSlots: schedule.availableSlots,
                             basePriceAdult: schedule.basePriceAdult,
-                            basePriceChildren: schedule.basePriceChildren
+                            basePriceChildren: schedule.basePriceChildren,
+                            singleRoomSupplement: schedule.singleRoomSupplement
                         })) || []
                 };
 
@@ -268,7 +269,8 @@ const CombosEdit = () => {
                         returnDate: schedule.returnDate.toISOString(),
                         availableSlots: schedule.availableSlots,
                         basePriceAdult: schedule.basePriceAdult || values.basePriceAdult,
-                        basePriceChildren: schedule.basePriceChildren || values.basePriceChildren
+                        basePriceChildren: schedule.basePriceChildren || values.basePriceChildren,
+                        singleRoomSupplement: schedule.singleRoomSupplement || 0
                     })) || []
             };
 
@@ -751,6 +753,24 @@ const CombosEdit = () => {
                                                         formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                                         parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                                                         placeholder="Giá mặc định"
+                                                        addonAfter="VNĐ"
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+
+                                            <Col xs={24} md={8}>
+                                                <Form.Item
+                                                    {...field}
+                                                    label="Phụ phí phòng đơn (tùy chọn)"
+                                                    name={[field.name, 'singleRoomSupplement']}
+                                                    extra="Để trống = 0đ"
+                                                >
+                                                    <InputNumber
+                                                        min={0}
+                                                        style={{ width: '100%' }}
+                                                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                        parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                                                        placeholder="0"
                                                         addonAfter="VNĐ"
                                                     />
                                                 </Form.Item>
