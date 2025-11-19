@@ -1,42 +1,68 @@
-// react-bootstrap
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'antd/dist/reset.css';
+import { Tabs, Input, DatePicker, Select, Button, Tooltip } from 'antd';
+import { SearchOutlined, CarOutlined, HomeOutlined, FlagOutlined, CreditCardOutlined } from '@ant-design/icons';
+import HomePageSearchBtn from './HomePageSearchBtn';
+import CarouselGallery from '../../../components/CarouselGallery';
+import BlogSection from './BlogSection';
+import FavouriteDestination from './FavouriteDestination';
+import ComboGiaTot from './ComboGiaTot';
 
-// project-imports
-import ChecksandRadios from 'sections/form-element/ChecksandRadios';
-import CustomForms from 'sections/form-element/CustomForms';
-import DataList from 'sections/form-element/DataList';
-import FormControls from 'sections/form-element/FormControls';
-import FormControlState from 'sections/form-element/FormControlState';
-import FormGrid from 'sections/form-element/FormGrid';
-import HorizontalForm from 'sections/form-element/HorizontalForm';
-import InlineForm from 'sections/form-element/InlineForm';
-import InputGroup from 'sections/form-element/InputGroup';
-import Picker from 'sections/form-element/Picker';
-import Sizeing from 'sections/form-element/Sizing';
-import SupportedElements from 'sections/form-element/SupportedElements';
-import Tooltips from 'sections/form-element/Tooltips';
-import ValidationForm from 'sections/form-element/ValidationForm';
+const { TabPane } = Tabs;
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 
-export default function FormBasic() {
+export default function VietravelSearchComponent() {
     return (
-        <Row>
-            <Col xs={12}>
-                <FormControls />
-                <Sizeing />
-                <Picker />
-                <DataList />
-                <FormControlState />
-                <InlineForm />
-                <FormGrid />
-                <HorizontalForm />
-                <ValidationForm />
-                <SupportedElements />
-                <Tooltips />
-                <ChecksandRadios />
-                <InputGroup />
-                <CustomForms />
-            </Col>
-        </Row>
+        <div style={{ paddingTop: 24 }}>
+            {/* Banner tạm */}
+            <div
+                style={{
+                    backgroundImage: "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1650&q=80')",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    height: 260,
+                    position: 'relative'
+                }}
+            >
+                {/* Card tìm kiếm nổi lên trên banner */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: '8%',
+                        right: '8%',
+                        bottom: -130,
+                        zIndex: 10
+                    }}
+                >
+                    <div
+                        className="card shadow"
+                        style={{
+                            borderRadius: 12,
+                            overflow: 'visible'
+                        }}
+                    >
+                        <div className="card-body p-3">
+                            <HomePageSearchBtn />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Khoảng đệm để nhìn rõ card */}
+            <div style={{ height: 72 }} />
+
+            {/* Carousel demo */}
+            <div style={{ padding: '0 8%', marginTop: 156 }}>
+                <CarouselGallery height={220} />
+            </div>
+
+            <BlogSection />
+
+            <FavouriteDestination />
+
+            <ComboGiaTot />
+        </div>
     );
 }
