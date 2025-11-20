@@ -1,0 +1,59 @@
+/* ComboGiaTot.css */
+
+.combo-flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 270px;                  /* adjust height if needed */
+  perspective: 1000px;
+  margin-bottom: 36px;
+}
+
+.combo-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-style: preserve-3d;
+}
+
+.combo-flip-card:hover .combo-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.combo-flip-front,
+.combo-flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.combo-flip-front {
+  background: white;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.combo-flip-back {
+  background: #000;
+  transform: rotateY(180deg);
+}
+
+.combo-flip-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Optional: small improvement for mobile touch devices */
+@media (hover: none) {
+  .combo-flip-card:hover .combo-flip-inner {
+    transform: none;
+  }
+}
