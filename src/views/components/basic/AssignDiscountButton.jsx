@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Button, Input, Table, Space, Typography, Row, Col, notification } from 'antd';
-import {
-    SearchOutlined,
-    ReloadOutlined,
-    CloseOutlined,
-    SendOutlined,
-    CheckOutlined
-} from '@ant-design/icons';
+import { SearchOutlined, ReloadOutlined, CloseOutlined, SendOutlined, CheckOutlined } from '@ant-design/icons';
 import LoadingModal from '../../../components/LoadingModal';
 import discountAPI from '../../../api/discount/discountAPI';
 import itemDiscountAPI from '../../../api/itemDiscount/itemDiscountAPI';
@@ -106,9 +100,9 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
                 setListDiscount(list);
                 setTotal(res.meta?.totalCount ?? list.length);
                 setCurrentPage(pageIndex + 1);
-                const defaultCheckedIds = list.filter(x => x.checked).map(x => x.id);
+                const defaultCheckedIds = list.filter((x) => x.checked).map((x) => x.id);
                 setSelectedRowKeys(defaultCheckedIds);
-                setSelectedCoupons(list.filter(x => x.checked));
+                setSelectedCoupons(list.filter((x) => x.checked));
             } else {
                 notification.error({
                     message: 'Lỗi khi tải danh sách mã giảm giá',
@@ -231,9 +225,7 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
                         <div className="mb-2 mt-2">
                             <span className="font-semibold text-indigo-700">Đã chọn: </span>
                             <span className="ml-2 font-medium text-indigo-800">
-                                {selectedCoupons.length > 0
-                                    ? selectedCoupons.map((c) => c.code).join(', ')
-                                    : 'Chưa có mã nào được chọn'}
+                                {selectedCoupons.length > 0 ? selectedCoupons.map((c) => c.code).join(', ') : 'Chưa có mã nào được chọn'}
                             </span>
                         </div>
 
@@ -257,11 +249,7 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
 
                     <div className="d-flex justify-content-end">
                         <Space>
-                            <Button
-                                type="primary"
-                                icon={<CheckOutlined />}
-                                onClick={handleSave}
-                            >
+                            <Button type="primary" icon={<CheckOutlined />} onClick={handleSave}>
                                 Áp dụng
                             </Button>
                             <Button danger icon={<CloseOutlined />} onClick={handleCancel}>

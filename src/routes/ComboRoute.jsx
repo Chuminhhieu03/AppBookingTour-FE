@@ -20,17 +20,21 @@ const ComboRoute = {
             ),
             children: [
                 {
-                    path: 'combos',
+                    path: 'service',
                     children: [
-                        { index: true, element: <ComboDefault /> },
-                        { path: 'addnew', element: <ComboAddnew /> },
-                        { path: 'display/:id', element: <ComboDisplay /> },
-                        { path: 'edit/:id', element: <ComboEdit /> }
+                        {
+                            path: 'combo',
+                            children: [
+                                { index: true, element: <ComboDefault /> },
+                                { path: 'addnew', element: <ComboAddnew /> },
+                                { path: 'display/:id', element: <ComboDisplay /> },
+                                { path: 'edit/:id', element: <ComboEdit /> }
+                            ]
+                        }
                     ]
                 }
             ]
         }
     ]
 };
-
 export default ComboRoute;

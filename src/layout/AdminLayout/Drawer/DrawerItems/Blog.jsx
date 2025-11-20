@@ -1,11 +1,11 @@
 const blog = {
     id: 'blog',
-    title: 'Blog',
+    title: 'Tương tác',
     type: 'group',
     children: [
         {
             id: 'blog-posts',
-            title: 'Blog Posts',
+            title: 'Bài viết',
             type: 'item',
             icon: <i className="ph ph-article" />,
             url: '/admin/blog'

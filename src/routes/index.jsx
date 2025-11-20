@@ -12,13 +12,16 @@ import DiscountRoute from './DiscountRoute';
 import AccommodationRoute from './AccommodationRoute';
 import ChangePasswordRoute from './ChangePasswordRoute';
 import BlogPostRoute from './BlogPostRoute';
-import AccommodationCustomerRoutes from './Customers/AccommodationCustomerRout';
+import AccommodationCustomerRoutes from './Customers/AccommodationCustomerRoute';
+import HomeCustomerRoute from './Customers/HomeCustomerRoute';
 import ComboRoute from './ComboRoute';
 import TourRoute from './TourRoute';
+import BookingRoute from './BookingRoute';
 import StatisticsRoute from './StatisticsRoute';
 
 const router = createBrowserRouter(
     [
+        HomeCustomerRoute,
         NavigationRoutes,
         ComponentsRoutes,
         FormsRoutes,
@@ -33,6 +36,7 @@ const router = createBrowserRouter(
         AccommodationCustomerRoutes,
         ComboRoute,
         TourRoute,
+        BookingRoute,
         StatisticsRoute
     ],
     {

@@ -178,10 +178,7 @@ export default function Default() {
                         <Col span={6}>
                             <Flex gap="small" align="center">
                                 <span>Mã</span>
-                                <Input
-                                    value={filter.Code}
-                                    onChange={(e) => setFilter({ ...filter, Code: e.target.value })}
-                                />
+                                <Input value={filter.Code} onChange={(e) => setFilter({ ...filter, Code: e.target.value })} />
                             </Flex>
                         </Col>
                         <Col span={6}>

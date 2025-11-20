@@ -1,6 +1,6 @@
 const statistics = {
     id: 'statistics',
-    title: 'Statistics',
+    title: 'Thống kê',
     type: 'group',
     children: [
         {

@@ -39,7 +39,7 @@ const discountAPI = {
     getByEntityType: async (data) => {
         const response = await axiosInstance.post(`/Discount/get-by-entity-type`, data);
         return response.data;
-    },
+    }
 };
 
 export { discountAPI };

@@ -36,6 +36,11 @@ export default class Constants {
         Premium: 3
     };
 
+    static VehicleType = {
+        Car: 1,
+        Plane: 2
+    };
+
     // Options cho bộ lọc và các thành phần giao diện
     static StatusOptions = [
         { value: this.Status.Active, label: 'Hoạt động' },
@@ -76,5 +81,10 @@ export default class Constants {
         { value: this.PriceLevel.Budget, label: 'Tiết kiệm' },
         { value: this.PriceLevel.Standard, label: 'Tiêu chuẩn' },
         { value: this.PriceLevel.Premium, label: 'Cao cấp' }
+    ];
+
+    static VehicleTypeOptions = [
+        { value: this.VehicleType.Car, label: 'Xe ô tô' },
+        { value: this.VehicleType.Plane, label: 'Máy bay' }
     ];
 }

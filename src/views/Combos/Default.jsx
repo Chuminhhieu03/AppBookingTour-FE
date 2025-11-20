@@ -33,7 +33,6 @@ import MainCard from 'components/MainCard';
 import comboAPI from 'api/combo/comboAPI';
 import cityAPI from 'api/city/cityAPI';
 import Utility from 'utils/Utility';
-import { VEHICLE_TYPES, ACTIVE_STATUS } from 'constants/enums';
 import { getVehicleLabel, getStatusLabel, getStatusColor } from 'utils/common_utlity';
 
 const { Search } = Input;
@@ -69,7 +68,7 @@ const CombosDefault = () => {
         const fetchCities = async () => {
             try {
                 setLoadingCities(true);
-                const response = await cityAPI.getAllCities();
+                const response = await cityAPI.getListCity();
                 if (response.success) {
                     setCities(response.data || []);
                 } else {

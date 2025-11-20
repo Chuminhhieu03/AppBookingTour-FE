@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import Stack from 'react-bootstrap/Stack';
-import branding from 'branding.json';
+import branding from '../../branding.json';
 
 export default function Footer() {
     return (

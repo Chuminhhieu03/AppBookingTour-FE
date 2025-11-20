@@ -51,6 +51,12 @@ const comboAPI = {
             data: { imageUrls }
         });
         return response.data;
+    },
+
+    // POST apply discount code
+    applyDiscount: async (data) => {
+        const response = await axiosInstance.post('/bookings/apply-discount', data);
+        return response.data;
     }
 };
 

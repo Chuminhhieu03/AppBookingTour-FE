@@ -2,7 +2,7 @@ import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store/store';
-import router from 'routes';
+import router from './routes';
 
 function App() {
     return (
