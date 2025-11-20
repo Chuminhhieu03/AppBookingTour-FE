@@ -21,13 +21,21 @@ const blogAPI = {
 
     // Create blog post
     create: async (data) => {
-        const response = await axiosInstance.post('/blogposts', data);
+        const response = await axiosInstance.post('/blogposts', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     },
 
     // Update blog post
     update: async (id, data) => {
-        const response = await axiosInstance.put(`/blogposts/${id}`, data);
+        const response = await axiosInstance.put(`/blogposts/${id}`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     },
 

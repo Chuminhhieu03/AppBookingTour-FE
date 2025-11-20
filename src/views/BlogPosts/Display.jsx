@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Space, message, Modal, Tag, Descriptions, Typography, Row, Col, Spin } from 'antd';
+import { Button, Space, message, Modal, Tag, Descriptions, Typography, Row, Col, Spin, Image } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import MainCard from 'components/MainCard';
@@ -112,6 +112,17 @@ const BlogPostsDisplay = () => {
                     </Col>
                 </Row>
 
+                {/* Cover Image */}
+                {blogPost.coverImage && (
+                    <div style={{ marginBottom: 24 }}>
+                        <Image
+                            src={blogPost.coverImage}
+                            alt={blogPost.title}
+                            style={{ width: '100%', maxHeight: 400, objectFit: 'cover', borderRadius: 8 }}
+                        />
+                    </div>
+                )}
+
                 {/* Title */}
                 <div>
                     <Title level={2} style={{ marginBottom: 8 }}>
@@ -119,7 +130,7 @@ const BlogPostsDisplay = () => {
                     </Title>
                     <Space>
                         {getStatusTag(blogPost.status)}
-                        <Tag color="blue">{blogPost.city}</Tag>
+                        <Tag color="blue">{blogPost.cityName}</Tag>
                     </Space>
                 </div>
 
@@ -127,9 +138,9 @@ const BlogPostsDisplay = () => {
                 <Descriptions bordered column={{ xs: 1, sm: 2, md: 2, lg: 2 }}>
                     <Descriptions.Item label="ID">{blogPost.id}</Descriptions.Item>
                     <Descriptions.Item label="Slug">{blogPost.slug}</Descriptions.Item>
-                    <Descriptions.Item label="Tác giả">{blogPost.author}</Descriptions.Item>
-                    <Descriptions.Item label="Thành phố">{blogPost.city}</Descriptions.Item>
-                    <Descriptions.Item label="Trạng thái">{getStatusTag(blogPost.status)}</Descriptions.Item>
+                    <Descriptions.Item label="Tác giả">{blogPost.authorName}</Descriptions.Item>
+                    <Descriptions.Item label="Thành phố">{blogPost.cityName}</Descriptions.Item>
+                    <Descriptions.Item label="Trạng thái">{getStatusTag(blogPost.statusName)}</Descriptions.Item>
                     <Descriptions.Item label="Ngày xuất bản">
                         {blogPost.publishedDate ? formatDate(blogPost.publishedDate) : 'Chưa xuất bản'}
                     </Descriptions.Item>

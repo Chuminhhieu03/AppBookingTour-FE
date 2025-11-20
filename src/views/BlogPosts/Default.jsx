@@ -137,6 +137,33 @@ const BlogPostsDefault = () => {
             align: 'center'
         },
         {
+            title: 'Cover',
+            dataIndex: 'coverImage',
+            key: 'coverImage',
+            width: 100,
+            align: 'center',
+            render: (coverImage) =>
+                coverImage ? (
+                    <img src={coverImage} alt="cover" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }} />
+                ) : (
+                    <div
+                        style={{
+                            width: 60,
+                            height: 40,
+                            background: '#f0f0f0',
+                            borderRadius: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: 12,
+                            color: '#999'
+                        }}
+                    >
+                        No Image
+                    </div>
+                )
+        },
+        {
             title: 'Tiêu đề',
             dataIndex: 'title',
             key: 'title',
