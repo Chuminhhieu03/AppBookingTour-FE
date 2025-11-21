@@ -7,6 +7,12 @@ const tourAPI = {
         return response.data;
     },
 
+    // Search tours for customers with filters
+    searchToursForCustomer: async (query) => {
+        const response = await axiosInstance.post('/tours/search-for-customer', query);
+        return response.data;
+    },
+
     // Get by ID
     getById: async (id) => {
         const response = await axiosInstance.get(`/tours/${id}`);

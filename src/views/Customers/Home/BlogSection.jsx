@@ -1,6 +1,6 @@
-import blogAPI from "api/blog/blogAPI";
-import blog from "layout/AdminLayout/Drawer/DrawerItems/Blog";
-import { useEffect, useState } from "react";
+import blogAPI from 'api/blog/blogAPI';
+import blog from 'layout/AdminLayout/Drawer/DrawerItems/Blog';
+import { useEffect, useState } from 'react';
 
 const BlogSection = () => {
     const [blogPosts, setBlogPosts] = useState([]);
@@ -14,8 +14,7 @@ const BlogSection = () => {
             }
         };
         fetchBlogPosts();
-    }
-    , []);
+    }, []);
 
     return (
         <div style={{ padding: '60px 8%' }}>
@@ -46,31 +45,31 @@ const BlogSection = () => {
             <div className="row mt-4">
                 {/* 1. TOUR CARAVAN */}
                 {blogPosts.map((post) => (
-                <div className="col-md-4 mb-4">
-                    <a href="/tour-caravan" style={{ textDecoration: 'none' }}>
-                        <div className="position-relative">
-                            <img
-                                src={post.coverImage}
-                                className="img-fluid rounded shadow"
-                                style={{ height: 260, objectFit: 'cover', width: '100%' }}
-                            />
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    width: '100%',
-                                    background: 'rgba(0,0,0,0.45)',
-                                    color: 'white',
-                                    padding: '10px 14px',
-                                    fontWeight: '600',
-                                    borderRadius: '0 0 10px 10px'
-                                }}
-                            >
-                                {post.title}
+                    <div className="col-md-4 mb-4">
+                        <a href="/tour-caravan" style={{ textDecoration: 'none' }}>
+                            <div className="position-relative">
+                                <img
+                                    src={post.coverImage}
+                                    className="img-fluid rounded shadow"
+                                    style={{ height: 260, objectFit: 'cover', width: '100%' }}
+                                />
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        width: '100%',
+                                        background: 'rgba(0,0,0,0.45)',
+                                        color: 'white',
+                                        padding: '10px 14px',
+                                        fontWeight: '600',
+                                        borderRadius: '0 0 10px 10px'
+                                    }}
+                                >
+                                    {post.title}
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
                 ))}
             </div>
         </div>

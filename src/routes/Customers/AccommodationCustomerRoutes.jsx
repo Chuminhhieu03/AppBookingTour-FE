@@ -5,8 +5,8 @@ import Loadable from 'components/Loadable';
 import ProtectedRoute from 'components/auth/ProtectedRoute';
 import CustomerLayout from 'layout/CustomerLayout/CustomerLayout';
 
-// render - bootstrap table pages
-const AccommodationCustomerDefault = Loadable(lazy(() => import('views/Customers/Accommodations/Default')));
+// render - accommodation pages
+const AccommodationList = Loadable(lazy(() => import('views/Customers/Accommodations/AccommodationList')));
 
 const AccommodationCustomerRoutes = {
     path: '/',
@@ -21,12 +21,7 @@ const AccommodationCustomerRoutes = {
             children: [
                 {
                     path: 'accommodations',
-                    children: [
-                        {
-                            path: 'default',
-                            element: <AccommodationCustomerDefault />
-                        }
-                    ]
+                    element: <AccommodationList />
                 }
             ]
         }

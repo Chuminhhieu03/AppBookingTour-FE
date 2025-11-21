@@ -41,7 +41,9 @@ const HomePageSearchBtn = () => {
                 />
             </div>
             <div className="col-md-3" style={{ borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Ngày đi</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Ngày đi
+                </label>
                 <DatePicker
                     size="large"
                     placeholder="Th 4, 19 thg 11, 2025"
@@ -52,7 +54,9 @@ const HomePageSearchBtn = () => {
                 />
             </div>
             <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Ngân sách</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Ngân sách
+                </label>
                 <Select size="large" bordered={false} placeholder="Chọn mức giá" className="w-100" suffixIcon={<DollarOutlined />}>
                     <Option value="1">Dưới 5 triệu</Option>
                     <Option value="2">5-10 triệu</Option>
@@ -126,14 +130,23 @@ const HomePageSearchBtn = () => {
         <div className="row g-3 align-items-end">
             <div style={{ display: 'flex', width: '100%', gap: 16, alignItems: 'end' }}>
                 <div style={{ flex: '0 0 30%', maxWidth: '30%', borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
-                    <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Địa điểm</label>
-                    <Input size="large" bordered={false} placeholder="Nhập địa điểm" prefix={<EnvironmentOutlined className="text-muted" />} />
+                    <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                        Địa điểm
+                    </label>
+                    <Input
+                        size="large"
+                        bordered={false}
+                        placeholder="Nhập địa điểm"
+                        prefix={<EnvironmentOutlined className="text-muted" />}
+                    />
                 </div>
 
                 <div style={{ flex: '0 0 40%', maxWidth: '40%', borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <div style={{ flex: 1 }}>
-                            <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Nhận phòng</label>
+                            <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                                Nhận phòng
+                            </label>
                             <DatePicker
                                 size="large"
                                 placeholder={dayjs().format('DD/MM/YYYY')}
@@ -146,14 +159,29 @@ const HomePageSearchBtn = () => {
                         </div>
 
                         <div style={{ width: 56, display: 'flex', justifyContent: 'center' }}>
-                            <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#ffffff', boxShadow: '0 4px 10px rgba(1, 1, 2, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6 }}>
+                            <div
+                                style={{
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: '50%',
+                                    background: '#ffffff',
+                                    boxShadow: '0 4px 10px rgba(1, 1, 2, 0.08)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexDirection: 'row',
+                                    gap: 6
+                                }}
+                            >
                                 <span style={{ fontWeight: 700 }}>{nights}</span>
                                 <span style={{ fontSize: 14 }}>🌙</span>
                             </div>
                         </div>
 
                         <div style={{ flex: 1 }}>
-                            <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Trả phòng</label>
+                            <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                                Trả phòng
+                            </label>
                             <DatePicker
                                 size="large"
                                 placeholder={dayjs().add(1, 'day').format('DD/MM/YYYY')}
@@ -168,13 +196,17 @@ const HomePageSearchBtn = () => {
                 </div>
 
                 <div style={{ flex: '1 1 30%', maxWidth: '30%', position: 'relative' }} ref={guestRef}>
-                    <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Số khách</label>
+                    <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                        Số khách
+                    </label>
 
                     <div
                         role="button"
                         tabIndex={0}
                         onClick={() => setGuestPanelVisible((v) => !v)}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setGuestPanelVisible((v) => !v); }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') setGuestPanelVisible((v) => !v);
+                        }}
                         className="w-100 d-flex align-items-center"
                         style={{
                             minHeight: 40,
@@ -207,7 +239,7 @@ const HomePageSearchBtn = () => {
                                 borderRadius: 8,
                                 padding: 12,
                                 zIndex: 1200,
-                                minWidth: 260,
+                                minWidth: 260
                             }}
                         >
                             <div className="d-flex align-items-center justify-content-between mb-3">
@@ -218,7 +250,14 @@ const HomePageSearchBtn = () => {
                                     <button
                                         type="button"
                                         onClick={() => setRooms((r) => Math.max(1, r - 1))}
-                                        style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 6,
+                                            border: '1px solid #e8e8e8',
+                                            background: '#fff',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         -
                                     </button>
@@ -226,7 +265,14 @@ const HomePageSearchBtn = () => {
                                     <button
                                         type="button"
                                         onClick={() => setRooms((r) => r + 1)}
-                                        style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 6,
+                                            border: '1px solid #e8e8e8',
+                                            background: '#fff',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         +
                                     </button>
@@ -242,7 +288,14 @@ const HomePageSearchBtn = () => {
                                     <button
                                         type="button"
                                         onClick={() => setAdults((a) => Math.max(1, a - 1))}
-                                        style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 6,
+                                            border: '1px solid #e8e8e8',
+                                            background: '#fff',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         -
                                     </button>
@@ -250,7 +303,14 @@ const HomePageSearchBtn = () => {
                                     <button
                                         type="button"
                                         onClick={() => setAdults((a) => a + 1)}
-                                        style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 6,
+                                            border: '1px solid #e8e8e8',
+                                            background: '#fff',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         +
                                     </button>
@@ -266,7 +326,14 @@ const HomePageSearchBtn = () => {
                                     <button
                                         type="button"
                                         onClick={() => setChildren((c) => Math.max(0, c - 1))}
-                                        style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 6,
+                                            border: '1px solid #e8e8e8',
+                                            background: '#fff',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         -
                                     </button>
@@ -274,7 +341,14 @@ const HomePageSearchBtn = () => {
                                     <button
                                         type="button"
                                         onClick={() => setChildren((c) => c + 1)}
-                                        style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 6,
+                                            border: '1px solid #e8e8e8',
+                                            background: '#fff',
+                                            cursor: 'pointer'
+                                        }}
                                     >
                                         +
                                     </button>
@@ -285,7 +359,13 @@ const HomePageSearchBtn = () => {
                 </div>
 
                 <div style={{ flex: '0 0 56px' }}>
-                    <Button type="primary" size="large" icon={<SearchOutlined />} className="w-100" style={{ backgroundColor: '#1890ff' }} />
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<SearchOutlined />}
+                        className="w-100"
+                        style={{ backgroundColor: '#1890ff' }}
+                    />
                 </div>
             </div>
         </div>
@@ -294,27 +374,43 @@ const HomePageSearchBtn = () => {
     const renderComboSearch = () => (
         <div className="row g-3 align-items-end">
             <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Từ (thành phố)</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Từ (thành phố)
+                </label>
                 <Input size="large" bordered={false} placeholder="Thành phố đi" prefix={<EnvironmentOutlined className="text-muted" />} />
             </div>
 
             <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Đến</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Đến
+                </label>
                 <Input size="large" bordered={false} placeholder="Thành phố đến" prefix={<EnvironmentOutlined className="text-muted" />} />
             </div>
 
             <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Ngày đi</label>
-                <DatePicker size="large" placeholder={dayjs().format('DD/MM/YYYY')} className="w-100" format="DD/MM/YYYY" bordered={false} />
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Ngày đi
+                </label>
+                <DatePicker
+                    size="large"
+                    placeholder={dayjs().format('DD/MM/YYYY')}
+                    className="w-100"
+                    format="DD/MM/YYYY"
+                    bordered={false}
+                />
             </div>
 
             <div className="col-md-2" style={{ position: 'relative' }} ref={guestRef}>
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Số khách</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Số khách
+                </label>
                 <div
                     role="button"
                     tabIndex={0}
                     onClick={() => setGuestPanelVisible((v) => !v)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setGuestPanelVisible((v) => !v); }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') setGuestPanelVisible((v) => !v);
+                    }}
                     className="w-100 d-flex align-items-center"
                     style={{
                         minHeight: 40,
@@ -327,9 +423,7 @@ const HomePageSearchBtn = () => {
                         border: '1px solid transparent'
                     }}
                 >
-                    <div style={{ color: '#555' }}>
-                        {adults + children} Khách
-                    </div>
+                    <div style={{ color: '#555' }}>{adults + children} Khách</div>
                     <div style={{ color: '#888' }}>
                         <TeamOutlined />
                     </div>
@@ -347,7 +441,7 @@ const HomePageSearchBtn = () => {
                             borderRadius: 8,
                             padding: 12,
                             zIndex: 1200,
-                            minWidth: 260,
+                            minWidth: 260
                         }}
                     >
                         <div className="d-flex align-items-center justify-content-between mb-3">
@@ -359,7 +453,14 @@ const HomePageSearchBtn = () => {
                                 <button
                                     type="button"
                                     onClick={() => setAdults((a) => Math.max(1, a - 1))}
-                                    style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                    style={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: 6,
+                                        border: '1px solid #e8e8e8',
+                                        background: '#fff',
+                                        cursor: 'pointer'
+                                    }}
                                 >
                                     -
                                 </button>
@@ -367,7 +468,14 @@ const HomePageSearchBtn = () => {
                                 <button
                                     type="button"
                                     onClick={() => setAdults((a) => a + 1)}
-                                    style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                    style={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: 6,
+                                        border: '1px solid #e8e8e8',
+                                        background: '#fff',
+                                        cursor: 'pointer'
+                                    }}
                                 >
                                     +
                                 </button>
@@ -383,7 +491,14 @@ const HomePageSearchBtn = () => {
                                 <button
                                     type="button"
                                     onClick={() => setChildren((c) => Math.max(0, c - 1))}
-                                    style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                    style={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: 6,
+                                        border: '1px solid #e8e8e8',
+                                        background: '#fff',
+                                        cursor: 'pointer'
+                                    }}
                                 >
                                     -
                                 </button>
@@ -391,7 +506,14 @@ const HomePageSearchBtn = () => {
                                 <button
                                     type="button"
                                     onClick={() => setChildren((c) => c + 1)}
-                                    style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', cursor: 'pointer' }}
+                                    style={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: 6,
+                                        border: '1px solid #e8e8e8',
+                                        background: '#fff',
+                                        cursor: 'pointer'
+                                    }}
                                 >
                                     +
                                 </button>
@@ -410,15 +532,21 @@ const HomePageSearchBtn = () => {
     const renderFlightSearch = () => (
         <div className="row g-3 align-items-end">
             <div className="col-md-5">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Điểm đi - Điểm đến</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Điểm đi - Điểm đến
+                </label>
                 <Input size="large" placeholder="Nhập điểm đi và điểm đến" prefix={<EnvironmentOutlined className="text-muted" />} />
             </div>
             <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Ngày bay</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Ngày bay
+                </label>
                 <DatePicker size="large" placeholder="Chọn ngày bay" className="w-100" format="DD/MM/YYYY" />
             </div>
             <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>Hành khách</label>
+                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
+                    Hành khách
+                </label>
                 <Select size="large" placeholder="Số hành khách" className="w-100" suffixIcon={<TeamOutlined />}>
                     <Option value="1">1 người</Option>
                     <Option value="2">2 người</Option>

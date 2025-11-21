@@ -57,6 +57,12 @@ const comboAPI = {
     applyDiscount: async (data) => {
         const response = await axiosInstance.post('/bookings/apply-discount', data);
         return response.data;
+    },
+
+    // POST search combos for customers with filters
+    searchCombosForCustomer: async (searchData) => {
+        const response = await axiosInstance.post('/combos/search-for-customer', searchData);
+        return response.data;
     }
 };
 
