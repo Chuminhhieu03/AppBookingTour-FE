@@ -280,10 +280,10 @@ const CombosDefault = () => {
             render: (_, record) => (
                 <Space size="small">
                     <Tooltip title="Xem chi tiết">
-                        <Button type="text" icon={<EyeOutlined />} onClick={() => navigate(`/admin/combos/display/${record.id}`)} />
+                        <Button type="text" icon={<EyeOutlined />} onClick={() => navigate(`/admin/service/combo/display/${record.id}`)} />
                     </Tooltip>
                     <Tooltip title="Chỉnh sửa">
-                        <Button type="text" icon={<EditOutlined />} onClick={() => navigate(`/admin/combos/edit/${record.id}`)} />
+                        <Button type="text" icon={<EditOutlined />} onClick={() => navigate(`/admin/service/combo/edit/${record.id}`)} />
                     </Tooltip>
                     <Tooltip title="Xóa">
                         <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id, record.code)} />
@@ -307,7 +307,7 @@ const CombosDefault = () => {
                         <Button icon={<ReloadOutlined />} onClick={() => fetchCombos()}>
                             Làm mới
                         </Button>
-                        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/admin/combos/addnew')}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/admin/service/combo/addnew')}>
                             Thêm Combo mới
                         </Button>
                     </Space>

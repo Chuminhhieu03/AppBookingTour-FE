@@ -5,9 +5,6 @@ import AdminLayout from '../layout/AdminLayout/AdminLayout';
 import Loadable from 'components/Loadable';
 import ProtectedRoute from 'components/auth/ProtectedRoute';
 
-// render - forms element pages
-const FormBasic = Loadable(lazy(() => import('views/forms/form-element/FormBasic')));
-
 // ==============================|| FORMS ROUTING ||============================== //
 
 const FormsRoutes = {
@@ -21,15 +18,7 @@ const FormsRoutes = {
                 </ProtectedRoute>
             ),
             children: [
-                {
-                    path: 'forms',
-                    children: [
-                        {
-                            path: 'form-elements',
-                            children: [{ path: 'basic', element: <FormBasic /> }]
-                        }
-                    ]
-                }
+                // Forms routes can be added here when needed
             ]
         }
     ]

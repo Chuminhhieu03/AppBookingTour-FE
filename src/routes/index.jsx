@@ -14,6 +14,7 @@ import ChangePasswordRoute from './ChangePasswordRoute';
 import BlogPostRoute from './BlogPostRoute';
 import AccommodationCustomerRoutes from './Customers/AccommodationCustomerRoute';
 import HomeCustomerRoute from './Customers/HomeCustomerRoute';
+import ComboCustomerRoute from './Customers/ComboCustomerRoute';
 import ComboRoute from './ComboRoute';
 import TourRoute from './TourRoute';
 import BookingRoute from './BookingRoute';
@@ -22,6 +23,7 @@ import StatisticsRoute from './StatisticsRoute';
 const router = createBrowserRouter(
     [
         HomeCustomerRoute,
+        ComboCustomerRoute,
         NavigationRoutes,
         ComponentsRoutes,
         FormsRoutes,

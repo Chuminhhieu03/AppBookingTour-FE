@@ -373,10 +373,10 @@ const CombosAddnew = () => {
                         </Form.Item>
                     </Col>
                     <Col xs={24}>
-                        <Form.Item label="Trạng thái" name="isActive" initialValue={true}>
+                        <Form.Item label="Phương tiện" name="vehicle" rules={[{ required: true, message: 'Vui lòng chọn phương tiện' }]}>
                             <Radio.Group>
-                                {STATUS_OPTIONS.map((option) => (
-                                    <Radio.Button key={option.value} value={option.value === 'active'}>
+                                {Constants.VehicleTypeOptions.map((option) => (
+                                    <Radio.Button key={option.value} value={option.value}>
                                         {option.label}
                                     </Radio.Button>
                                 ))}
