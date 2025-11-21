@@ -1,59 +1,75 @@
 import { Card, Row, Col, Typography, Button, Space, Tag, Rate, Badge } from 'antd';
 import { EnvironmentOutlined, CalendarOutlined, FireOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import tourAPI from 'api/tour/tourAPI';
 
 const { Title, Text } = Typography;
 
 export default function TourHotNhat() {
-    const featuredTours = [
-        {
-            id: 1,
-            title: 'Du lịch Đà Nẵng - Hội An 3N2Đ',
-            image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&q=80',
-            price: 4500000,
-            originalPrice: 5000000,
-            duration: '3 ngày 2 đêm',
-            location: 'Đà Nẵng',
-            rating: 4.8,
-            reviews: 128,
-            discount: 10,
-            hot: true
-        },
-        {
-            id: 2,
-            title: 'Tour Phú Quốc - Thiên đường biển đảo',
-            image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&q=80',
-            price: 6200000,
-            originalPrice: 7000000,
-            duration: '4 ngày 3 đêm',
-            location: 'Phú Quốc',
-            rating: 4.9,
-            reviews: 256,
-            discount: 11,
-            hot: true
-        },
-        {
-            id: 3,
-            title: 'Sapa - Chinh phục Fansipan',
-            image: 'https://images.unsplash.com/photo-1578070181910-f1e514afdd08?w=800&q=80',
-            price: 3800000,
-            duration: '3 ngày 2 đêm',
-            location: 'Sapa',
-            rating: 4.7,
-            reviews: 89,
-            hot: false
-        },
-        {
-            id: 4,
-            title: 'Nha Trang - Vinpearl Land 4N3Đ',
-            image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80',
-            price: 5500000,
-            duration: '4 ngày 3 đêm',
-            location: 'Nha Trang',
-            rating: 4.6,
-            reviews: 174,
-            hot: false
-        }
-    ];
+    const [featuredTours, setFeaturedTours] = useState([]);
+
+    useEffect(() => {
+        const fetchBlogPosts = async () => {
+            try {
+                const res = await tourAPI.getFeaturedTours();
+                setFeaturedTours(res.data || []);
+            } catch (error) {
+                console.error('Error fetching blog posts:', error);
+            }
+        };
+        fetchBlogPosts();
+    }, []);
+
+    // const featuredTours = [
+    //     {
+    //         id: 1,
+    //         title: 'Du lịch Đà Nẵng - Hội An 3N2Đ',
+    //         image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&q=80',
+    //         price: 4500000,
+    //         originalPrice: 5000000,
+    //         duration: '3 ngày 2 đêm',
+    //         location: 'Đà Nẵng',
+    //         rating: 4.8,
+    //         reviews: 128,
+    //         discount: 10,
+    //         hot: true
+    //     },
+    //     {
+    //         id: 2,
+    //         title: 'Tour Phú Quốc - Thiên đường biển đảo',
+    //         image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&q=80',
+    //         price: 6200000,
+    //         originalPrice: 7000000,
+    //         duration: '4 ngày 3 đêm',
+    //         location: 'Phú Quốc',
+    //         rating: 4.9,
+    //         reviews: 256,
+    //         discount: 11,
+    //         hot: true
+    //     },
+    //     {
+    //         id: 3,
+    //         title: 'Sapa - Chinh phục Fansipan',
+    //         image: 'https://images.unsplash.com/photo-1578070181910-f1e514afdd08?w=800&q=80',
+    //         price: 3800000,
+    //         duration: '3 ngày 2 đêm',
+    //         location: 'Sapa',
+    //         rating: 4.7,
+    //         reviews: 89,
+    //         hot: false
+    //     },
+    //     {
+    //         id: 4,
+    //         title: 'Nha Trang - Vinpearl Land 4N3Đ',
+    //         image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80',
+    //         price: 5500000,
+    //         duration: '4 ngày 3 đêm',
+    //         location: 'Nha Trang',
+    //         rating: 4.6,
+    //         reviews: 174,
+    //         hot: false
+    //     }
+    // ];
 
     return (
         <div style={{ background: '#dbf0ff', padding: '40px 8%' }}>
@@ -117,11 +133,11 @@ export default function TourHotNhat() {
                                     <div style={{ marginTop: 16 }}>
                                         {tour.originalPrice && (
                                             <Text delete type="secondary" style={{ marginRight: 8 }}>
-                                                {tour.originalPrice.toLocaleString('vi-VN')}đ
+                                                0 đ
                                             </Text>
                                         )}
                                         <Text strong style={{ fontSize: 18, color: '#ff4d4f' }}>
-                                            {tour.price.toLocaleString('vi-VN')}đ
+                                            0 đ
                                         </Text>
                                     </div>
                                 </div>

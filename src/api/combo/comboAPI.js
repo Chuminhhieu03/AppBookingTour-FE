@@ -65,6 +65,12 @@ const comboAPI = {
             params: { limit }
         });
         return response.data;
+    },
+
+    // POST search combos for customers with filters
+    searchCombosForCustomer: async (searchData) => {
+        const response = await axiosInstance.post('/combos/search-for-customer', searchData);
+        return response.data;
     }
 };
 

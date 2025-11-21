@@ -2,13 +2,14 @@ import React from 'react';
 import { Carousel } from 'antd';
 import 'antd/dist/reset.css';
 
+// Import local images
+import image1 from '../assets/images/carousel/1.jfif';
+import image2 from '../assets/images/carousel/2.jfif';
+import image3 from '../assets/images/carousel/3.jfif';
+import image4 from '../assets/images/carousel/4.jfif';
+
 // Carousel showing 3 slides at once, autoplay every 2s, using 4 images
-const images = [
-    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1200&q=80'
-];
+const images = [image1, image2, image3, image4];
 
 const CarouselGallery = ({ height = 220 }) => {
     const settings = {
@@ -27,13 +28,19 @@ const CarouselGallery = ({ height = 220 }) => {
             <Carousel {...settings}>
                 {images.map((src, idx) => (
                     <div key={idx}>
-                        <div style={{
-                            margin: 8,
-                            height,
-                            borderRadius: 8,
-                            overflow: 'hidden',
-                        }}>
-                            <img src={src} alt={`slide-${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        <div
+                            style={{
+                                margin: 8,
+                                height,
+                                borderRadius: 8,
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <img
+                                src={src}
+                                alt={`slide-${idx}`}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
                         </div>
                     </div>
                 ))}

@@ -29,6 +29,12 @@ const tourDepartureAPI = {
     delete: async (id) => {
         const response = await axiosInstance.delete(`/tour-departures/${id}`);
         return response.data;
+    },
+
+    // Get list tour departures for guide
+    getListForGuide: async (guideId) => {
+        const response = await axiosInstance.get(`/tour-departures/get-list-for-guide/${guideId}`);
+        return response.data;
     }
 };
 
