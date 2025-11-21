@@ -4,7 +4,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import PagesRoutes from './PagesRoutes';
 import NavigationRoutes from './NavigationRoutes';
 import ComponentsRoutes from './ComponentsRoutes';
-import FormsRoutes from './FormsRoutes';
 import TablesRoutes from './TablesRoutes';
 import ChartMapRoutes from './ChartMapRoutes';
 import OtherRoutes from './OtherRoutes';
@@ -24,7 +23,6 @@ const router = createBrowserRouter(
         HomeCustomerRoute,
         NavigationRoutes,
         ComponentsRoutes,
-        FormsRoutes,
         TablesRoutes,
         ChartMapRoutes,
         PagesRoutes,

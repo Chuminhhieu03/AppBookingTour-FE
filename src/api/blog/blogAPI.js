@@ -43,6 +43,11 @@ const blogAPI = {
     delete: async (id) => {
         const response = await axiosInstance.delete(`/blogposts/${id}`);
         return response.data;
+    },
+
+    getRandomBlog: async (count = 3) => {
+        const response = await axiosInstance.get(`/blogposts/random-titles?count=${count}`);
+        return response.data;
     }
 };
 

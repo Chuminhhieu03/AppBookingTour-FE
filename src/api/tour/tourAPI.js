@@ -37,6 +37,11 @@ const tourAPI = {
     delete: async (id) => {
         const response = await axiosInstance.delete(`/tours/${id}`);
         return response.data;
+    },
+
+    getFeaturedTours: async (count = 4) => {
+        const response = await axiosInstance.get(`/tours/featured?count=${count}`);
+        return response.data;
     }
 };
 
