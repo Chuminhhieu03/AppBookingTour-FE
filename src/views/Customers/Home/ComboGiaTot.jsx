@@ -4,7 +4,7 @@ import { Card, Row, Col, Button } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 
 // Import the CSS file
-import './ComboGiaTot.css';   // Adjust path if you put CSS elsewhere
+import './ComboGiaTot.css'; // Adjust path if you put CSS elsewhere
 
 export default function ComboGiaTot() {
     const [activeFilter, setActiveFilter] = useState('all');
@@ -52,7 +52,7 @@ export default function ComboGiaTot() {
         }
     ];
 
-    const filteredCombos = combos.filter(c => {
+    const filteredCombos = combos.filter((c) => {
         if (activeFilter === 'all') return true;
         if (activeFilter === 'plane') return c.transport === 'Máy bay';
         if (activeFilter === 'car') return c.transport === 'Xe';
@@ -60,7 +60,7 @@ export default function ComboGiaTot() {
     });
 
     return (
-        <div style={{ background: "#dbf0ff", padding: '40px 8%' }}>
+        <div style={{ background: '#dbf0ff', padding: '40px 8%' }}>
             <h2 className="text-center mb-2" style={{ fontWeight: 700, color: '#004E9A' }}>
                 COMBO GIÁ TỐT
             </h2>
@@ -79,7 +79,7 @@ export default function ComboGiaTot() {
                     { key: 'all', label: 'Tất cả' },
                     { key: 'plane', label: 'Máy bay + khách sạn' },
                     { key: 'car', label: 'Xe + khách sạn' }
-                ].map(item => (
+                ].map((item) => (
                     <Button
                         key={item.key}
                         onClick={() => setActiveFilter(item.key)}
@@ -112,22 +112,30 @@ export default function ComboGiaTot() {
                                         </b>
 
                                         <div className="mt-3" style={{ display: 'flex', gap: 8 }}>
-                                            <span style={{ width: 110, flexShrink: 0 }}><b>Mã tour:</b></span>
+                                            <span style={{ width: 110, flexShrink: 0 }}>
+                                                <b>Mã tour:</b>
+                                            </span>
                                             <span style={{ wordBreak: 'break-all' }}>{c.code}</span>
                                         </div>
 
                                         <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
-                                            <span style={{ width: 110, flexShrink: 0 }}><b>Khởi hành:</b></span>
+                                            <span style={{ width: 110, flexShrink: 0 }}>
+                                                <b>Khởi hành:</b>
+                                            </span>
                                             <span>{c.date}</span>
                                         </div>
 
                                         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                                            <span style={{ width: 110, flexShrink: 0 }}><b>Khách sạn:</b></span>
+                                            <span style={{ width: 110, flexShrink: 0 }}>
+                                                <b>Khách sạn:</b>
+                                            </span>
                                             <span>{c.hotel}</span>
                                         </div>
 
                                         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                                            <span style={{ width: 110, flexShrink: 0 }}><b>Phương tiện:</b></span>
+                                            <span style={{ width: 110, flexShrink: 0 }}>
+                                                <b>Phương tiện:</b>
+                                            </span>
                                             <span>{c.transport}</span>
                                         </div>
 
@@ -144,46 +152,54 @@ export default function ComboGiaTot() {
                                 <div className="combo-flip-back">
                                     <img src={c.image} alt={`${c.from} → ${c.to}`} />
                                     {/* Overlay elements */}
-                                    <div style={{
-                                      position: 'absolute',
-                                      top: '50%',
-                                      left: '50%',
-                                      transform: 'translate(-50%, -50%)',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      alignItems: 'center',
-                                      gap: '12px'
-                                    }}>
-                                      {/* Circular button with arrow */}
-                                      <div style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        borderRadius: '50%',
-                                        backgroundColor: 'white',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        fontSize: '20px',
-                                        color: '#004E9A',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                                      }}>
-                                        <ArrowRightOutlined />
-                                      </div>
-                                      {/* White line */}
-                                      <div style={{
-                                        width: '80px',
-                                        height: '2px',
-                                        backgroundColor: 'white'
-                                      }}></div>
-                                      {/* Text */}
-                                      <div style={{
-                                        color: 'white',
-                                        fontSize: '16px',
-                                        fontWeight: '500'
-                                      }}>
-                                        Xem chi tiết
-                                      </div>
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: '12px'
+                                        }}
+                                    >
+                                        {/* Circular button with arrow */}
+                                        <div
+                                            style={{
+                                                width: '50px',
+                                                height: '50px',
+                                                borderRadius: '50%',
+                                                backgroundColor: 'white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                cursor: 'pointer',
+                                                fontSize: '20px',
+                                                color: '#004E9A',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                                            }}
+                                        >
+                                            <ArrowRightOutlined />
+                                        </div>
+                                        {/* White line */}
+                                        <div
+                                            style={{
+                                                width: '80px',
+                                                height: '2px',
+                                                backgroundColor: 'white'
+                                            }}
+                                        ></div>
+                                        {/* Text */}
+                                        <div
+                                            style={{
+                                                color: 'white',
+                                                fontSize: '16px',
+                                                fontWeight: '500'
+                                            }}
+                                        >
+                                            Xem chi tiết
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -204,11 +220,11 @@ export default function ComboGiaTot() {
                         fontWeight: 500,
                         fontSize: '18px'
                     }}
-                    onMouseEnter={e => {
+                    onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = '#004E9A';
                         e.currentTarget.style.color = 'white';
                     }}
-                    onMouseLeave={e => {
+                    onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = 'transparent';
                         e.currentTarget.style.color = '#004E9A';
                     }}

@@ -9,12 +9,7 @@ import image3 from '../assets/images/carousel/3.jfif';
 import image4 from '../assets/images/carousel/4.jfif';
 
 // Carousel showing 3 slides at once, autoplay every 2s, using 4 images
-const images = [
-    image1,
-    image2,
-    image3,
-    image4
-];
+const images = [image1, image2, image3, image4];
 
 const CarouselGallery = ({ height = 220 }) => {
     const settings = {
@@ -33,13 +28,19 @@ const CarouselGallery = ({ height = 220 }) => {
             <Carousel {...settings}>
                 {images.map((src, idx) => (
                     <div key={idx}>
-                        <div style={{
-                            margin: 8,
-                            height,
-                            borderRadius: 8,
-                            overflow: 'hidden',
-                        }}>
-                            <img src={src} alt={`slide-${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        <div
+                            style={{
+                                margin: 8,
+                                height,
+                                borderRadius: 8,
+                                overflow: 'hidden'
+                            }}
+                        >
+                            <img
+                                src={src}
+                                alt={`slide-${idx}`}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
                         </div>
                     </div>
                 ))}
