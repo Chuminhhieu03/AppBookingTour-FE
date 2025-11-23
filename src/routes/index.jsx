@@ -15,6 +15,7 @@ import ComboCustomerRoute from './Customers/ComboCustomerRoute';
 import TourCustomerRoute from './Customers/TourCustomerRoutes';
 import AccommodationCustomerRoute from './Customers/AccommodationCustomerRoutes';
 import ProfileCustomerRoute from './Customers/ProfileCustomerRoute';
+import BlogPostCustomerRoute from './Customers/BlogPostCustomerRoute';
 import ComboRoute from './ComboRoute';
 import TourRoute from './TourRoute';
 import BookingRoute from './BookingRoute';
@@ -24,7 +25,10 @@ import AssignedTourRoute from './AssignedTourRoute';
 const router = createBrowserRouter(
     [
         HomeCustomerRoute,
+        TourCustomerRoute,
         ComboCustomerRoute,
+        AccommodationCustomerRoute,
+        BlogPostCustomerRoute,
         NavigationRoutes,
         ComponentsRoutes,
         ChartMapRoutes,
@@ -34,9 +38,6 @@ const router = createBrowserRouter(
         AccommodationRoute,
         ChangePasswordRoute,
         BlogPostRoute,
-        TourCustomerRoute,
-        ComboCustomerRoute,
-        AccommodationCustomerRoute,
         ProfileCustomerRoute,
         ComboRoute,
         TourRoute,

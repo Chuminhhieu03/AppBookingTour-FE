@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, Col, Row, Input, Button, message, Tag, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import { tourDepartureAPI } from '../../api/tour/tourDepartureAPI';
+import profileAPI from '../../api/profile/profileAPI';
 
 export default function AssignedTourList() {
     const navigate = useNavigate();
@@ -12,6 +13,24 @@ export default function AssignedTourList() {
     const [filteredTours, setFilteredTours] = useState([]);
     const [guideId, setGuideId] = useState('');
     const [filterStatus, setFilterStatus] = useState('upcoming');
+    const [guides, setGuides] = useState([]);
+
+    useEffect(() => {
+        fetchGuides();
+    }, []);
+
+    const fetchGuides = async () => {
+        try {
+            const response = await profileAPI.getGuides();
+            if (response.success) {
+                setGuides(response.data || []);
+            } else {
+                console.error('Failed to fetch guides:', response.message);
+            }
+        } catch (error) {
+            console.error('Error fetching guides:', error);
+        }
+    };
 
     const filterOptions = [
         { value: 'all', label: 'Xem tất cả các tour' },
@@ -37,7 +56,7 @@ export default function AssignedTourList() {
 
     const fetchAssignedTours = async (searchGuideId = guideId) => {
         if (!searchGuideId) {
-            message.warning('Vui lòng nhập ID hướng dẫn viên');
+            message.warning('Vui lòng chọn hướng dẫn viên');
             return;
         }
 
@@ -184,12 +203,21 @@ export default function AssignedTourList() {
                             />
                         </Col>
                         <Col span={6}>
-                            <Input
+                            <Select
                                 value={guideId}
-                                onChange={(e) => setGuideId(e.target.value)}
-                                placeholder="Nhập ID hướng dẫn viên"
-                                onPressEnter={handleSearch}
-                            />
+                                onChange={setGuideId}
+                                placeholder="Chọn hướng dẫn viên"
+                                style={{ width: '100%' }}
+                                allowClear
+                                showSearch
+                                filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+                            >
+                                {guides.map((guide) => (
+                                    <Select.Option key={guide.id} value={guide.id}>
+                                        {guide.fullName}
+                                    </Select.Option>
+                                ))}
+                            </Select>
                         </Col>
                         <Col span={4}>
                             <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch} loading={loading}>
@@ -207,7 +235,7 @@ export default function AssignedTourList() {
                         pagination={false}
                         scroll={{ x: 'max-content' }}
                         locale={{
-                            emptyText: guideId ? 'Không có tour nào được phân công' : 'Vui lòng nhập ID hướng dẫn viên và tìm kiếm'
+                            emptyText: guideId ? 'Không có tour nào được phân công' : 'Vui lòng chọn hướng dẫn viên và tìm kiếm'
                         }}
                         size="middle"
                     />
