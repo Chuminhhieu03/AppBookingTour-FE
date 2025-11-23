@@ -71,6 +71,11 @@ const comboAPI = {
     searchCombosForCustomer: async (searchData) => {
         const response = await axiosInstance.post('/combos/search-for-customer', searchData);
         return response.data;
+    },
+
+    getFeaturedCombos: async (limit = 5) => {
+        const response = await axiosInstance.get(`/combos/featured?count=${limit}`);
+        return response.data;
     }
 };
 
