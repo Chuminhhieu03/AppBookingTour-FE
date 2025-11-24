@@ -21,7 +21,30 @@ import {
     Badge,
     Collapse
 } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, CarOutlined, RocketOutlined, EyeOutlined, StarFilled } from '@ant-design/icons';
+import {
+    ArrowLeftOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    CarOutlined,
+    RocketOutlined,
+    EyeOutlined,
+    StarFilled,
+    EnvironmentOutlined,
+    CoffeeOutlined,
+    TeamOutlined,
+    ClockCircleOutlined,
+    GiftOutlined,
+    HomeOutlined,
+    ShopOutlined,
+    StarOutlined,
+    HeartOutlined,
+    PhoneOutlined,
+    SafetyOutlined,
+    ThunderboltOutlined,
+    TrophyOutlined,
+    SmileOutlined,
+    CustomerServiceOutlined
+} from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import comboAPI from 'api/combo/comboAPI';
 import Utility from 'utils/Utility';
@@ -49,12 +72,12 @@ const CombosDisplay = () => {
                 setCombo(response.data);
             } else {
                 message.error(response.message || 'Không thể tải thông tin combo');
-                navigate('/admin/combos');
+                navigate('/admin/service/combo');
             }
         } catch (error) {
             console.error('Error fetching combo detail:', error);
             message.error('Đã xảy ra lỗi khi tải thông tin combo');
-            navigate('/admin/combos');
+            navigate('/admin/service/combo');
         } finally {
             setLoading(false);
         }
@@ -72,7 +95,7 @@ const CombosDisplay = () => {
                     const response = await comboAPI.delete(id);
                     if (response.success) {
                         message.success('Xóa combo thành công');
-                        navigate('/admin/combos');
+                        navigate('/admin/service/combo');
                     } else {
                         message.error(response.message || 'Không thể xóa combo');
                     }
@@ -89,6 +112,52 @@ const CombosDisplay = () => {
         if (vehicle == 1) return <>Xe ô tô</>;
         if (vehicle == 2) return <>Máy bay</>;
         return vehicle;
+    };
+
+    const iconMap = {
+        EnvironmentOutlined: EnvironmentOutlined,
+        CoffeeOutlined: CoffeeOutlined,
+        TeamOutlined: TeamOutlined,
+        ClockCircleOutlined: ClockCircleOutlined,
+        CarOutlined: CarOutlined,
+        GiftOutlined: GiftOutlined,
+        HomeOutlined: HomeOutlined,
+        ShopOutlined: ShopOutlined,
+        StarOutlined: StarOutlined,
+        HeartOutlined: HeartOutlined,
+        PhoneOutlined: PhoneOutlined,
+        SafetyOutlined: SafetyOutlined,
+        ThunderboltOutlined: ThunderboltOutlined,
+        TrophyOutlined: TrophyOutlined,
+        RocketOutlined: RocketOutlined,
+        SmileOutlined: SmileOutlined,
+        CustomerServiceOutlined: CustomerServiceOutlined
+    };
+
+    const getAdditionalInfoItems = () => {
+        if (!combo.additionalInfo) return [];
+        try {
+            const parsed = JSON.parse(combo.additionalInfo);
+            if (parsed && Array.isArray(parsed.items)) {
+                return parsed.items;
+            }
+        } catch (e) {
+            console.error('Failed to parse additionalInfo:', e);
+        }
+        return [];
+    };
+
+    const getImportantInfoSections = () => {
+        if (!combo.importantInfo) return [];
+        try {
+            const parsed = JSON.parse(combo.importantInfo);
+            if (parsed && Array.isArray(parsed.sections)) {
+                return parsed.sections;
+            }
+        } catch (e) {
+            console.error('Failed to parse importantInfo:', e);
+        }
+        return [];
     };
 
     const getStatusTag = (status) => {
@@ -170,13 +239,13 @@ const CombosDisplay = () => {
             {/* Header Actions */}
             <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
                 <Col>
-                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/combos')}>
+                    <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/service/combo')}>
                         Quay lại
                     </Button>
                 </Col>
                 <Col>
                     <Space>
-                        <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/admin/combos/edit/${id}`)}>
+                        <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/admin/service/combo/edit/${id}`)}>
                             Chỉnh sửa
                         </Button>
                         <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
@@ -264,10 +333,55 @@ const CombosDisplay = () => {
                 </Card>
             )}
 
+            {/* Additional Info */}
+            {getAdditionalInfoItems().length > 0 && (
+                <Card title="Thông tin chuyến đi" style={{ marginBottom: 16 }}>
+                    <Row gutter={[16, 16]}>
+                        {getAdditionalInfoItems().map((item, index) => {
+                            const IconComponent = iconMap[item.icon] || EnvironmentOutlined;
+                            return (
+                                <Col xs={24} sm={12} lg={8} key={index}>
+                                    <div style={{ textAlign: 'center', padding: 16, border: '1px solid #f0f0f0', borderRadius: 8 }}>
+                                        <div style={{ marginBottom: 12 }}>
+                                            <IconComponent style={{ fontSize: 32, color: item.color || '#04a9f5' }} />
+                                        </div>
+                                        <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8, color: '#2C3E50' }}>
+                                            {item.title}
+                                        </div>
+                                        <div style={{ fontSize: 14, color: '#64748B' }}>{item.content}</div>
+                                    </div>
+                                </Col>
+                            );
+                        })}
+                    </Row>
+                </Card>
+            )}
+
             {/* Description */}
             {combo.description && (
                 <Card title="Mô tả chi tiết" style={{ marginBottom: 16 }}>
                     <div className="combo-content" dangerouslySetInnerHTML={{ __html: combo.description }} />
+                </Card>
+            )}
+
+            {/* Important Info Sections */}
+            {getImportantInfoSections().length > 0 && (
+                <Card title="Thông tin quan trọng" style={{ marginBottom: 16 }}>
+                    <Collapse
+                        items={getImportantInfoSections().map((section, index) => ({
+                            key: String(index),
+                            label: <span style={{ fontWeight: 600 }}>{section.title}</span>,
+                            children: (
+                                <ul style={{ paddingLeft: 20, margin: 0 }}>
+                                    {section.items.map((item, itemIndex) => (
+                                        <li key={itemIndex} style={{ marginBottom: 8 }}>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )
+                        }))}
+                    />
                 </Card>
             )}
 

@@ -125,7 +125,7 @@ const ComboDetail = () => {
                         <ComboInfoGrid combo={combo} />
 
                         {/* Itinerary */}
-                        <ComboItinerary comboId={combo.id} durationDays={combo.durationDays} description={combo.description} />
+                        {/* <ComboItinerary comboId={combo.id} durationDays={combo.durationDays} description={combo.description} /> */}
 
                         {/* Important Info */}
                         <ComboImportantInfo combo={combo} />
