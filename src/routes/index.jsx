@@ -15,16 +15,21 @@ import ComboCustomerRoute from './Customers/ComboCustomerRoute';
 import TourCustomerRoute from './Customers/TourCustomerRoutes';
 import AccommodationCustomerRoute from './Customers/AccommodationCustomerRoutes';
 import ProfileCustomerRoute from './Customers/ProfileCustomerRoute';
+import BlogPostCustomerRoute from './Customers/BlogPostCustomerRoute';
 import ComboRoute from './ComboRoute';
 import TourRoute from './TourRoute';
 import BookingRoute from './BookingRoute';
 import StatisticsRoute from './StatisticsRoute';
 import AssignedTourRoute from './AssignedTourRoute';
+import BookingHistoryCustomerRoute from './Customers/BookingHistoryRoute';
 
 const router = createBrowserRouter(
     [
         HomeCustomerRoute,
+        TourCustomerRoute,
         ComboCustomerRoute,
+        AccommodationCustomerRoute,
+        BlogPostCustomerRoute,
         NavigationRoutes,
         ComponentsRoutes,
         ChartMapRoutes,
@@ -34,15 +39,13 @@ const router = createBrowserRouter(
         AccommodationRoute,
         ChangePasswordRoute,
         BlogPostRoute,
-        TourCustomerRoute,
-        ComboCustomerRoute,
-        AccommodationCustomerRoute,
         ProfileCustomerRoute,
         ComboRoute,
         TourRoute,
         BookingRoute,
         StatisticsRoute,
-        AssignedTourRoute
+        AssignedTourRoute,
+        BookingHistoryCustomerRoute
     ],
     {
         basename: import.meta.env.VITE_APP_BASE_NAME

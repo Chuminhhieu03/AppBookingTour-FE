@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import MainCard from '../../../components/MainCard';
 import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
+import profileAPI from '../../../api/profile/profileAPI';
 import LoadingModal from '../../../components/LoadingModal';
 import dayjs from 'dayjs';
 import Constants from 'Constants/Constants';
@@ -16,6 +17,7 @@ export default function TourDepartureAddnew() {
     const location = useLocation();
     const { tourId } = useParams();
     const [loading, setLoading] = useState(false);
+    const [guides, setGuides] = useState([]);
 
     const tourData = location.state;
 
@@ -32,7 +34,21 @@ export default function TourDepartureAddnew() {
                 status: 1
             });
         }
+        fetchGuides();
     }, [tourData, form]);
+
+    const fetchGuides = async () => {
+        try {
+            const response = await profileAPI.getGuides();
+            if (response.success) {
+                setGuides(response.data || []);
+            } else {
+                console.error('Failed to fetch guides:', response.message);
+            }
+        } catch (error) {
+            console.error('Error fetching guides:', error);
+        }
+    };
 
     const handleSubmit = async (values) => {
         try {
@@ -272,11 +288,11 @@ export default function TourDepartureAddnew() {
                             <Col span={6}>
                                 <Form.Item label="Hướng dẫn viên phụ trách" name="guideId">
                                     <Select placeholder="Chọn hướng dẫn viên (tùy chọn)" allowClear>
-                                        {/* Mock data - sẽ thay thế bằng API call sau */}
-                                        <Option value="guide-1">Nguyễn Văn A</Option>
-                                        <Option value="guide-2">Trần Thị B</Option>
-                                        <Option value="guide-3">Lê Văn C</Option>
-                                        <Option value="guide-4">Phạm Thị D</Option>
+                                        {guides.map((guide) => (
+                                            <Option key={guide.id} value={guide.id}>
+                                                {guide.fullName}
+                                            </Option>
+                                        ))}
                                     </Select>
                                 </Form.Item>
                             </Col>

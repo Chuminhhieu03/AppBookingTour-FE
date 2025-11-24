@@ -1,56 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Card, Row, Col, Button } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
-
-// Import the CSS file
-import './ComboGiaTot.css'; // Adjust path if you put CSS elsewhere
+import comboAPI from 'api/combo/comboAPI';
+import './ComboGiaTot.css';
+import LoadingModal from 'components/LoadingModal';
+import Utility from 'src/Utils/Utility';
+import Constants from 'Constants/Constants';
 
 export default function ComboGiaTot() {
     const [activeFilter, setActiveFilter] = useState('all');
+    const [combos, setCombos] = useState([]);
 
-    const combos = [
-        {
-            from: 'TP. HỒ CHÍ MINH',
-            to: 'HÀ NỘI',
-            code: 'FESGN1171-009-211125VU-V',
-            date: '21/11/2025',
-            hotel: 'Khách sạn tương...',
-            transport: 'Máy bay',
-            price: '5.790.000 đ',
-            image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?ixlib=rb-4.0.3&auto=format&fit=crop&q=80'
-        },
-        {
-            from: 'TP. HỒ CHÍ MINH',
-            to: 'HÀ NỘI',
-            code: 'FESGN1162-009-211125VU-V',
-            date: '21/11/2025',
-            hotel: 'Khách sạn tương...',
-            transport: 'Máy bay',
-            price: '6.990.000 đ',
-            image: 'https://images.unsplash.com/photo-1551918120-9739cb430c6d?ixlib=rb-4.0.3&auto=format&fit=crop&q=80'
-        },
-        {
-            from: 'TP. HỒ CHÍ MINH',
-            to: 'PHÚ QUỐC',
-            code: 'FESGN8769-008-221125VN-H',
-            date: '22/11/2025',
-            hotel: 'Khách sạn tương...',
-            transport: 'Máy bay',
-            price: '5.190.000 đ',
-            image: 'https://images.unsplash.com/photo-1589394393346-7fad8d0e7c2c?ixlib=rb-4.0.3&auto=format&fit=crop&q=80'
-        },
-        {
-            from: 'PHÚ QUỐC',
-            to: 'KIÊN GIANG',
-            code: 'FAPQC008-027-221125',
-            date: '22/11/2025',
-            hotel: 'HOTEL HAPPY PHU...',
-            transport: 'Xe',
-            price: '1.850.000 đ',
-            image: 'https://images.unsplash.com/photo-1573843981267-75c07e0012cb?ixlib=rb-4.0.3&auto=format&fit=crop&q=80'
-        }
-    ];
+    useEffect(() => {
+        // Fetch combo data from API or define statically
+        const fetchCombos = async () => {
+            try {
+                const res = await comboAPI.getFeaturedCombos();
+                setCombos(res.data || []);
+                console.log(res.data);
+            } catch (error) {
+                console.error('Error fetching combos:', error);
+            }
+        };
+        fetchCombos();
+    }, []);
 
     const filteredCombos = combos.filter((c) => {
         if (activeFilter === 'all') return true;
@@ -107,22 +81,27 @@ export default function ComboGiaTot() {
                                 {/* Front Face */}
                                 <div className="combo-flip-front">
                                     <div style={{ fontSize: 14, color: '#000', flex: 1 }}>
-                                        <b style={{ fontSize: 17, color: '#004E9A' }}>
-                                            {c.from} → {c.to}
-                                        </b>
+                                        <b style={{ fontSize: 17, color: '#004E9A' }}>{c.name}</b>
 
                                         <div className="mt-3" style={{ display: 'flex', gap: 8 }}>
                                             <span style={{ width: 110, flexShrink: 0 }}>
-                                                <b>Mã tour:</b>
+                                                <b>Mã combo:</b>
                                             </span>
                                             <span style={{ wordBreak: 'break-all' }}>{c.code}</span>
                                         </div>
 
+                                        <div className="mt-3" style={{ display: 'flex', gap: 8 }}>
+                                            <span style={{ width: 110, flexShrink: 0 }}>
+                                                <b>Tuyến đường:</b>
+                                            </span>
+                                            <span style={{ wordBreak: 'break-all' }}>{c.fromCityName} → {c.toCityName}</span>
+                                        </div>
+
                                         <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
                                             <span style={{ width: 110, flexShrink: 0 }}>
-                                                <b>Khởi hành:</b>
+                                                <b>Ngày khởi hành:</b>
                                             </span>
-                                            <span>{c.date}</span>
+                                            <span>{c.schedules?.length > 0 ? Utility.formatDate(c.schedules[0].departureDate) : ''}</span>
                                         </div>
 
                                         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -136,13 +115,13 @@ export default function ComboGiaTot() {
                                             <span style={{ width: 110, flexShrink: 0 }}>
                                                 <b>Phương tiện:</b>
                                             </span>
-                                            <span>{c.transport}</span>
+                                            <span>{Utility.getLabelByValue(Constants.VehicleTypeOptions, c.vehicle)}</span>
                                         </div>
 
                                         <div className="text-end mt-auto">
                                             <b>Giá từ</b>
                                             <div style={{ color: 'red', fontSize: 18, fontWeight: 700 }}>
-                                                {c.price} <span style={{ color: '#000' }}>/ Khách</span>
+                                                {Utility.formatPrice(c.basePriceAdult)} <span style={{ color: '#000' }}>/ Khách</span>
                                             </div>
                                         </div>
                                     </div>
@@ -150,7 +129,13 @@ export default function ComboGiaTot() {
 
                                 {/* Back Face - Image */}
                                 <div className="combo-flip-back">
-                                    <img src={c.image} alt={`${c.from} → ${c.to}`} />
+                                    <img 
+                                        src={c.comboImageCoverUrl} 
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover'
+                                        }} />
                                     {/* Overlay elements */}
                                     <div
                                         style={{

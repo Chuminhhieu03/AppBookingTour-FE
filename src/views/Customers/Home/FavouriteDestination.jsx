@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import cityAPI from 'api/city/cityAPI';
 import './FavouriteDestination.css';
 
 export default function FavouriteDestinations() {
     const [activeRegion, setActiveRegion] = useState('Miền Trung');
-
-    const regions = ['Miền Bắc', 'Miền Trung', 'Miền Đông Nam Bộ', 'Miền Tây Nam Bộ'];
-
-    const destinationData = {
+    const [destinationData, setDestinationData] = useState({
         'Miền Bắc': [
             {
                 name: 'Hà Nội',
@@ -159,6 +158,48 @@ export default function FavouriteDestinations() {
                 img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80'
             }
         ]
+    });
+
+    const navigate = useNavigate();
+    const regions = ['Miền Bắc', 'Miền Trung', 'Miền Đông Nam Bộ', 'Miền Tây Nam Bộ'];
+
+    useEffect(() => {
+        const fetchCitiesAndMatchUrls = async () => {
+            try {
+                const response = await cityAPI.getListCity();
+                const cities = response.data || [];
+
+                // Create a map of city names to ids for quick lookup
+                const cityMap = {};
+                cities.forEach((city) => {
+                    cityMap[city.name] = city.id;
+                });
+
+                // Update destinationData with URLs
+                const updatedData = {};
+                Object.keys(destinationData).forEach((region) => {
+                    updatedData[region] = destinationData[region].map((destination) => {
+                        const matchingCityId = cityMap[destination.name];
+                        return {
+                            ...destination,
+                            url: matchingCityId ? `/tours?destinationCityId=${matchingCityId}&page=1` : null
+                        };
+                    });
+                });
+
+                setDestinationData(updatedData);
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        };
+
+        fetchCitiesAndMatchUrls();
+    }, []);
+
+    const handleExploreClick = (url) => {
+        if (url) {
+            navigate(url);
+        }
     };
 
     const items = destinationData[activeRegion] || [];
@@ -191,7 +232,12 @@ export default function FavouriteDestinations() {
                         <span>{item.name}</span>
                         <div className="dest-overlay-content">
                             <div className="dest-name">{item.name}</div>
-                            <button className="explore-btn">Khám phá</button>
+                            <button 
+                                className="explore-btn"
+                                onClick={() => handleExploreClick(item.url)}
+                            >
+                                Khám phá
+                            </button>
                         </div>
                     </div>
                 ))}
