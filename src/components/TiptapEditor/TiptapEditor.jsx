@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from '@tiptap/react';
+import { useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
@@ -105,6 +106,13 @@ const TiptapEditor = ({ content, onChange, placeholder = 'Nhập nội dung...',
             }
         }
     });
+
+    // Update editor content when content prop changes
+    useEffect(() => {
+        if (editor && content !== editor.getHTML()) {
+            editor.commands.setContent(content || '');
+        }
+    }, [content, editor]);
 
     if (!editor) {
         return null;

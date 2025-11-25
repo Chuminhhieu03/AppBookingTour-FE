@@ -2,6 +2,7 @@ import { Col, Row, Button, Space, Input, Rate } from 'antd';
 import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import LoadingModal from '../../components/LoadingModal';
 import { useParams } from 'react-router-dom';
 import RoomTypeTable from './RoomTypes/RoomTypeTable';
@@ -14,6 +15,16 @@ import Constants from '../../Constants/Constants';
 import AssignDiscountButton from '../components/basic/AssignDiscountButton';
 
 const { TextArea } = Input;
+
+const mapContainerStyle = {
+    width: '100%',
+    height: '400px'
+};
+
+const defaultCenter = {
+    lat: 21.0285, // Hanoi coordinates as default
+    lng: 105.8542
+};
 
 export default function Display() {
     const [accommodation, setAccommodation] = useState({});
@@ -108,12 +119,37 @@ export default function Display() {
                         </Col>
                         <Col span={24}>
                             <span>Quy định</span>
-                            <TextArea value={accommodation.regulation} readOnly />
+                            <div className='mt-4' dangerouslySetInnerHTML={{ __html: accommodation.regulation }} />
                         </Col>
                         <Col span={24}>
                             <span>Mô tả</span>
                             <TextArea value={accommodation.description} readOnly />
                         </Col>
+                        {/* <Col span={24}>
+                            <span>Vị trí trên bản đồ</span>
+                            <div style={{ marginTop: 8 }}>
+                                <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE'}>
+                                    <GoogleMap
+                                        mapContainerStyle={mapContainerStyle}
+                                        center={
+                                            accommodation.latitude && accommodation.longitude
+                                                ? { lat: parseFloat(accommodation.latitude), lng: parseFloat(accommodation.longitude) }
+                                                : defaultCenter
+                                        }
+                                        zoom={15}
+                                    >
+                                        {accommodation.latitude && accommodation.longitude && (
+                                            <Marker
+                                                position={{
+                                                    lat: parseFloat(accommodation.latitude),
+                                                    lng: parseFloat(accommodation.longitude)
+                                                }}
+                                            />
+                                        )}
+                                    </GoogleMap>
+                                </LoadScript>
+                            </div>
+                        </Col> */}
                     </Row>
                     <Row className="mt-5">
                         <Col span={12}>

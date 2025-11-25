@@ -9,6 +9,7 @@ import accommodationAPI from '../../api/accommodation/accommodationAPI';
 import cityAPI from '../../api/city/cityAPI';
 import systemParameterAPI from '../../api/systemParameters/systemParameterAPI';
 import Constants from '../../Constants/Constants';
+import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
 
 const { TextArea } = Input;
 
@@ -18,6 +19,7 @@ export default function Addnew() {
     const [listAmenity, setListAmenity] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
+    const [regulation, setRegulation] = useState('');
 
     useEffect(() => {
         getListAccommodationAmenity();
@@ -56,7 +58,7 @@ export default function Addnew() {
             formData.append('Address', accommodationRequest.Address ?? accommodationRequest.address ?? '');
             formData.append('StarRating', accommodationRequest.StarRating ?? accommodationRequest.starRating ?? 0);
             formData.append('Description', accommodationRequest.Description ?? accommodationRequest.description ?? '');
-            formData.append('Regulation', accommodationRequest.Regulation ?? accommodationRequest.regulation ?? '');
+            formData.append('Regulation', regulation);
             formData.append('Amenities', amenities ?? '');
             formData.append('IsActive', accommodationRequest.IsActive);
             // cover image file from local state
@@ -172,9 +174,14 @@ export default function Addnew() {
                             </Col>
 
                             <Col span={24}>
-                                <Form.Item name="Regulation" label="Quy định">
-                                    <TextArea />
-                                </Form.Item>
+                                <span>Quy định</span>
+                                <div style={{ marginTop: 8 }}>
+                                    <TiptapEditor
+                                        content={regulation}
+                                        onChange={setRegulation}
+                                        minHeight={100}
+                                    />
+                                </div>
                             </Col>
 
                             <Col span={24}>

@@ -146,7 +146,7 @@ const BookingHistory = () => {
                                             </Text>
                                         </div>
                                         <div className="mt-2">
-                                            {booking.status === 'completed' ? (
+                                            {booking.status === 'completed' && (
                                                 <Button
                                                     type="primary"
                                                     style={{
@@ -161,19 +161,6 @@ const BookingHistory = () => {
                                                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ec2225ff')}
                                                 >
                                                     Đánh giá
-                                                </Button>
-                                            ) : (
-                                                <Button
-                                                    type="primary"
-                                                    style={{
-                                                        backgroundColor: '#fff',
-                                                        borderColor: '#2a2a2aff',
-                                                        color: 'black',
-                                                        padding: '15px 30px',
-                                                        marginTop: '12px'
-                                                    }}
-                                                >
-                                                    Hủy
                                                 </Button>
                                             )}
                                         </div>

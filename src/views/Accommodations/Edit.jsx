@@ -14,6 +14,7 @@ import accommodationAPI from '../../api/accommodation/accommodationAPI';
 import cityAPI from '../../api/city/cityAPI';
 import systemParameterAPI from '../../api/systemParameters/systemParameterAPI';
 import Constants from '../../Constants/Constants';
+import TiptapEditor from 'components/TiptapEditor/TiptapEditor';    
 
 const { TextArea } = Input;
 
@@ -23,6 +24,7 @@ export default function Edit() {
     const [listCity, setListCity] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
+    const [regulation, setRegulation] = useState('');
     const { id } = useParams();
     const [isOpenModalAddnew, setIsOpenModalAddnew] = useState(false);
 
@@ -73,10 +75,10 @@ export default function Edit() {
                 IsActive: accommodationRes.isActive,
                 Amenity: accommodationRes.amenity,
                 StarRating: accommodationRes.starRating,
-                Description: accommodationRes.description,
-                Regulation: accommodationRes.regulation,
                 CoverImageUrl: accommodationRes.coverImgUrl
             });
+            setRegulation(accommodationRes.regulation || '');
+            
             // existing info images
             setAccommodation((prev) => ({ ...prev, listInfoImage: accommodationRes.listInfoImage || [] }));
         } catch (error) {
@@ -98,7 +100,7 @@ export default function Edit() {
             formData.append('Address', accommodationValues.Address ?? accommodation.address ?? '');
             formData.append('StarRating', accommodationValues.StarRating ?? accommodation.starRating ?? 0);
             formData.append('Description', accommodationValues.Description ?? accommodation.description ?? '');
-            formData.append('Regulation', accommodationValues.Regulation ?? accommodation.regulation ?? '');
+            formData.append('Regulation', regulation ?? '');
             formData.append('Amenities', amenities ?? '');
             formData.append('IsActive', accommodationValues.IsActive);
             formData.append('CoverImgUrl', accommodation.coverImgUrl ?? '');
@@ -277,9 +279,13 @@ export default function Edit() {
                             </Col>
 
                             <Col span={24}>
-                                <Form.Item name="Regulation" label="Quy định">
-                                    <TextArea />
-                                </Form.Item>
+                                <span>Quy định</span>
+                                <div style={{ marginTop: 8 }}>
+                                    <TiptapEditor 
+                                        content={regulation} 
+                                        onChange={setRegulation}
+                                        minHeight={100} />
+                                </div>
                             </Col>
 
                             <Col span={24}>

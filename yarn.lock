@@ -531,7 +531,7 @@
   dependencies:
     "@swc/helpers" "^0.5.0"
 
-"@react-google-maps/api@2.20.5":
+"@react-google-maps/api@^2.20.5":
   version "2.20.5"
   resolved "https://registry.npmjs.org/@react-google-maps/api/-/api-2.20.5.tgz"
   integrity sha512-Dx3faV4d7JXFSD7SB8ePIt5LOB72mNGHKFp/hIQVaPEsLJlEi4ID+XL6HM3Xw10AzGbr4KS/eQSi3OAaN7YttQ==

@@ -12,6 +12,7 @@ import {
     GiftOutlined,
     AimOutlined
 } from '@ant-design/icons';
+import cityAPI from 'api/city/cityAPI';
 import 'antd/dist/reset.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -20,12 +21,26 @@ const { Option } = Select;
 
 const HomePageSearchBtn = () => {
     const [activeTab, setActiveTab] = useState('tour');
+    const [cities, setCities] = useState([]);
 
     const tabs = [
         { key: 'tour', label: 'Tour trọn gói', icon: <GiftOutlined /> },
         { key: 'hotel', label: 'Khách sạn', icon: <HomeOutlined /> },
         { key: 'combo', label: 'Combo', icon: <CarOutlined /> }
     ];
+
+    // Fetch cities on component mount
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const response = await cityAPI.getListCity();
+                setCities(response.data || []);
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        };
+        fetchCities();
+    }, []);
 
     const renderTourSearch = () => (
         <div className="row g-3 align-items-end">
@@ -133,12 +148,23 @@ const HomePageSearchBtn = () => {
                     <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
                         Địa điểm
                     </label>
-                    <Input
+                    <Select
                         size="large"
                         bordered={false}
-                        placeholder="Nhập địa điểm"
-                        prefix={<EnvironmentOutlined className="text-muted" />}
-                    />
+                        placeholder="Chọn địa điểm"
+                        suffixIcon={<EnvironmentOutlined className="text-muted" />}
+                        className="w-100"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                    >
+                        {cities.map((city) => (
+                            <Option key={city.id} value={city.id}>
+                                {city.name}
+                            </Option>
+                        ))}
+                    </Select>
                 </div>
 
                 <div style={{ flex: '0 0 40%', maxWidth: '40%', borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
@@ -377,14 +403,46 @@ const HomePageSearchBtn = () => {
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
                     Từ (thành phố)
                 </label>
-                <Input size="large" bordered={false} placeholder="Thành phố đi" prefix={<EnvironmentOutlined className="text-muted" />} />
+                <Select
+                    size="large"
+                    bordered={false}
+                    placeholder="Chọn thành phố đi"
+                    suffixIcon={<EnvironmentOutlined className="text-muted" />}
+                    className="w-100"
+                    showSearch
+                    filterOption={(input, option) =>
+                        (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                >
+                    {cities.map((city) => (
+                        <Option key={city.id} value={city.id}>
+                            {city.name}
+                        </Option>
+                    ))}
+                </Select>
             </div>
 
             <div className="col-md-3">
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
                     Đến
                 </label>
-                <Input size="large" bordered={false} placeholder="Thành phố đến" prefix={<EnvironmentOutlined className="text-muted" />} />
+                <Select
+                    size="large"
+                    bordered={false}
+                    placeholder="Chọn thành phố đến"
+                    suffixIcon={<EnvironmentOutlined className="text-muted" />}
+                    className="w-100"
+                    showSearch
+                    filterOption={(input, option) =>
+                        (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                >
+                    {cities.map((city) => (
+                        <Option key={city.id} value={city.id}>
+                            {city.name}
+                        </Option>
+                    ))}
+                </Select>
             </div>
 
             <div className="col-md-3">
