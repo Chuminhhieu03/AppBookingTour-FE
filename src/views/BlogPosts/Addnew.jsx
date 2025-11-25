@@ -65,6 +65,9 @@ const BlogPostsAddnew = () => {
             const formData = new FormData();
             formData.append('Title', values.title);
             formData.append('Slug', values.slug);
+            if (values.description) {
+                formData.append('Description', values.description);
+            }
             formData.append('Content', content);
             formData.append('CityId', values.city);
             formData.append('Tags', values.tags);
@@ -145,6 +148,19 @@ const BlogPostsAddnew = () => {
                                     ]}
                                 >
                                     <Input placeholder="vi-du-bai-viet-hay" />
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="description"
+                                    label="Mô tả ngắn (SEO)"
+                                    rules={[{ max: 500, message: 'Mô tả không được quá 500 ký tự' }]}
+                                >
+                                    <Input.TextArea
+                                        placeholder="Nhập mô tả ngắn cho bài viết (hiển thị trong danh sách và kết quả tìm kiếm)"
+                                        rows={3}
+                                        showCount
+                                        maxLength={500}
+                                    />
                                 </Form.Item>
 
                                 <Form.Item label="Nội dung" required>

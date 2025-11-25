@@ -104,7 +104,7 @@ const BlogPostList = () => {
 
     // Handle view detail
     const handleViewDetail = (slug) => {
-        console.log('Viewing blog post with slug:', slug);
+        window.location.href = `/blog-posts/${slug}`;
     };
 
     return (

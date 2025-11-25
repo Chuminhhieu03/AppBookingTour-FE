@@ -232,10 +232,7 @@ export default function FavouriteDestinations() {
                         <span>{item.name}</span>
                         <div className="dest-overlay-content">
                             <div className="dest-name">{item.name}</div>
-                            <button 
-                                className="explore-btn"
-                                onClick={() => handleExploreClick(item.url)}
-                            >
+                            <button className="explore-btn" onClick={() => handleExploreClick(item.url)}>
                                 Khám phá
                             </button>
                         </div>

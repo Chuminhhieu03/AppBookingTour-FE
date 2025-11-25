@@ -94,7 +94,9 @@ export default function ComboGiaTot() {
                                             <span style={{ width: 110, flexShrink: 0 }}>
                                                 <b>Tuyến đường:</b>
                                             </span>
-                                            <span style={{ wordBreak: 'break-all' }}>{c.fromCityName} → {c.toCityName}</span>
+                                            <span style={{ wordBreak: 'break-all' }}>
+                                                {c.fromCityName} → {c.toCityName}
+                                            </span>
                                         </div>
 
                                         <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
@@ -129,13 +131,14 @@ export default function ComboGiaTot() {
 
                                 {/* Back Face - Image */}
                                 <div className="combo-flip-back">
-                                    <img 
-                                        src={c.comboImageCoverUrl} 
+                                    <img
+                                        src={c.comboImageCoverUrl}
                                         style={{
                                             width: '100%',
                                             height: '100%',
                                             objectFit: 'cover'
-                                        }} />
+                                        }}
+                                    />
                                     {/* Overlay elements */}
                                     <div
                                         style={{

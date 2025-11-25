@@ -128,6 +128,9 @@ const BlogPostsDisplay = () => {
                     <Title level={2} style={{ marginBottom: 8 }}>
                         {blogPost.title}
                     </Title>
+                    {blogPost.description && (
+                        <Paragraph style={{ fontSize: 16, color: '#666', marginBottom: 16 }}>{blogPost.description}</Paragraph>
+                    )}
                     <Space>
                         {getStatusTag(blogPost.status)}
                         <Tag color="blue">{blogPost.cityName}</Tag>
@@ -138,6 +141,11 @@ const BlogPostsDisplay = () => {
                 <Descriptions bordered column={{ xs: 1, sm: 2, md: 2, lg: 2 }}>
                     <Descriptions.Item label="ID">{blogPost.id}</Descriptions.Item>
                     <Descriptions.Item label="Slug">{blogPost.slug}</Descriptions.Item>
+                    {blogPost.description && (
+                        <Descriptions.Item label="Mô tả ngắn" span={2}>
+                            {blogPost.description}
+                        </Descriptions.Item>
+                    )}
                     <Descriptions.Item label="Tác giả">{blogPost.authorName}</Descriptions.Item>
                     <Descriptions.Item label="Thành phố">{blogPost.cityName}</Descriptions.Item>
                     <Descriptions.Item label="Trạng thái">{getStatusTag(blogPost.statusName)}</Descriptions.Item>
