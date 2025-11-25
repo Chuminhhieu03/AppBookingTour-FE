@@ -3,6 +3,7 @@ import Loadable from 'components/Loadable';
 import CustomerLayout from 'layout/CustomerLayout/CustomerLayout';
 
 const BlogPostList = Loadable(lazy(() => import('views/Customers/BlogPosts/BlogPostList')));
+const BlogDetail = Loadable(lazy(() => import('views/Customers/BlogPosts/BlogDetail')));
 
 const BlogPostCustomerRoute = {
     path: '/',
@@ -11,6 +12,10 @@ const BlogPostCustomerRoute = {
         {
             path: 'blog-posts',
             element: <BlogPostList />
+        },
+        {
+            path: 'blog-posts/:slug',
+            element: <BlogDetail />
         }
     ]
 };

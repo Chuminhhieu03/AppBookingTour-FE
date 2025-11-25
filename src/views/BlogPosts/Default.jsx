@@ -170,9 +170,16 @@ const BlogPostsDefault = () => {
             width: 300,
             ellipsis: true,
             render: (text, record) => (
-                <Button type="link" onClick={() => navigate(`/admin/blog/display/${record.id}`)}>
-                    {text}
-                </Button>
+                <div>
+                    <Button type="link" onClick={() => navigate(`/admin/blog/display/${record.id}`)} style={{ padding: 0, height: 'auto' }}>
+                        {text}
+                    </Button>
+                    {record.description && (
+                        <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
+                            {record.description.length > 80 ? `${record.description.substring(0, 80)}...` : record.description}
+                        </div>
+                    )}
+                </div>
             )
         },
         {

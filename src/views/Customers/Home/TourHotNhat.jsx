@@ -20,7 +20,7 @@ export default function TourHotNhat() {
         };
         fetchBlogPosts();
     }, []);
-    
+
     return (
         <div style={{ background: '#dbf0ff', padding: '40px 8%' }}>
             <h2 className="text-center mb-2" style={{ fontWeight: 700, color: '#004E9A' }}>
@@ -39,7 +39,11 @@ export default function TourHotNhat() {
                                 hoverable
                                 cover={
                                     <div style={{ position: 'relative' }}>
-                                        <img alt={tour.name} src={tour.imageMainUrl} style={{ width: '100%', height: 200, objectFit: 'cover' }} />
+                                        <img
+                                            alt={tour.name}
+                                            src={tour.imageMainUrl}
+                                            style={{ width: '100%', height: 200, objectFit: 'cover' }}
+                                        />
                                         {tour.discount && (
                                             <Tag
                                                 color="red"
@@ -63,14 +67,18 @@ export default function TourHotNhat() {
                                         {tour.name}
                                     </Title>
                                     <Tag color="blue">{tour.categoryName}</Tag>
-                                    <Space direction="vertical" size="small" style={{ width: '100%', marginTop: 8}}>
+                                    <Space direction="vertical" size="small" style={{ width: '100%', marginTop: 8 }}>
                                         <div>
                                             <EnvironmentOutlined style={{ color: '#1890ff', marginRight: 4 }} />
-                                            <Text type="secondary">{tour.departureCityName} - {tour.destinationCityName}</Text>
+                                            <Text type="secondary">
+                                                {tour.departureCityName} - {tour.destinationCityName}
+                                            </Text>
                                         </div>
                                         <div>
                                             <ClockCircleOutlined style={{ color: '#52c41a', marginRight: 4 }} />
-                                            <Text type="secondary">{tour.durationDays} ngày {tour.durationNights} đêm</Text>
+                                            <Text type="secondary">
+                                                {tour.durationDays} ngày {tour.durationNights} đêm
+                                            </Text>
                                         </div>
                                         <div>
                                             <Rate disabled defaultValue={tour.rating} style={{ fontSize: 14 }} />

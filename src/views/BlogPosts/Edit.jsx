@@ -50,6 +50,7 @@ const BlogPostsEdit = () => {
                 form.setFieldsValue({
                     title: blogPost.title,
                     slug: blogPost.slug,
+                    description: blogPost.description || '',
                     author: blogPost.authorName,
                     city: blogPost.cityName,
                     tags: blogPost.tags,
@@ -90,6 +91,9 @@ const BlogPostsEdit = () => {
             formData.append('Id', id);
             formData.append('Title', values.title);
             formData.append('Slug', values.slug);
+            if (values.description) {
+                formData.append('Description', values.description);
+            }
             formData.append('Content', content);
             formData.append('Status', statusMap[values.status]);
 
@@ -184,6 +188,19 @@ const BlogPostsEdit = () => {
                                     <Input placeholder="vi-du-bai-viet-hay" />
                                 </Form.Item>
 
+                                <Form.Item
+                                    name="description"
+                                    label="Mô tả ngắn (SEO)"
+                                    rules={[{ max: 500, message: 'Mô tả không được quá 500 ký tự' }]}
+                                >
+                                    <Input.TextArea
+                                        placeholder="Nhập mô tả ngắn cho bài viết (hiển thị trong danh sách và kết quả tìm kiếm)"
+                                        rows={3}
+                                        showCount
+                                        maxLength={500}
+                                    />
+                                </Form.Item>
+
                                 <Form.Item name="author" label="Tác giả" rules={[{ required: true, message: 'Vui lòng nhập tên tác giả' }]}>
                                     <Input placeholder="Nhập tên tác giả" disabled />
                                 </Form.Item>
@@ -261,7 +278,7 @@ const BlogPostsEdit = () => {
                                 </Form.Item>
 
                                 <Form.Item name="city" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
-                                    <Select placeholder="Chọn thành phố" showSearch disabled>
+                                    <Select placeholder="Chọn thành phố" showSearch>
                                         {cities.map((city) => (
                                             <Option key={city} value={city}>
                                                 {city}
