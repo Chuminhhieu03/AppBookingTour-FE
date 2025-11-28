@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, message } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -29,17 +29,20 @@ export default function Addnew() {
             request.Discount = { ...discount };
             request.Discount.StartEffectedDtg = discount.StartEffectedDtg?.toDate().toISOString();
             request.Discount.EndEffectedDtg = discount.EndEffectedDtg?.toDate().toISOString();
+            request.Discount.MaximumDiscount = discount.MaximumDiscount;
             const res = await discountAPI.create(request);
             const discountRes = res.discount;
             if (res.success) {
+                message.success('Thêm mới mã giảm giá thành công');
                 window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
             } else {
                 const errorData = res.data || [];
                 const listErrorMessage = errorData?.map((e) => e.errorMessage);
-                alert(`Lỗi khi thêm mới mã giảm giá:\n${listErrorMessage.join('\n')}`);
+                message.error(`Lỗi khi thêm mới mã giảm giá: ${listErrorMessage.join(', ')}`);
             }
         } catch (error) {
             console.error('Error adding new discount:', error);
+            message.error('Đã xảy ra lỗi khi thêm mới mã giảm giá');
         }
         LoadingModal.hideLoading();
     };
@@ -85,6 +88,17 @@ export default function Addnew() {
                                 max={100}
                                 className="w-100"
                                 onChange={(val) => setDiscount({ ...discount, DiscountPercent: val })}
+                            />
+                        </Col>
+                        <Col span={8}>
+                            <span>Số tiền giảm tối đa (VND)</span>
+                            <InputNumber
+                                value={discount.MaximumDiscount}
+                                min={0}
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/,/g, '')}
+                                onChange={(val) => setDiscount({ ...discount, MaximumDiscount: val })}
                             />
                         </Col>
                         <Col span={8}>

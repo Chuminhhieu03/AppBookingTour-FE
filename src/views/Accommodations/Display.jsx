@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, Rate } from 'antd';
+import { Col, Row, Button, Space, Input, Rate, Tabs } from 'antd';
 import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,8 @@ import accommodationAPI from '../../api/accommodation/accommodationAPI';
 import Utility from '../../Utils/Utility';
 import Constants from '../../Constants/Constants';
 import AssignDiscountButton from '../components/basic/AssignDiscountButton';
+import { MapContainer, TileLayer, Marker as LeafletMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const { TextArea } = Input;
 
@@ -75,96 +77,115 @@ export default function Display() {
                         </Space>
                     }
                 >
-                    <Row gutter={[24, 24]}>
-                        <Col span={24} style={{ textAlign: 'center' }}>
-                            <div className="mb-3 d-flex justify-content-center">
-                                <ImagesUC imageUrl={accommodation.coverImgUrl} viewOnly />
-                            </div>
-                            <span>Hình đại diện</span>
-                        </Col>
-                        <Col span={8}>
-                            <span>Tên</span>
-                            <Input value={accommodation.name} readOnly />
-                        </Col>
-                        <Col span={8}>
-                            <span>Loại</span>
-                            <Input value={accommodation.typeName} readOnly />
-                        </Col>
-                        <Col span={8}>
-                            <span>Thành phố</span>
-                            <Input value={accommodation.city?.name} readOnly />
-                        </Col>
-                        <Col span={8}>
-                            <span>Địa chỉ chi tiết</span>
-                            <Input value={accommodation.address} readOnly />
-                        </Col>
-                        <Col span={8}>
-                            <span>Trạng thái</span>
-                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, accommodation.isActive)} readOnly />
-                        </Col>
-                        <Col span={8}>
-                            <span>Tiện ích</span>
-                            <Input value={accommodation.amenityName} readOnly />
-                        </Col>
-                        <Col span={8}>
-                            <span>Hạng sao</span>
-                            <br />
-                            <Rate className="mt-2" value={accommodation.starRating} readOnly />
-                        </Col>
-                        <Col span={24}>
-                            <span>Hình ảnh khác</span>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                                <Gallery listImage={accommodation.listInfoImage} viewOnly />
-                            </div>
-                        </Col>
-                        <Col span={24}>
-                            <span>Quy định</span>
-                            <div className='mt-4' dangerouslySetInnerHTML={{ __html: accommodation.regulation }} />
-                        </Col>
-                        <Col span={24}>
-                            <span>Mô tả</span>
-                            <TextArea value={accommodation.description} readOnly />
-                        </Col>
-                        {/* <Col span={24}>
-                            <span>Vị trí trên bản đồ</span>
-                            <div style={{ marginTop: 8 }}>
-                                <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE'}>
-                                    <GoogleMap
-                                        mapContainerStyle={mapContainerStyle}
-                                        center={
-                                            accommodation.latitude && accommodation.longitude
-                                                ? { lat: parseFloat(accommodation.latitude), lng: parseFloat(accommodation.longitude) }
-                                                : defaultCenter
-                                        }
-                                        zoom={15}
-                                    >
-                                        {accommodation.latitude && accommodation.longitude && (
-                                            <Marker
-                                                position={{
-                                                    lat: parseFloat(accommodation.latitude),
-                                                    lng: parseFloat(accommodation.longitude)
-                                                }}
+                    <Tabs
+                        defaultActiveKey="1"
+                        items={[
+                            {
+                                key: '1',
+                                label: 'Thông tin cơ sở lưu trú',
+                                children: (
+                                    <Row gutter={[24, 24]}>
+                                        <Col span={24} style={{ textAlign: 'center' }}>
+                                            <div className="mb-3 d-flex justify-content-center">
+                                                <ImagesUC imageUrl={accommodation.coverImgUrl} viewOnly />
+                                            </div>
+                                            <span>Hình đại diện</span>
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Tên</span>
+                                            <Input value={accommodation.name} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Loại</span>
+                                            <Input value={accommodation.typeName} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Thành phố</span>
+                                            <Input value={accommodation.city?.name} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Địa chỉ chi tiết</span>
+                                            <Input value={accommodation.address} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Trạng thái</span>
+                                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, accommodation.isActive)} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Tiện ích</span>
+                                            <Input value={accommodation.amenityName} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Tọa độ</span>
+                                            <Input value={accommodation.coordinates} readOnly />
+                                        </Col>
+                                        <Col span={8}>
+                                            <span>Hạng sao</span>
+                                            <br />
+                                            <Rate className="mt-2" value={accommodation.starRating} readOnly />
+                                        </Col>
+                                        <Col span={24}>
+                                            <span>Hình ảnh khác</span>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                                                <Gallery listImage={accommodation.listInfoImage} viewOnly />
+                                            </div>
+                                        </Col>
+                                        <Col span={24}>
+                                            <span>Quy định</span>
+                                            <div className="mt-4" dangerouslySetInnerHTML={{ __html: accommodation.regulation }} />
+                                        </Col>
+                                        <Col span={24}>
+                                            <span>Mô tả</span>
+                                            <TextArea value={accommodation.description} readOnly />
+                                        </Col>
+                                        <Col span={24}>
+                                            <span>Vị trí</span>
+                                            <div style={{ height: '500px', width: '100%', marginTop: '8px' }}>
+                                                {(() => {
+                                                    const coords = accommodation.coordinates?.split(',').map(c => parseFloat(c.trim()));
+                                                    const center = coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1]) 
+                                                        ? coords 
+                                                        : [20.981804, 105.791978];
+                                                    return (
+                                                        <MapContainer
+                                                            center={center}
+                                                            zoom={13}
+                                                            scrollWheelZoom={false}
+                                                            style={{ height: '100%', width: '100%' }}
+                                                            key={accommodation.coordinates || 'default'}
+                                                        >
+                                                            <TileLayer
+                                                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                            />
+                                                            <LeafletMarker position={center}>
+                                                                <Popup>{accommodation.name}</Popup>
+                                                            </LeafletMarker>
+                                                        </MapContainer>
+                                                    );
+                                                })()}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                )
+                            },
+                            {
+                                key: '2',
+                                label: 'Danh sách loại phòng',
+                                children: (
+                                    <Row gutter={[24, 24]}>
+                                        <Col span={24}>
+                                            <RoomTypeTable
+                                                listRoomType={accommodation.listRoomType}
+                                                onRoomTypeClick={handleRoomTypeDisplayClick}
+                                                viewOnly
                                             />
-                                        )}
-                                    </GoogleMap>
-                                </LoadScript>
-                            </div>
-                        </Col> */}
-                    </Row>
-                    <Row className="mt-5">
-                        <Col span={12}>
-                            <span>Danh sách các loại phòng</span>
-                        </Col>
-                    </Row>
-                    <Row className="mt-2">
-                        <Col span={24}>
-                            <RoomTypeTable
-                                listRoomType={accommodation.listRoomType}
-                                onRoomTypeClick={handleRoomTypeDisplayClick}
-                                viewOnly
-                            />
-                        </Col>
-                    </Row>
+                                        </Col>
+                                    </Row>
+                                )
+                            }
+                        ]}
+                    />
                     {isRoomTypeDisplayModalOpen && selectedRoomType && (
                         <RoomTypeDisplay
                             isOpen={isRoomTypeDisplayModalOpen}

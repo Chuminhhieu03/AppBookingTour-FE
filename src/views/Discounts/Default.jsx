@@ -57,6 +57,13 @@ export default function Default() {
             key: 'discountPercent'
         },
         {
+            title: 'Số tiền giảm tối đa (VND)',
+            dataIndex: 'maximumDiscount',
+            key: 'maximumDiscount',
+            align: 'right',
+            render: (value) => value != null ? Intl.NumberFormat('vi-VN').format(value) : ''
+        },
+        {
             title: 'Dịch vụ áp dụng',
             dataIndex: 'serviceTypeName',
             key: 'serviceTypeName'

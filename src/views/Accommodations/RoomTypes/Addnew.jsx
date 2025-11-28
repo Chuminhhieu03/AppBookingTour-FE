@@ -1,4 +1,4 @@
-import { Modal, Button, InputNumber, Form, Input, Select, Col, Row } from 'antd';
+import { Modal, Button, InputNumber, Form, Input, Select, Col, Row, message } from 'antd';
 import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
@@ -39,8 +39,6 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             formData.append('MaxChildren', roomTypeRequest.MaxChildren);
             formData.append('Quantity', roomTypeRequest.Quantity);
             formData.append('Price', roomTypeRequest.Price);
-            formData.append('ExtraAdultPrice', roomTypeRequest.ExtraAdultPrice);
-            formData.append('ExtraChildrenPrice', roomTypeRequest.ExtraChildrenPrice);
             formData.append('Status', Number(roomTypeRequest.Status));
             // cover image file comes from local state
             if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
@@ -51,6 +49,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             });
             const res = await roomTypeAPI.create(formData);
             if (res.success) {
+                message.success('Thêm mới loại phòng thành công');
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal
                 form.resetFields();
@@ -58,9 +57,11 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                 setListInfoImage([]);
             } else {
                 console.error('Error adding new room type:', res.message);
+                message.error(res.message || 'Thêm mới loại phòng thất bại');
             }
         } catch (error) {
             console.error('Error adding new accommodation:', error);
+            message.error('Đã xảy ra lỗi khi thêm mới loại phòng');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -110,25 +111,25 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="MaxAdult" label="Số lượng người lớn" rules={[{ type: 'number', min: 0 }]}>
+                        <Form.Item name="MaxAdult" label="Số lượng người lớn" rules={[{ required: true, message: 'Vui lòng nhập số lượng người lớn' }, { type: 'number', min: 0 }]}>
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="MaxChildren" label="Số lượng trẻ em" rules={[{ type: 'number', min: 0 }]}>
+                        <Form.Item name="MaxChildren" label="Số lượng trẻ em" rules={[{ required: true, message: 'Vui lòng nhập số lượng trẻ em' }, { type: 'number', min: 0 }]}>
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Quantity" label="Số lượng phòng" rules={[{ type: 'number', min: 0 }]}>
+                        <Form.Item name="Quantity" label="Số lượng phòng" rules={[{ required: true, message: 'Vui lòng nhập số lượng phòng' }, { type: 'number', min: 0 }]}>
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Price" label="Giá phòng" rules={[{ type: 'number', min: 0 }]}>
+                        <Form.Item name="Price" label="Giá phòng" rules={[{ required: true, message: 'Vui lòng nhập giá phòng' }, { type: 'number', min: 0 }]}>
                             <InputNumber
                                 min={0}
                                 className="w-100"
@@ -140,43 +141,20 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="ExtraAdultPrice" label="Phụ phí người lớn" rules={[{ type: 'number', min: 0 }]}>
-                            <InputNumber
-                                min={0}
-                                className="w-100"
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                                maxLength={15}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-                        <Form.Item name="ExtraChildrenPrice" label="Phụ phí trẻ em" rules={[{ type: 'number', min: 0 }]}>
-                            <InputNumber
-                                min={0}
-                                className="w-100"
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
-                                maxLength={15}
-                            />
-                        </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-                        <Form.Item name="Amenity" label="Tiện ích">
+                        <Form.Item name="Amenity" label="Tiện ích" rules={[{ required: true, message: 'Vui lòng chọn tiện ích' }]}>
                             <Select
                                 mode="multiple"
                                 allowClear
                                 className="w-100"
+                                getPopupContainer={(trigger) => trigger.parentNode}
                                 options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
                             />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Status" label="Trạng thái">
-                            <Select allowClear className="w-100" options={Constants.StatusOptions} />
+                        <Form.Item name="Status" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
+                            <Select allowClear className="w-100" options={Constants.StatusOptions} getPopupContainer={(trigger) => trigger.parentNode}/>
                         </Form.Item>
                     </Col>
 
