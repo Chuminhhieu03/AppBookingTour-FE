@@ -341,20 +341,15 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             setSelectedRowKeys(selectedKeys);
         },
         getCheckboxProps: (record) => ({
-            disabled: editingId !== null, // Disable checkbox when editing
-        }),
+            disabled: editingId !== null // Disable checkbox when editing
+        })
     };
 
     return (
         <div>
             {editable && selectedRowKeys.length > 0 && (
                 <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                    <Button 
-                        danger 
-                        icon={<DeleteOutlined />} 
-                        onClick={handleBulkDelete}
-                        disabled={editingId !== null}
-                    >
+                    <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete} disabled={editingId !== null}>
                         Xóa {selectedRowKeys.length} mục đã chọn
                     </Button>
                 </div>

@@ -61,7 +61,7 @@ export default function Default() {
             dataIndex: 'maximumDiscount',
             key: 'maximumDiscount',
             align: 'right',
-            render: (value) => value != null ? Intl.NumberFormat('vi-VN').format(value) : ''
+            render: (value) => (value != null ? Intl.NumberFormat('vi-VN').format(value) : '')
         },
         {
             title: 'Dịch vụ áp dụng',

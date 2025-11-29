@@ -62,11 +62,11 @@ export default function Display() {
                         </Col>
                         <Col span={8}>
                             <span>Số tiền giảm tối đa (VND)</span>
-                            <InputNumber 
-                                value={discount.maximumDiscount} 
-                                className="w-100" 
+                            <InputNumber
+                                value={discount.maximumDiscount}
+                                className="w-100"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                readOnly 
+                                readOnly
                             />
                         </Col>
                         <Col span={8}>

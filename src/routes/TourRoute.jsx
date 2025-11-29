@@ -21,16 +21,6 @@ const TourTypeAddnew = Loadable(lazy(() => import('views/Tours/TourTypes/Addnew'
 const TourTypeEdit = Loadable(lazy(() => import('views/Tours/TourTypes/Edit')));
 const TourTypeDisplay = Loadable(lazy(() => import('views/Tours/TourTypes/Display')));
 
-// ==== TOUR ITINERARY COMPONENTS ====
-const TourItineraryAddnew = Loadable(lazy(() => import('views/Tours/TourItineraries/Addnew')));
-const TourItineraryEdit = Loadable(lazy(() => import('views/Tours/TourItineraries/Edit')));
-const TourItineraryDisplay = Loadable(lazy(() => import('views/Tours/TourItineraries/Display')));
-
-// ==== TOUR DEPARTURE COMPONENTS ====
-const TourDepartureAddnew = Loadable(lazy(() => import('views/Tours/TourDepartures/Addnew')));
-const TourDepartureEdit = Loadable(lazy(() => import('views/Tours/TourDepartures/Edit')));
-const TourDepartureDisplay = Loadable(lazy(() => import('views/Tours/TourDepartures/Display')));
-
 // ==== ROUTE CONFIGURATION ====
 const TourRoute = {
     path: '/',
@@ -52,28 +42,7 @@ const TourRoute = {
                                 { index: true, element: <TourDefault /> },
                                 { path: 'addnew', element: <TourAddNew /> },
                                 { path: 'display/:id', element: <TourDisplay /> },
-                                { path: 'edit/:id', element: <TourEdit /> },
-                                {
-                                    path: ':tourId',
-                                    children: [
-                                        {
-                                            path: 'itinerary',
-                                            children: [
-                                                { path: 'addnew', element: <TourItineraryAddnew /> },
-                                                { path: 'edit/:itineraryId', element: <TourItineraryEdit /> },
-                                                { path: 'display/:itineraryId', element: <TourItineraryDisplay /> }
-                                            ]
-                                        },
-                                        {
-                                            path: 'departure',
-                                            children: [
-                                                { path: 'addnew', element: <TourDepartureAddnew /> },
-                                                { path: 'edit/:departureId', element: <TourDepartureEdit /> },
-                                                { path: 'display/:departureId', element: <TourDepartureDisplay /> }
-                                            ]
-                                        }
-                                    ]
-                                }
+                                { path: 'edit/:id', element: <TourEdit /> }
                             ]
                         },
                         {

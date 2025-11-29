@@ -27,7 +27,7 @@ const redIcon = new L.Icon({
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
-});    
+});
 
 const { TextArea } = Input;
 
@@ -118,7 +118,7 @@ export default function Edit() {
                 CoverImageUrl: accommodationRes.coverImgUrl
             });
             setRegulation(accommodationRes.regulation || '');
-            
+
             // existing info images
             setAccommodation((prev) => ({ ...prev, listInfoImage: accommodationRes.listInfoImage || [] }));
         } catch (error) {
@@ -243,168 +243,181 @@ export default function Edit() {
                                     label: 'Thông tin cơ sở lưu trú',
                                     children: (
                                         <Row gutter={[24]}>
-                            <Col span={24} style={{ textAlign: 'center' }}>
-                                <div className="mb-3 d-flex justify-content-center">
-                                    <ImagesUC
-                                        imageUrl={accommodation.coverImgUrl}
-                                        onChange={(imgUrl, file) => {
-                                            setCoverImgFile(file);
-                                            setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl });
-                                            form.setFieldsValue({ CoverImageUrl: imgUrl });
-                                        }}
-                                    />
-                                </div>
-                                <span>Hình đại diện</span>
-                            </Col>
+                                            <Col span={24} style={{ textAlign: 'center' }}>
+                                                <div className="mb-3 d-flex justify-content-center">
+                                                    <ImagesUC
+                                                        imageUrl={accommodation.coverImgUrl}
+                                                        onChange={(imgUrl, file) => {
+                                                            setCoverImgFile(file);
+                                                            setAccommodation({ ...accommodation, coverImgFile: file, coverImgUrl: imgUrl });
+                                                            form.setFieldsValue({ CoverImageUrl: imgUrl });
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span>Hình đại diện</span>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item name="Name" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
-                                    <Input />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item
+                                                    name="Name"
+                                                    label="Tên"
+                                                    rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                                                >
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item name="Type" label="Loại" rules={[{ required: true, message: 'Vui lòng chọn loại' }]}>
-                                    <Select allowClear className="w-100" options={Constants.AccommodationTypeOptions} />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item
+                                                    name="Type"
+                                                    label="Loại"
+                                                    rules={[{ required: true, message: 'Vui lòng chọn loại' }]}
+                                                >
+                                                    <Select allowClear className="w-100" options={Constants.AccommodationTypeOptions} />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item name="CityId" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
-                                    <Select
-                                        allowClear
-                                        className="w-100"
-                                        options={listCity?.map((item) => ({ label: item.name, value: item.id }))}
-                                    />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item
+                                                    name="CityId"
+                                                    label="Thành phố"
+                                                    rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}
+                                                >
+                                                    <Select
+                                                        allowClear
+                                                        className="w-100"
+                                                        options={listCity?.map((item) => ({ label: item.name, value: item.id }))}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item name="Address" label="Địa chỉ chi tiết">
-                                    <Input />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item name="Address" label="Địa chỉ chi tiết">
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item
-                                    name="IsActive"
-                                    label="Trạng thái"
-                                    rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
-                                >
-                                    <Select allowClear className="w-100" options={Constants.StatusOptions} />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item
+                                                    name="IsActive"
+                                                    label="Trạng thái"
+                                                    rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
+                                                >
+                                                    <Select allowClear className="w-100" options={Constants.StatusOptions} />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item name="Amenity" label="Tiện ích">
-                                    <Select
-                                        mode="multiple"
-                                        allowClear
-                                        className="w-100"
-                                        options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
-                                    />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item name="Amenity" label="Tiện ích">
+                                                    <Select
+                                                        mode="multiple"
+                                                        allowClear
+                                                        className="w-100"
+                                                        options={listAmenity?.map((item) => ({ label: item.name, value: item.id }))}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8}>
-                                <Form.Item name="Coordinates" label="Tọa độ">
-                                    <Input placeholder="Ví dụ: 21.0285, 105.8542" readOnly />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8}>
+                                                <Form.Item name="Coordinates" label="Tọa độ">
+                                                    <Input placeholder="Ví dụ: 21.0285, 105.8542" readOnly />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={8} className="d-flex align-items-center gap-2">
-                                <Form.Item name="StarRating" label="Hạng sao" className="w-100" rules={[{ required: true, message: 'Vui lòng chọn hạng sao' }]}>
-                                    <Rate />
-                                </Form.Item>
-                            </Col>
+                                            <Col span={8} className="d-flex align-items-center gap-2">
+                                                <Form.Item
+                                                    name="StarRating"
+                                                    label="Hạng sao"
+                                                    className="w-100"
+                                                    rules={[{ required: true, message: 'Vui lòng chọn hạng sao' }]}
+                                                >
+                                                    <Rate />
+                                                </Form.Item>
+                                            </Col>
 
-                            <Col span={24}>
-                                <span>Hình ảnh khác</span>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-                                    <Gallery
-                                        listImage={accommodation.listInfoImage}
-                                        onChange={(listOldImage, listNewImage) =>
-                                            setAccommodation({
-                                                ...accommodation,
-                                                listInfoImage: listOldImage,
-                                                ListNewInfoImage: listNewImage
-                                            })
-                                        }
-                                    />
-                                </div>
-                            </Col>
+                                            <Col span={24}>
+                                                <span>Hình ảnh khác</span>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+                                                    <Gallery
+                                                        listImage={accommodation.listInfoImage}
+                                                        onChange={(listOldImage, listNewImage) =>
+                                                            setAccommodation({
+                                                                ...accommodation,
+                                                                listInfoImage: listOldImage,
+                                                                ListNewInfoImage: listNewImage
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                            </Col>
 
-                            <Col span={24}>
-                                <span>Quy định</span>
-                                <div style={{ marginTop: 8 }}>
-                                    <TiptapEditor 
-                                        content={regulation} 
-                                        onChange={setRegulation}
-                                        minHeight={100} />
-                                </div>
-                            </Col>
+                                            <Col span={24}>
+                                                <span>Quy định</span>
+                                                <div style={{ marginTop: 8 }}>
+                                                    <TiptapEditor content={regulation} onChange={setRegulation} minHeight={100} />
+                                                </div>
+                                            </Col>
 
-                            <Col span={24}>
-                                <Form.Item name="Description" label="Mô tả">
-                                    <TextArea allowClear className="w-100" />
-                                </Form.Item>
-                            </Col>
-                            <Col span={24}>
-                                <span>Vị trí</span>
-                                <div style={{ height: '500px', width: '100%', marginTop: '8px' }}>
-                                    {(() => {
-                                        const coords = accommodation.coordinates?.split(',').map(c => parseFloat(c.trim()));
-                                        const center = coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1]) 
-                                            ? coords 
-                                            : [20.981804, 105.791978];
-                                        return (
-                                            <MapContainer
-                                                center={center}
-                                                zoom={13}
-                                                scrollWheelZoom={false}
-                                                style={{ height: '100%', width: '100%' }}
-                                            >
-                                                <TileLayer
-                                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                />
-                                                <MapClickHandler />
-                                                <LeafletMarker position={center}>
-                                                    <Popup>{accommodation.name}</Popup>
-                                                </LeafletMarker>
-                                                {tempMarkerPosition && (
-                                                    <LeafletMarker 
-                                                        position={tempMarkerPosition} 
-                                                        icon={redIcon}
-                                                    >
-                                                        <Popup>
-                                                            <div style={{ textAlign: 'center' }}>
-                                                                <p style={{ marginBottom: '10px' }}>Xác nhận địa chỉ mới?</p>
-                                                                <Space>
-                                                                    <Button 
-                                                                        type="primary" 
-                                                                        size="small"
-                                                                        onClick={handleConfirmCoordinates}
-                                                                    >
-                                                                        Đồng ý
-                                                                    </Button>
-                                                                    <Button 
-                                                                        size="small"
-                                                                        onClick={handleCancelCoordinates}
-                                                                    >
-                                                                        Hủy
-                                                                    </Button>
-                                                                </Space>
-                                                            </div>
-                                                        </Popup>
-                                                    </LeafletMarker>
-                                                )}
-                                            </MapContainer>
-                                        );
-                                    })()}
-                                </div>
-                            </Col>
-                        </Row>
+                                            <Col span={24}>
+                                                <Form.Item name="Description" label="Mô tả">
+                                                    <TextArea allowClear className="w-100" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={24}>
+                                                <span>Vị trí</span>
+                                                <div style={{ height: '500px', width: '100%', marginTop: '8px' }}>
+                                                    {(() => {
+                                                        const coords = accommodation.coordinates
+                                                            ?.split(',')
+                                                            .map((c) => parseFloat(c.trim()));
+                                                        const center =
+                                                            coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])
+                                                                ? coords
+                                                                : [20.981804, 105.791978];
+                                                        return (
+                                                            <MapContainer
+                                                                center={center}
+                                                                zoom={13}
+                                                                scrollWheelZoom={false}
+                                                                style={{ height: '100%', width: '100%' }}
+                                                            >
+                                                                <TileLayer
+                                                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                                />
+                                                                <MapClickHandler />
+                                                                <LeafletMarker position={center}>
+                                                                    <Popup>{accommodation.name}</Popup>
+                                                                </LeafletMarker>
+                                                                {tempMarkerPosition && (
+                                                                    <LeafletMarker position={tempMarkerPosition} icon={redIcon}>
+                                                                        <Popup>
+                                                                            <div style={{ textAlign: 'center' }}>
+                                                                                <p style={{ marginBottom: '10px' }}>
+                                                                                    Xác nhận địa chỉ mới?
+                                                                                </p>
+                                                                                <Space>
+                                                                                    <Button
+                                                                                        type="primary"
+                                                                                        size="small"
+                                                                                        onClick={handleConfirmCoordinates}
+                                                                                    >
+                                                                                        Đồng ý
+                                                                                    </Button>
+                                                                                    <Button size="small" onClick={handleCancelCoordinates}>
+                                                                                        Hủy
+                                                                                    </Button>
+                                                                                </Space>
+                                                                            </div>
+                                                                        </Popup>
+                                                                    </LeafletMarker>
+                                                                )}
+                                                            </MapContainer>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            </Col>
+                                        </Row>
                                     )
                                 },
                                 {

@@ -14,8 +14,8 @@ const tourItineraryAPI = {
     },
 
     // Create tour itinerary
-    create: async (data) => {
-        const response = await axiosInstance.post('/tour-itineraries', data);
+    create: async (data, tourId) => {
+        const response = await axiosInstance.post(`/tour-itineraries/${tourId}`, data);
         return response.data;
     },
 
