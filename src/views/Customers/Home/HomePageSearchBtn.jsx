@@ -155,9 +155,7 @@ const HomePageSearchBtn = () => {
                         suffixIcon={<EnvironmentOutlined className="text-muted" />}
                         className="w-100"
                         showSearch
-                        filterOption={(input, option) =>
-                            (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
-                        }
+                        filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
                     >
                         {cities.map((city) => (
                             <Option key={city.id} value={city.id}>
@@ -410,9 +408,7 @@ const HomePageSearchBtn = () => {
                     suffixIcon={<EnvironmentOutlined className="text-muted" />}
                     className="w-100"
                     showSearch
-                    filterOption={(input, option) =>
-                        (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
-                    }
+                    filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
                 >
                     {cities.map((city) => (
                         <Option key={city.id} value={city.id}>
@@ -433,9 +429,7 @@ const HomePageSearchBtn = () => {
                     suffixIcon={<EnvironmentOutlined className="text-muted" />}
                     className="w-100"
                     showSearch
-                    filterOption={(input, option) =>
-                        (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
-                    }
+                    filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
                 >
                     {cities.map((city) => (
                         <Option key={city.id} value={city.id}>

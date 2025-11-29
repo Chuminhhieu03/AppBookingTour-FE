@@ -109,7 +109,10 @@ export default function Display() {
                                         </Col>
                                         <Col span={8}>
                                             <span>Trạng thái</span>
-                                            <Input value={Utility.getLabelByValue(Constants.StatusOptions, accommodation.isActive)} readOnly />
+                                            <Input
+                                                value={Utility.getLabelByValue(Constants.StatusOptions, accommodation.isActive)}
+                                                readOnly
+                                            />
                                         </Col>
                                         <Col span={8}>
                                             <span>Tiện ích</span>
@@ -142,10 +145,11 @@ export default function Display() {
                                             <span>Vị trí</span>
                                             <div style={{ height: '500px', width: '100%', marginTop: '8px' }}>
                                                 {(() => {
-                                                    const coords = accommodation.coordinates?.split(',').map(c => parseFloat(c.trim()));
-                                                    const center = coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1]) 
-                                                        ? coords 
-                                                        : [20.981804, 105.791978];
+                                                    const coords = accommodation.coordinates?.split(',').map((c) => parseFloat(c.trim()));
+                                                    const center =
+                                                        coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])
+                                                            ? coords
+                                                            : [20.981804, 105.791978];
                                                     return (
                                                         <MapContainer
                                                             center={center}

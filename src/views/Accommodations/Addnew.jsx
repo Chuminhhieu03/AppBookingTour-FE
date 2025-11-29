@@ -208,7 +208,12 @@ export default function Addnew() {
                             </Col>
 
                             <Col span={8} className="d-flex align-items-center gap-2">
-                                <Form.Item name="StarRating" label="Hạng sao" className="w-100" rules={[{ required: true, message: 'Vui lòng chọn hạng sao' }]}>
+                                <Form.Item
+                                    name="StarRating"
+                                    label="Hạng sao"
+                                    className="w-100"
+                                    rules={[{ required: true, message: 'Vui lòng chọn hạng sao' }]}
+                                >
                                     <Rate />
                                 </Form.Item>
                             </Col>
@@ -227,11 +232,7 @@ export default function Addnew() {
                             <Col span={24}>
                                 <span>Quy định</span>
                                 <div style={{ marginTop: 8 }}>
-                                    <TiptapEditor
-                                        content={regulation}
-                                        onChange={setRegulation}
-                                        minHeight={100}
-                                    />
+                                    <TiptapEditor content={regulation} onChange={setRegulation} minHeight={100} />
                                 </div>
                             </Col>
 
@@ -244,10 +245,14 @@ export default function Addnew() {
                                 <span>Vị trí</span>
                                 <div style={{ height: '500px', width: '100%', marginTop: '8px' }}>
                                     {(() => {
-                                        const coords = form.getFieldValue('Coordinates')?.split(',').map(c => parseFloat(c.trim()));
-                                        const center = coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1]) 
-                                            ? coords 
-                                            : [20.981804, 105.791978];
+                                        const coords = form
+                                            .getFieldValue('Coordinates')
+                                            ?.split(',')
+                                            .map((c) => parseFloat(c.trim()));
+                                        const center =
+                                            coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])
+                                                ? coords
+                                                : [20.981804, 105.791978];
                                         return (
                                             <MapContainer
                                                 center={center}
@@ -266,25 +271,15 @@ export default function Addnew() {
                                                     </LeafletMarker>
                                                 )}
                                                 {tempMarkerPosition && (
-                                                    <LeafletMarker 
-                                                        position={tempMarkerPosition} 
-                                                        icon={redIcon}
-                                                    >
+                                                    <LeafletMarker position={tempMarkerPosition} icon={redIcon}>
                                                         <Popup>
                                                             <div style={{ textAlign: 'center' }}>
                                                                 <p style={{ marginBottom: '10px' }}>Xác nhận địa chỉ mới?</p>
                                                                 <Space>
-                                                                    <Button 
-                                                                        type="primary" 
-                                                                        size="small"
-                                                                        onClick={handleConfirmCoordinates}
-                                                                    >
+                                                                    <Button type="primary" size="small" onClick={handleConfirmCoordinates}>
                                                                         Đồng ý
                                                                     </Button>
-                                                                    <Button 
-                                                                        size="small"
-                                                                        onClick={handleCancelCoordinates}
-                                                                    >
+                                                                    <Button size="small" onClick={handleCancelCoordinates}>
                                                                         Hủy
                                                                     </Button>
                                                                 </Space>

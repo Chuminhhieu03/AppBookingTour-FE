@@ -111,25 +111,53 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="MaxAdult" label="Số lượng người lớn" rules={[{ required: true, message: 'Vui lòng nhập số lượng người lớn' }, { type: 'number', min: 0 }]}>
+                        <Form.Item
+                            name="MaxAdult"
+                            label="Số lượng người lớn"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập số lượng người lớn' },
+                                { type: 'number', min: 0 }
+                            ]}
+                        >
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="MaxChildren" label="Số lượng trẻ em" rules={[{ required: true, message: 'Vui lòng nhập số lượng trẻ em' }, { type: 'number', min: 0 }]}>
+                        <Form.Item
+                            name="MaxChildren"
+                            label="Số lượng trẻ em"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập số lượng trẻ em' },
+                                { type: 'number', min: 0 }
+                            ]}
+                        >
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Quantity" label="Số lượng phòng" rules={[{ required: true, message: 'Vui lòng nhập số lượng phòng' }, { type: 'number', min: 0 }]}>
+                        <Form.Item
+                            name="Quantity"
+                            label="Số lượng phòng"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập số lượng phòng' },
+                                { type: 'number', min: 0 }
+                            ]}
+                        >
                             <InputNumber min={0} className="w-100" />
                         </Form.Item>
                     </Col>
 
                     <Col span={8}>
-                        <Form.Item name="Price" label="Giá phòng" rules={[{ required: true, message: 'Vui lòng nhập giá phòng' }, { type: 'number', min: 0 }]}>
+                        <Form.Item
+                            name="Price"
+                            label="Giá phòng"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập giá phòng' },
+                                { type: 'number', min: 0 }
+                            ]}
+                        >
                             <InputNumber
                                 min={0}
                                 className="w-100"
@@ -154,7 +182,12 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
 
                     <Col span={8}>
                         <Form.Item name="Status" label="Trạng thái" rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}>
-                            <Select allowClear className="w-100" options={Constants.StatusOptions} getPopupContainer={(trigger) => trigger.parentNode}/>
+                            <Select
+                                allowClear
+                                className="w-100"
+                                options={Constants.StatusOptions}
+                                getPopupContainer={(trigger) => trigger.parentNode}
+                            />
                         </Form.Item>
                     </Col>
 

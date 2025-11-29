@@ -1,68 +1,127 @@
-import { Table, Button, Space, Card, message, Modal } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import tourItineraryAPI from '../../../api/tour/tourItineraryAPI';
-import LoadingModal from '../../../components/LoadingModal';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Table, Button, Space, message, Popconfirm } from 'antd';
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import TourItineraryModal from './TourItineraryModal';
+import { tourItineraryAPI } from '../../../api/tour/tourItineraryAPI';
 
-export default function TourItineraryTable({ tourId, isEditMode = false, title = 'Lịch trình chi tiết' }) {
-    const navigate = useNavigate();
-    const [itineraries, setItineraries] = useState([]);
+const TourItineraryTable = ({ mode = 'local', tourId, dataSource = [], onDataChange, tourInfo = {}, readOnly = false }) => {
     const [loading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
+    const [modalConfig, setModalConfig] = useState({
+        visible: false,
+        mode: 'create',
+        selectedRecord: null
+    });
 
-    useEffect(() => {
-        if (tourId) {
-            fetchItineraries();
-        }
-    }, [tourId]);
+    // --- LOGIC 1: FETCH DATA (API Mode) ---
+    const fetchData = useCallback(async () => {
+        if (!tourId || mode === 'local') return;
 
-    const fetchItineraries = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await tourItineraryAPI.getByTourId(tourId);
             if (response.success) {
-                setItineraries(response.data || []);
+                setData(response.data || []);
+            } else {
+                message.error(response.message || 'Không thể tải dữ liệu lịch trình');
             }
         } catch (error) {
-            console.error('Error fetching itineraries:', error);
+            console.error('Error fetching tour itineraries:', error);
+            message.error('Đã xảy ra lỗi khi tải dữ liệu');
         } finally {
             setLoading(false);
         }
+    }, [tourId, mode]);
+
+    // --- LOGIC 2: SYNC DATA ---
+    // API Mode: Chạy fetch khi tourId đổi
+    useEffect(() => {
+        if (mode === 'api') fetchData();
+    }, [fetchData, mode]);
+
+    // Local Mode: Sync từ props dataSource vào state nội bộ và sắp xếp theo dayNumber
+    useEffect(() => {
+        if (mode === 'local') {
+            const sortedData = (dataSource || []).sort((a, b) => (a.dayNumber || 0) - (b.dayNumber || 0));
+            setData(sortedData);
+        }
+    }, [mode, dataSource]);
+
+    // --- HANDLERS ---
+    const toggleModal = (visible, mode = 'create', record = null) => {
+        setModalConfig({ visible, mode, selectedRecord: record });
     };
 
-    const handleDelete = (itineraryId) => {
-        Modal.confirm({
-            title: 'Xác nhận xóa',
-            content: 'Bạn có chắc chắn muốn xóa lịch trình này?',
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            onOk: async () => {
-                try {
-                    LoadingModal.showLoading();
-                    const response = await tourItineraryAPI.delete(itineraryId);
-                    if (response.success) {
-                        message.success('Xóa lịch trình thành công!');
-                        fetchItineraries(); // Refresh the list
-                    } else {
-                        message.error('Xóa lịch trình thất bại!');
-                    }
-                } catch (error) {
-                    console.error('Error deleting itinerary:', error);
-                    message.error('Đã xảy ra lỗi khi xóa lịch trình.');
-                } finally {
-                    LoadingModal.hideLoading();
+    const updateLocalData = (newData) => {
+        // Sắp xếp dữ liệu theo dayNumber trước khi cập nhật
+        const sortedData = newData.sort((a, b) => (a.dayNumber || 0) - (b.dayNumber || 0));
+        setData(sortedData);
+        if (onDataChange) onDataChange(sortedData);
+    };
+
+    const handleDelete = async (record, index) => {
+        if (mode === 'local') {
+            const newData = data.filter((_, idx) => idx !== index);
+            updateLocalData(newData);
+        } else {
+            // API: Xóa server
+            setLoading(true);
+            try {
+                const response = await tourItineraryAPI.delete(record.id);
+                if (response.success) {
+                    message.success('Xóa lịch trình thành công!');
+                    fetchData();
+                } else {
+                    message.error(response.message || 'Không thể xóa');
+                }
+            } catch (error) {
+                message.error('Lỗi khi xóa lịch trình');
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleModalSave = async (formData) => {
+        const { mode: currentModalMode, selectedRecord } = modalConfig;
+
+        if (mode === 'local') {
+            let newData = [...data];
+            if (currentModalMode === 'create') {
+                // Thêm mới (Giả lập ID để tránh lỗi key react)
+                newData.push({ ...formData, id: Date.now() });
+            } else {
+                // Sửa: Tìm đúng vị trí của record đang chọn để update
+                const targetIndex = data.indexOf(selectedRecord);
+                if (targetIndex > -1) {
+                    newData[targetIndex] = { ...selectedRecord, ...formData };
                 }
             }
-        });
-    };
+            updateLocalData(newData);
+            toggleModal(false);
+        } else {
+            // API Mode
+            setLoading(true);
+            try {
+                const apiCall =
+                    currentModalMode === 'create'
+                        ? tourItineraryAPI.create(formData, tourId)
+                        : tourItineraryAPI.update(selectedRecord.id, formData);
 
-    const handleEdit = (record) => {
-        navigate(`/admin/service/tour/${tourId}/itinerary/edit/${record.id}`);
-    };
-
-    const handleAdd = () => {
-        navigate(`/admin/service/tour/${tourId}/itinerary/addnew`);
+                const response = await apiCall;
+                if (response.success) {
+                    message.success(currentModalMode === 'create' ? 'Thêm mới thành công!' : 'Cập nhật thành công!');
+                    fetchData();
+                    toggleModal(false);
+                } else {
+                    message.error(response.message || 'Thao tác thất bại');
+                }
+            } catch (error) {
+                message.error('Đã xảy ra lỗi hệ thống');
+            } finally {
+                setLoading(false);
+            }
+        }
     };
 
     const columns = [
@@ -70,87 +129,102 @@ export default function TourItineraryTable({ tourId, isEditMode = false, title =
             title: 'STT',
             key: 'index',
             width: 60,
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (_, __, index) => <div style={{ textAlign: 'center' }}>{index + 1}</div>
+            align: 'center',
+            render: (_, __, index) => index + 1
         },
         {
             title: 'Ngày',
             dataIndex: 'dayNumber',
             key: 'dayNumber',
-            width: 200,
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (dayNumber) => <div style={{ textAlign: 'center' }}>{`Ngày ${dayNumber}`}</div>
+            width: 160,
+            align: 'center',
+            render: (day) => `Ngày ${day}`
         },
         {
             title: 'Tiêu đề',
             dataIndex: 'title',
             key: 'title',
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (title) => <div style={{ textAlign: 'center' }}>{title}</div>
+            align: 'center'
         },
         {
             title: 'Hoạt động',
             dataIndex: 'activity',
             key: 'activity',
-            ellipsis: true,
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (activity) => <div style={{ textAlign: 'center' }}>{activity}</div>
+            align: 'center',
+            ellipsis: true
+        },
+        {
+            title: 'Hành động',
+            key: 'action',
+            align: 'center',
+            width: 150,
+            fixed: 'right',
+            render: (_, record, index) => (
+                <Space size="small">
+                    <Button
+                        type="primary"
+                        ghost
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => toggleModal(true, 'view', record)}
+                        title="Xem chi tiết"
+                    />
+                    {!readOnly && (
+                        <>
+                            <Button
+                                type="default"
+                                size="small"
+                                icon={<EditOutlined />}
+                                onClick={() => toggleModal(true, 'edit', record)}
+                                title="Chỉnh sửa"
+                            />
+                            <Popconfirm
+                                title="Bạn có chắc muốn xóa lịch trình tour này?"
+                                onConfirm={() => handleDelete(record, index)}
+                                okText="Có"
+                                cancelText="Không"
+                            >
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} title="Xóa" />
+                            </Popconfirm>
+                        </>
+                    )}
+                </Space>
+            )
         }
     ];
 
-    // Always add action column - show different buttons based on mode
-    columns.push({
-        title: 'Hành động',
-        key: 'action',
-        width: 150,
-        align: 'center',
-        fixed: 'right',
-        onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-        render: (_, record) => (
-            <Space size="small">
-                <Button
-                    type="primary"
-                    ghost
-                    size="small"
-                    icon={<EyeOutlined />}
-                    onClick={() => navigate(`/admin/service/tour/${tourId}/itinerary/display/${record.id}`)}
-                />
-                {isEditMode && (
-                    <>
-                        <Button type="default" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-                        <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
-                    </>
-                )}
-            </Space>
-        )
-    });
-
     return (
-        <Card
-            title={title}
-            size="small"
-            style={{ marginBottom: 24 }}
-            extra={
-                isEditMode && (
-                    <Button type="primary" icon={<PlusOutlined />} size="small" onClick={handleAdd}>
+        <div>
+            {!readOnly && (
+                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => toggleModal(true, 'create')}>
                         Thêm lịch trình
                     </Button>
-                )
-            }
-        >
+                </div>
+            )}
+
             <Table
                 columns={columns}
-                dataSource={itineraries}
-                rowKey="id"
+                dataSource={data}
                 loading={loading}
+                rowKey={(record, index) => record.id || index}
                 pagination={false}
-                size="small"
+                size="middle"
                 bordered
                 scroll={{ x: 700 }}
-                locale={{
-                    emptyText: 'Chưa có lịch trình chi tiết nào'
-                }}
+                locale={{ emptyText: 'Chưa có lịch trình nào' }}
             />
-        </Card>
+
+            <TourItineraryModal
+                open={modalConfig.visible}
+                mode={modalConfig.mode}
+                initialData={modalConfig.selectedRecord}
+                tourInfo={tourInfo}
+                onSave={handleModalSave}
+                onCancel={() => toggleModal(false)}
+            />
+        </div>
     );
-}
+};
+
+export default TourItineraryTable;

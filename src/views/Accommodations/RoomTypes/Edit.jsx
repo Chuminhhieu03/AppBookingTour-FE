@@ -130,9 +130,9 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                 BookedRooms: values.Slot,
                 roomTypeId: roomTypeEdit.id
             };
-            
+
             const response = await roomInventoryAPI.createBulk(requestBody);
-            
+
             if (response.success) {
                 message.success('Thêm khoảng ngày thành công');
                 setIsDateRangeModalOpen(false);
@@ -169,9 +169,9 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                     RoomTypeId: roomTypeEdit.id
                 }
             };
-            
+
             const response = await roomInventoryAPI.create(requestBody);
-            
+
             if (response.success) {
                 message.success('Thêm ngày đặc biệt thành công');
                 setIsSpecialDateModalOpen(false);
