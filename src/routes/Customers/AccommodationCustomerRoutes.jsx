@@ -7,6 +7,7 @@ import CustomerLayout from 'layout/CustomerLayout/CustomerLayout';
 
 // render - accommodation pages
 const AccommodationList = Loadable(lazy(() => import('views/Customers/Accommodations/AccommodationList')));
+const AccommodationDetail = Loadable(lazy(() => import('views/Customers/Accommodations/AccommodationDetails/AccommodationDetail')));
 
 const AccommodationCustomerRoutes = {
     path: '/',
@@ -22,6 +23,10 @@ const AccommodationCustomerRoutes = {
                 {
                     path: 'accommodations',
                     element: <AccommodationList />
+                },
+                {
+                    path: 'accommodations/:id',
+                    element: <AccommodationDetail />
                 }
             ]
         }

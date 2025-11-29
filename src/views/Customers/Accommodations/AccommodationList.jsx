@@ -7,10 +7,12 @@ import ItemCard from '../components/ItemCard';
 import BookingSearchBar from '../components/BookingSearchBar';
 import { createEmptyFilter, buildUrlParams, parseUrlParams } from '../../../utils/itemDataHelpers';
 import Constants from '../../../Constants/Constants';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
 const AccommodationList = () => {
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [accommodationData, setAccommodationData] = useState({
@@ -175,8 +177,7 @@ const AccommodationList = () => {
     // Handle view details
     const handleViewDetails = (accommodation) => {
         console.log('View accommodation details:', accommodation.id);
-        // TODO: Navigate to accommodation details page
-        // Example: navigate(`/accommodation/${accommodation.id}`);
+       navigate(`/accommodations/${accommodation.id}`);
     };
 
     return (
@@ -220,7 +221,10 @@ const AccommodationList = () => {
                                 {accommodationData.accommodations && accommodationData.accommodations.length > 0
                                     ? accommodationData.accommodations.map((accommodation) => (
                                           <div key={accommodation.id} style={{ marginBottom: '16px' }}>
-                                              <ItemCard data={accommodation} type="accommodation" onViewDetails={handleViewDetails} />
+                                              <ItemCard 
+                                                data={accommodation} 
+                                                type="accommodation" 
+                                                onViewDetails={handleViewDetails} />
                                           </div>
                                       ))
                                     : !loading && (

@@ -1,9 +1,9 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, message } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, notification } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
 import LoadingModal from '../../components/LoadingModal';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
 import Utility from '../../Utils/Utility';
@@ -12,6 +12,7 @@ import axiosIntance from '../../api/axiosInstance';
 const { TextArea } = Input;
 
 export default function Edit() {
+    const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
     const { id } = useParams();
 
@@ -20,13 +21,24 @@ export default function Edit() {
     }, []);
 
     const setupEditForm = async () => {
-        const response = await axiosIntance.post(`/Discount/setup-edit/${id}`);
-        const res = response.data;
-        const discountRes = res.discount ?? {};
-        discountRes.startEffectedDtg = Utility.convertStringToDate(discountRes.startEffectedDtg);
-        discountRes.endEffectedDtg = Utility.convertStringToDate(discountRes.endEffectedDtg);
-        discountRes.status = Boolean(discountRes.status);
-        setDiscount(discountRes);
+        LoadingModal.showLoading();
+        try {
+            const response = await axiosIntance.post(`/Discount/setup-edit/${id}`);
+            const res = response.data;
+            const discountRes = res.discount ?? {};
+            discountRes.startEffectedDtg = Utility.convertStringToDate(discountRes.startEffectedDtg);
+            discountRes.endEffectedDtg = Utility.convertStringToDate(discountRes.endEffectedDtg);
+            discountRes.status = Boolean(discountRes.status);
+            setDiscount(discountRes);
+        } catch (error) {
+            console.error('Error loading discount data:', error);
+            notification.error({
+                message: 'Lỗi',
+                description: 'Không thể tải thông tin mã giảm giá'
+            });
+        } finally {
+            LoadingModal.hideLoading();
+        }
     };
 
     const onEditDiscount = async (discount) => {
@@ -38,18 +50,42 @@ export default function Edit() {
             request.status = Number(discount.status);
             request.maximumDiscount = discount.maximumDiscount;
             const res = await discountAPI.update(id, request);
-            const discountRes = res.discount ?? {};
+            
             if (res.success) {
-                message.success('Cập nhật mã giảm giá thành công');
-                window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
+                const discountRes = res.discount ?? {};
+                notification.success({
+                    message: 'Thành công',
+                    description: 'Cập nhật mã giảm giá thành công',
+                    duration: 2
+                });
+                setTimeout(() => {
+                    navigate(`/admin/sale/discount/display/${discountRes.id}`);
+                }, 1500);
             } else {
-                message.error(res.message || 'Lỗi khi chỉnh sửa mã giảm giá');
+                const errorData = res.data || [];
+                if (errorData.length > 0) {
+                    const listErrorMessage = errorData.map((e) => e.errorMessage);
+                    notification.error({
+                        message: 'Lỗi',
+                        description: `Lỗi khi chỉnh sửa mã giảm giá: ${listErrorMessage.join(', ')}`
+                    });
+                } else {
+                    notification.error({
+                        message: 'Lỗi',
+                        description: res.message || 'Lỗi khi chỉnh sửa mã giảm giá'
+                    });
+                }
             }
         } catch (error) {
             console.error('Error editing discount:', error);
-            message.error('Đã xảy ra lỗi khi chỉnh sửa mã giảm giá');
+            const errorMsg = error.response?.data?.message || error.message || 'Đã xảy ra lỗi khi chỉnh sửa mã giảm giá';
+            notification.error({
+                message: 'Lỗi',
+                description: errorMsg
+            });
+        } finally {
+            LoadingModal.hideLoading();
         }
-        LoadingModal.hideLoading();
     };
 
     return (

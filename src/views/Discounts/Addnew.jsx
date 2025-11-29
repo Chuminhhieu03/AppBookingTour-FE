@@ -1,50 +1,65 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, message } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, notification } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoadingModal from '../../components/LoadingModal';
 import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
+import axiosIntance from '../../api/axiosInstance'; 
 
 const { TextArea } = Input;
 
 export default function Addnew() {
+    const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
-
-    useEffect(() => {
-        setupAddnewForm();
-    }, []);
-
-    const setupAddnewForm = async () => {
-        const response = await axiosIntance.post('/Discount/setup-addnew', {});
-        const res = response.data;
-        setListStatus(res.listStatus);
-        setListServiceType(res.listServiceType);
-    };
 
     const onAddnewDiscount = async (discount) => {
         LoadingModal.showLoading();
         try {
             const request = {};
             request.Discount = { ...discount };
+            request.Discount.Status = Number(discount.Status);
             request.Discount.StartEffectedDtg = discount.StartEffectedDtg?.toDate().toISOString();
             request.Discount.EndEffectedDtg = discount.EndEffectedDtg?.toDate().toISOString();
             request.Discount.MaximumDiscount = discount.MaximumDiscount;
             const res = await discountAPI.create(request);
-            const discountRes = res.discount;
+            
             if (res.success) {
-                message.success('Thêm mới mã giảm giá thành công');
-                window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
+                const discountRes = res.discount;
+                notification.success({
+                    message: 'Thành công',
+                    description: 'Thêm mới mã giảm giá thành công',
+                    duration: 2
+                });
+                setTimeout(() => {
+                    navigate(`/admin/sale/discount/display/${discountRes.id}`);
+                }, 1500);
             } else {
                 const errorData = res.data || [];
-                const listErrorMessage = errorData?.map((e) => e.errorMessage);
-                message.error(`Lỗi khi thêm mới mã giảm giá: ${listErrorMessage.join(', ')}`);
+                if (errorData.length > 0) {
+                    const listErrorMessage = errorData.map((e) => e.errorMessage);
+                    notification.error({
+                        message: 'Lỗi',
+                        description: `Lỗi khi thêm mới mã giảm giá: ${listErrorMessage.join(', ')}`
+                    });
+                } else {
+                    notification.error({
+                        message: 'Lỗi',
+                        description: res.message || 'Lỗi khi thêm mới mã giảm giá'
+                    });
+                }
             }
         } catch (error) {
             console.error('Error adding new discount:', error);
-            message.error('Đã xảy ra lỗi khi thêm mới mã giảm giá');
+            const errorMsg = error.response?.data?.message || error.message || 'Đã xảy ra lỗi khi thêm mới mã giảm giá';
+            notification.error({
+                message: 'Lỗi',
+                description: errorMsg
+            });
+        } finally {
+            LoadingModal.hideLoading();
         }
-        LoadingModal.hideLoading();
     };
 
     return (
