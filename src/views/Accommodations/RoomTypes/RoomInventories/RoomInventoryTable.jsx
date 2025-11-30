@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, InputNumber, Button, DatePicker, Space, Modal, message } from 'antd';
+import { Table, InputNumber, Button, DatePicker, Space, Modal, message, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import LoadingModal from '../../../../components/LoadingModal';
@@ -177,39 +177,25 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         setEditingId(null); // Exit edit mode without reverting
     };
 
-    const handleBulkDelete = () => {
-        if (selectedRowKeys.length === 0) {
-            message.warning('Vui lòng chọn ít nhất một mục để xóa');
-            return;
-        }
-
-        Modal.confirm({
-            title: 'Xác nhận xóa',
-            content: `Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} mục đã chọn?`,
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            onOk: async () => {
-                LoadingModal.showLoading();
-                try {
-                    const response = await roomInventoryAPI.deleteBulk(selectedRowKeys);
-                    if (response.success) {
-                        message.success('Xóa thành công');
-                        const updated = listRoomInventory.filter((item) => !selectedRowKeys.includes(item.id));
-                        setListRoomInventory(updated);
-                        onChange?.(updated);
-                        setSelectedRowKeys([]);
-                    } else {
-                        message.error(response.message || 'Không thể xóa');
-                    }
-                } catch (error) {
-                    console.error('Error deleting room inventories:', error);
-                    message.error('Đã xảy ra lỗi khi xóa');
-                } finally {
-                    LoadingModal.hideLoading();
-                }
+    const handleBulkDelete = async () => {
+        LoadingModal.showLoading();
+        try {
+            const response = await roomInventoryAPI.deleteBulk(selectedRowKeys);
+            if (response.success) {
+                message.success('Xóa thành công');
+                const updated = listRoomInventory.filter((item) => !selectedRowKeys.includes(item.id));
+                setListRoomInventory(updated);
+                onChange?.(updated);
+                setSelectedRowKeys([]);
+            } else {
+                message.error(response.message || 'Không thể xóa');
             }
-        });
+        } catch (error) {
+            console.error('Error deleting room inventories:', error);
+            message.error('Đã xảy ra lỗi khi xóa');
+        } finally {
+            LoadingModal.hideLoading();
+        }
     };
 
     const columns = [
@@ -349,9 +335,19 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         <div>
             {editable && selectedRowKeys.length > 0 && (
                 <div style={{ marginBottom: 16, textAlign: 'right' }}>
-                    <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete} disabled={editingId !== null}>
-                        Xóa {selectedRowKeys.length} mục đã chọn
-                    </Button>
+                    <Popconfirm
+                        title="Xác nhận xóa"
+                        description={`Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} mục đã chọn?`}
+                        onConfirm={handleBulkDelete}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        okButtonProps={{ danger: true }}
+                        getPopupContainer={(trigger) => trigger.parentNode}
+                    >
+                        <Button danger icon={<DeleteOutlined />} disabled={editingId !== null}>
+                            Xóa {selectedRowKeys.length} mục đã chọn
+                        </Button>
+                    </Popconfirm>
                 </div>
             )}
             <Table
