@@ -1,11 +1,14 @@
-import { Modal, Button, InputNumber, Form, Input, Select, Col, Row, message } from 'antd';
+import { Modal, Button, InputNumber, Form, Input, Select, Col, Row, message, TimePicker } from 'antd';
 import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import LoadingModal from '../../../components/LoadingModal';
 import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
 import Constants from '../../../Constants/Constants';
 import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI';
+import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
+import { useUI } from 'components/providers/UIProvider';
 
 const { TextArea } = Input;
 
@@ -13,10 +16,14 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
     const [form] = Form.useForm();
     const [listInfoImage, setListInfoImage] = useState([]);
     const [listAmenity, setListAmenity] = useState([]);
+    const [listRoomView, setListRoomView] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
+    const [cancelPolicy, setCancelPolicy] = useState('');
+    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         getListRoomTypeAmenity();
+        getListRoomView();
     }, []);
 
     const getListRoomTypeAmenity = async () => {
@@ -28,11 +35,21 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
         }
     };
 
+    const getListRoomView = async () => {
+        try {
+            // Use static options from Constants instead of API
+            setListRoomView(Constants.RoomViewOptions);
+        } catch (error) {
+            console.error('Error fetching room view options:', error);
+        }
+    };
+
     const onAddnewRoomType = async (roomType) => {
         LoadingModal.showLoading();
         try {
             const roomTypeRequest = { ...roomType };
             const amenities = roomTypeRequest.Amenity?.join(', ') || '';
+            const views = roomTypeRequest.View?.join(', ') || '';
             const formData = new FormData();
             formData.append('Name', roomTypeRequest.Name);
             formData.append('MaxAdult', roomTypeRequest.MaxAdult);
@@ -40,6 +57,11 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             formData.append('Quantity', roomTypeRequest.Quantity);
             formData.append('Price', roomTypeRequest.Price);
             formData.append('Status', Number(roomTypeRequest.Status));
+            formData.append('CheckinHour', roomTypeRequest.CheckinHour?.format('HH:mm:ss') || '');
+            formData.append('CheckoutHour', roomTypeRequest.CheckoutHour?.format('HH:mm:ss') || '');
+            formData.append('Area', roomTypeRequest.Area || 0);
+            formData.append('View', views);
+            formData.append('CancelPolicy', cancelPolicy || '');
             // cover image file comes from local state
             if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
             formData.append('Amenities', amenities);
@@ -49,7 +71,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             });
             const res = await roomTypeAPI.create(formData);
             if (res.success) {
-                message.success('Thêm mới loại phòng thành công');
+                messageApi.success('Thêm mới loại phòng thành công');
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal
                 form.resetFields();
@@ -57,11 +79,11 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                 setListInfoImage([]);
             } else {
                 console.error('Error adding new room type:', res.message);
-                message.error(res.message || 'Thêm mới loại phòng thất bại');
+                messageApi.error(res.message || 'Thêm mới loại phòng thất bại');
             }
         } catch (error) {
             console.error('Error adding new accommodation:', error);
-            message.error('Đã xảy ra lỗi khi thêm mới loại phòng');
+            messageApi.error('Đã xảy ra lỗi khi thêm mới loại phòng');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -72,12 +94,13 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
     };
 
     return (
-        <Modal
-            title="Thêm mới loại phòng"
-            closable={true}
-            open={isOpen}
-            onCancel={onCancel}
-            onOk={handleOk}
+        <>
+            <Modal
+                title="Thêm mới loại phòng"
+                closable={true}
+                open={isOpen}
+                onCancel={onCancel}
+                onOk={handleOk}
             footer={[
                 <Button key="back" onClick={onCancel}>
                     Hủy
@@ -191,6 +214,75 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                         </Form.Item>
                     </Col>
 
+                    <Col span={8}>
+                        <Form.Item
+                            name="CheckinHour"
+                            label="Giờ nhận phòng"
+                            rules={[{ required: true, message: 'Vui lòng chọn giờ nhận phòng' }]}
+                        >
+                            <TimePicker
+                                className="w-100"
+                                format="HH:mm"
+                                placeholder="Chọn giờ nhận phòng"
+                                getPopupContainer={(trigger) => trigger.parentNode}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item
+                            name="CheckoutHour"
+                            label="Giờ trả phòng"
+                            rules={[{ required: true, message: 'Vui lòng chọn giờ trả phòng' }]}
+                        >
+                            <TimePicker
+                                className="w-100"
+                                format="HH:mm"
+                                placeholder="Chọn giờ trả phòng"
+                                getPopupContainer={(trigger) => trigger.parentNode}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item
+                            name="Area"
+                            label="Diện tích (m²)"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập diện tích' },
+                                { type: 'number', min: 0 }
+                            ]}
+                        >
+                            <InputNumber
+                                min={0}
+                                className="w-100"
+                                placeholder="Nhập diện tích"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item name="View" label="Tầm nhìn" rules={[{ required: true, message: 'Vui lòng chọn tầm nhìn' }]}>
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                className="w-100"
+                                placeholder="Chọn tầm nhìn"
+                                getPopupContainer={(trigger) => trigger.parentNode}
+                                options={listRoomView}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={24}>
+                        <span>Quy định hủy phòng</span>
+                        <div style={{ marginTop: 8 }}>
+                            <TiptapEditor content={cancelPolicy} onChange={setCancelPolicy} minHeight={100} />
+                        </div>
+                    </Col>
+
                     <Col span={24}>
                         <span>Hình ảnh khác</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
@@ -204,5 +296,6 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                 </Row>
             </Form>
         </Modal>
+        </>
     );
 }

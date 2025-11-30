@@ -25,6 +25,11 @@ const accommodationAPI = {
         return response.data;
     },
 
+    getByIdForCustomer: async (id) => {
+        const response = await axiosInstance.get(`/Accommodation/customer/${id}`);
+        return response.data;
+    },
+
     update: async (id, formData) => {
         const response = await axiosInstance.put(`/Accommodation/${id}`, formData, {
             headers: {

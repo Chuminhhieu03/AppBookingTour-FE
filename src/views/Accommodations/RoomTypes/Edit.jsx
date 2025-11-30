@@ -1,13 +1,16 @@
-import { Modal, Button, InputNumber, Form, Input, Select, Col, Row, Tabs, message, DatePicker } from 'antd';
+import { Modal, Button, InputNumber, Form, Input, Select, Col, Row, Tabs, message, DatePicker, TimePicker } from 'antd';
 import ImagesUC from '../../components/basic/ImagesUC';
 import Gallery from '../../components/basic/Gallery';
 import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import LoadingModal from '../../../components/LoadingModal';
 import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
 import Constants from '../../../Constants/Constants';
 import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI';
 import RoomInventoryTable from './RoomInventories/RoomInventoryTable';
 import roomInventoryAPI from '../../../api/accommodation/roomInventoryAPI';
+import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
+import { useUI } from 'components/providers/UIProvider';
 
 const { TextArea } = Input;
 
@@ -21,6 +24,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
     const [coverImgFile, setCoverImgFile] = useState(null);
     const [isDateRangeModalOpen, setIsDateRangeModalOpen] = useState(false);
     const [isSpecialDateModalOpen, setIsSpecialDateModalOpen] = useState(false);
+    const [cancelPolicy, setCancelPolicy] = useState(roomType?.cancelPolicy || '');
+    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         getListRoomTypeAmenity();
@@ -49,6 +54,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
         // Populate form when roomType prop changes
         const rt = roomType || {};
         const amenityArr = rt.amenities?.split(', ').map(Number) || [];
+        const viewArr = rt.view?.split(', ').map(Number) || [];
         setRoomTypeEdit(rt);
         setListInfoImage(rt.listInfoImage || []);
         form.setFieldsValue({
@@ -60,6 +66,11 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             Price: rt.price,
             Status: rt.status,
             Amenity: amenityArr,
+            CheckinHour: rt.checkinHour ? dayjs(rt.checkinHour, 'HH:mm:ss') : undefined,
+            CheckoutHour: rt.checkoutHour ? dayjs(rt.checkoutHour, 'HH:mm:ss') : undefined,
+            Area: rt.area,
+            View: viewArr,
+            CancelPolicy: rt.cancelPolicy,
             CoverImageUrl: rt.coverImageUrl
         });
     }, [roomType, form]);
@@ -68,6 +79,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
         LoadingModal.showLoading();
         try {
             const amenities = roomTypeData.Amenity?.join(', ') || roomTypeData.amenity?.join(', ') || '';
+            const views = roomTypeData.View?.join(', ') || '';
             const formData = new FormData();
             formData.append('Id', roomTypeData.Id ?? roomTypeEdit.id);
             formData.append('Name', roomTypeData.Name ?? roomTypeEdit.name);
@@ -76,6 +88,11 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             formData.append('Quantity', roomTypeData.Quantity ?? roomTypeEdit.quantity);
             formData.append('Price', roomTypeData.Price ?? roomTypeEdit.price);
             formData.append('Status', Number(roomTypeData.Status) ?? Number(roomTypeEdit.status));
+            formData.append('CheckinHour', roomTypeData.CheckinHour?.format('HH:mm:ss') || roomTypeEdit.checkinHour || '');
+            formData.append('CheckoutHour', roomTypeData.CheckoutHour?.format('HH:mm:ss') || roomTypeEdit.checkoutHour || '');
+            formData.append('Area', roomTypeData.Area ?? roomTypeEdit.area ?? 0);
+            formData.append('View', views || roomTypeEdit.view || '');
+            formData.append('CancelPolicy', cancelPolicy || roomTypeEdit.cancelPolicy || '');
             formData.append('AccommodationId', accommodationId);
             formData.append('Amenities', amenities);
             formData.append('CoverImageUrl', roomTypeData.CoverImageUrl ?? roomTypeEdit.coverImageUrl ?? '');
@@ -89,7 +106,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const idToPut = roomTypeData.Id ?? roomTypeEdit.id;
             const res = await roomTypeAPI.update(idToPut, formData);
             if (res.success) {
-                message.success('Cập nhật loại phòng thành công');
+                messageApi.success('Cập nhật loại phòng thành công');
                 onOk(true);
                 onCancel();
                 form.resetFields();
@@ -98,11 +115,11 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                 setCoverImgFile(null);
             } else {
                 console.error('Error editing room type:', res.message);
-                message.error(res.message || 'Cập nhật loại phòng thất bại');
+                messageApi.error(res.message || 'Cập nhật loại phòng thất bại');
             }
         } catch (error) {
             console.error('Error editing room type:', error);
-            message.error('Đã xảy ra lỗi khi cập nhật loại phòng');
+            messageApi.error('Đã xảy ra lỗi khi cập nhật loại phòng');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -134,17 +151,17 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const response = await roomInventoryAPI.createBulk(requestBody);
 
             if (response.success) {
-                message.success('Thêm khoảng ngày thành công');
+                messageApi.success('Thêm khoảng ngày thành công');
                 setIsDateRangeModalOpen(false);
                 dateRangeForm.resetFields();
                 // Refresh room type data to update the table
                 await getRoomTypeById(roomTypeEdit.id);
             } else {
-                message.error(response.message || 'Không thể thêm khoảng ngày');
+                messageApi.error(response.message || 'Không thể thêm khoảng ngày');
             }
         } catch (error) {
             console.error('Error creating date range:', error);
-            message.error('Đã xảy ra lỗi khi thêm khoảng ngày');
+            messageApi.error('Đã xảy ra lỗi khi thêm khoảng ngày');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -173,17 +190,17 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const response = await roomInventoryAPI.create(requestBody);
 
             if (response.success) {
-                message.success('Thêm ngày đặc biệt thành công');
+                messageApi.success('Thêm ngày đặc biệt thành công');
                 setIsSpecialDateModalOpen(false);
                 specialDateForm.resetFields();
                 // Refresh room type data to update the table
                 await getRoomTypeById(roomTypeEdit.id);
             } else {
-                message.error(response.message || 'Không thể thêm ngày đặc biệt');
+                messageApi.error(response.message || 'Không thể thêm ngày đặc biệt');
             }
         } catch (error) {
             console.error('Error creating special date:', error);
-            message.error('Đã xảy ra lỗi khi thêm ngày đặc biệt');
+            messageApi.error('Đã xảy ra lỗi khi thêm ngày đặc biệt');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -317,6 +334,80 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                                             />
                                         </Form.Item>
                                     </Col>
+
+                                    <Col span={8}>
+                                        <Form.Item
+                                            name="CheckinHour"
+                                            label="Giờ nhận phòng"
+                                            rules={[{ required: true, message: 'Vui lòng chọn giờ nhận phòng' }]}
+                                        >
+                                            <TimePicker
+                                                className="w-100"
+                                                format="HH:mm"
+                                                placeholder="Chọn giờ nhận phòng"
+                                                getPopupContainer={(trigger) => trigger.parentNode}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={8}>
+                                        <Form.Item
+                                            name="CheckoutHour"
+                                            label="Giờ trả phòng"
+                                            rules={[{ required: true, message: 'Vui lòng chọn giờ trả phòng' }]}
+                                        >
+                                            <TimePicker
+                                                className="w-100"
+                                                format="HH:mm"
+                                                placeholder="Chọn giờ trả phòng"
+                                                getPopupContainer={(trigger) => trigger.parentNode}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={8}>
+                                        <Form.Item
+                                            name="Area"
+                                            label="Diện tích (m²)"
+                                            rules={[
+                                                { required: true, message: 'Vui lòng nhập diện tích' },
+                                                { type: 'number', min: 0 }
+                                            ]}
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                className="w-100"
+                                                placeholder="Nhập diện tích"
+                                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                parser={(value) => value?.replace(/\$\s?|(,*)/g, '')}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={8}>
+                                        <Form.Item
+                                            name="View"
+                                            label="Tầm nhìn"
+                                            rules={[{ required: true, message: 'Vui lòng chọn tầm nhìn' }]}
+                                        >
+                                            <Select
+                                                mode="multiple"
+                                                allowClear
+                                                className="w-100"
+                                                placeholder="Chọn tầm nhìn"
+                                                getPopupContainer={(trigger) => trigger.parentNode}
+                                                options={Constants.RoomViewOptions}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={24}>
+                                        <span>Quy định hủy phòng</span>
+                                        <div style={{ marginTop: 8 }}>
+                                            <TiptapEditor content={cancelPolicy} onChange={setCancelPolicy} minHeight={100} />
+                                        </div>
+                                    </Col>
+
                                     <Col span={24}>
                                         <span>Hình ảnh khác</span>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>

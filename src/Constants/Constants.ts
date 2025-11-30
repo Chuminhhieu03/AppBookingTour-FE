@@ -9,7 +9,8 @@ export default class Constants {
 
     static FeatureCode = {
         AccommodationAmenity: 'AccommodationAmenity',
-        RoomTypeAmenity: 'RoomTypeAmenity'
+        RoomTypeAmenity: 'RoomTypeAmenity',
+        RoomView: 'RoomView'
     };
 
     static AccommodationType = {
@@ -51,6 +52,14 @@ export default class Constants {
         Male: 1,
         Female: 2,
         Other: 3
+    };
+
+    static RoomView = {
+        Sea: 1,
+        Mountain: 2,
+        Lake: 3,
+        Garden: 4,
+        City: 5
     };
 
     // Options cho bộ lọc và các thành phần giao diện
@@ -104,6 +113,14 @@ export default class Constants {
         { value: this.Gender.Male, label: 'Nam' },
         { value: this.Gender.Female, label: 'Nữ' },
         { value: this.Gender.Other, label: 'Khác' }
+    ];
+
+    static RoomViewOptions = [
+        { value: this.RoomView.Sea, label: 'Biển' },
+        { value: this.RoomView.Mountain, label: 'Núi' },
+        { value: this.RoomView.Lake, label: 'Hồ' },
+        { value: this.RoomView.Garden, label: 'Vườn' },
+        { value: this.RoomView.City, label: 'Thành phố' }
     ];
 
     public static readonly DEFAULT_LIST_ITEM_PAGE_SIZE: number = 10;

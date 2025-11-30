@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DatePicker, Input, Select, Button } from 'antd';
+import { useUI } from 'components/providers/UIProvider';
 import {
     SearchOutlined,
     EnvironmentOutlined,
@@ -20,6 +22,8 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 const HomePageSearchBtn = () => {
+    const navigate = useNavigate();
+    const { messageApi } = useUI();
     const [activeTab, setActiveTab] = useState('tour');
     const [cities, setCities] = useState([]);
 
@@ -86,14 +90,15 @@ const HomePageSearchBtn = () => {
     );
 
     // hotel date state
-    const [checkIn, setCheckIn] = useState(null);
-    const [checkOut, setCheckOut] = useState(null);
+    const [checkIn, setCheckIn] = useState(dayjs());
+    const [checkOut, setCheckOut] = useState(dayjs().add(1, 'day'));
     const [nights, setNights] = useState(1);
+    const [selectedCity, setSelectedCity] = useState(null);
 
     // guest picker state
     const [guestPanelVisible, setGuestPanelVisible] = useState(false);
     const [rooms, setRooms] = useState(1);
-    const [adults, setAdults] = useState(2);
+    const [adults, setAdults] = useState(1);
     const [children, setChildren] = useState(0);
     const guestRef = useRef(null);
 
@@ -141,12 +146,41 @@ const HomePageSearchBtn = () => {
         updateNights(ci, co);
     };
 
+    const handleHotelSearch = () => {
+        // Validate required fields
+        if (!selectedCity) {
+            messageApi.error('Vui lòng chọn địa điểm');
+            return;
+        }
+        if (!checkIn) {
+            messageApi.error('Vui lòng chọn ngày nhận phòng');
+            return;
+        }
+        if (!checkOut) {
+            messageApi.error('Vui lòng chọn ngày trả phòng');
+            return;
+        }
+
+        // Navigate with query parameters
+        const params = new URLSearchParams({
+            checkInDate: checkIn.format('YYYY-MM-DD'),
+            checkOutDate: checkOut.format('YYYY-MM-DD'),
+            numOfAdult: adults.toString(),
+            numOfChild: children.toString(),
+            numOfRoom: rooms.toString(),
+            page: '1',
+            cityId: selectedCity.toString()
+        });
+        
+        navigate(`/accommodations?${params.toString()}`);
+    };
+
     const renderHotelSearch = () => (
         <div className="row g-3 align-items-end">
             <div style={{ display: 'flex', width: '100%', gap: 16, alignItems: 'end' }}>
                 <div style={{ flex: '0 0 30%', maxWidth: '30%', borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
                     <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                        Địa điểm
+                        Địa điểm <span className="text-danger">*</span>
                     </label>
                     <Select
                         size="large"
@@ -155,6 +189,8 @@ const HomePageSearchBtn = () => {
                         suffixIcon={<EnvironmentOutlined className="text-muted" />}
                         className="w-100"
                         showSearch
+                        value={selectedCity}
+                        onChange={(value) => setSelectedCity(value)}
                         filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
                     >
                         {cities.map((city) => (
@@ -169,7 +205,7 @@ const HomePageSearchBtn = () => {
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <div style={{ flex: 1 }}>
                             <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                                Nhận phòng
+                                Nhận phòng <span className="text-danger">*</span>
                             </label>
                             <DatePicker
                                 size="large"
@@ -204,7 +240,7 @@ const HomePageSearchBtn = () => {
 
                         <div style={{ flex: 1 }}>
                             <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                                Trả phòng
+                                Trả phòng <span className="text-danger">*</span>
                             </label>
                             <DatePicker
                                 size="large"
@@ -221,7 +257,7 @@ const HomePageSearchBtn = () => {
 
                 <div style={{ flex: '1 1 30%', maxWidth: '30%', position: 'relative' }} ref={guestRef}>
                     <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                        Số khách
+                        Số khách <span className="text-danger">*</span>
                     </label>
 
                     <div
@@ -388,6 +424,7 @@ const HomePageSearchBtn = () => {
                         size="large"
                         icon={<SearchOutlined />}
                         className="w-100"
+                        onClick={handleHotelSearch}
                         style={{ backgroundColor: '#1890ff' }}
                     />
                 </div>
@@ -581,37 +618,6 @@ const HomePageSearchBtn = () => {
         </div>
     );
 
-    const renderFlightSearch = () => (
-        <div className="row g-3 align-items-end">
-            <div className="col-md-5">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                    Điểm đi - Điểm đến
-                </label>
-                <Input size="large" placeholder="Nhập điểm đi và điểm đến" prefix={<EnvironmentOutlined className="text-muted" />} />
-            </div>
-            <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                    Ngày bay
-                </label>
-                <DatePicker size="large" placeholder="Chọn ngày bay" className="w-100" format="DD/MM/YYYY" />
-            </div>
-            <div className="col-md-3">
-                <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                    Hành khách
-                </label>
-                <Select size="large" placeholder="Số hành khách" className="w-100" suffixIcon={<TeamOutlined />}>
-                    <Option value="1">1 người</Option>
-                    <Option value="2">2 người</Option>
-                    <Option value="3">3-4 người</Option>
-                    <Option value="4">5+ người</Option>
-                </Select>
-            </div>
-            <div className="col-md-1">
-                <Button type="primary" size="large" icon={<SearchOutlined />} className="w-100" style={{ backgroundColor: '#1890ff' }} />
-            </div>
-        </div>
-    );
-
     const renderSearchContent = () => {
         switch (activeTab) {
             case 'tour':
@@ -620,8 +626,6 @@ const HomePageSearchBtn = () => {
                 return renderHotelSearch();
             case 'combo':
                 return renderComboSearch();
-            case 'flight':
-                return renderFlightSearch();
             default:
                 return renderTourSearch();
         }

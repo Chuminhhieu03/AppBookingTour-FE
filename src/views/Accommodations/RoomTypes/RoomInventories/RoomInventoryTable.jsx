@@ -4,19 +4,23 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined
 import dayjs from 'dayjs';
 import LoadingModal from '../../../../components/LoadingModal';
 import roomInventoryAPI from '../../../../api/accommodation/roomInventoryAPI';
+import { useUI } from "components/providers/UIProvider";
 
 export default function RoomInventoryTable({ value = [], onChange, editable = true, roomTypeId }) {
     const [listRoomInventory, setListRoomInventory] = useState(Array.isArray(value) ? value : []);
-    const [editingId, setEditingId] = useState(null); // Track the id of the row being edited
+    const [editingId, setEditingId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+    // NEW
+    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         setListRoomInventory(Array.isArray(value) ? value : []);
     }, [value]);
 
-    // Utility to validate row data
+    // Validate row data
     const isValidRow = (row) => {
         return (
             row.date &&
@@ -29,22 +33,23 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
     };
 
     const updateRoomInventory = (id, field, val) => {
-        const updated = listRoomInventory.map((item) => (item.id === id ? { ...item, [field]: val } : item));
+        const updated = listRoomInventory.map((item) =>
+            item.id === id ? { ...item, [field]: val } : item
+        );
         setListRoomInventory(updated);
         onChange?.(updated);
     };
 
     const handleAddRoomInventory = (newItem) => {
         if (!isValidRow(newItem)) {
-            message.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá và Số phòng đã đặt');
+            messageApi.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá và Số phòng đã đặt');
             return;
         }
 
-        Modal.confirm({
+        modalApi.confirm({
             title: 'Xác nhận thêm',
             content: 'Bạn có chắc chắn muốn thêm giảm giá đặc biệt này?',
             okText: 'Thêm',
-            okType: 'primary',
             cancelText: 'Hủy',
             onOk: async () => {
                 LoadingModal.showLoading();
@@ -55,12 +60,15 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                         bookedRooms: newItem.bookedRooms,
                         ...(roomTypeId && { RoomTypeId: roomTypeId })
                     };
+
                     const data = { RoomInventory: roomInventory };
                     const response = await roomInventoryAPI.create(data);
+
                     if (response.success) {
-                        message.success('Thêm giảm giá đặc biệt thành công');
+                        messageApi.success('Thêm giảm giá đặc biệt thành công');
+
                         const item = {
-                            id: response.roomInventory?.id || -Date.now(), // Negative ID for local rows
+                            id: response.roomInventory?.id || -Date.now(),
                             date: newItem.date,
                             basePrice: newItem.basePrice,
                             bookedRooms: newItem.bookedRooms
@@ -69,11 +77,11 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                         setListRoomInventory(updated);
                         onChange?.(updated);
                     } else {
-                        message.error(response.message || 'Không thể thêm giảm giá đặc biệt');
+                        messageApi.error(response.message || 'Không thể thêm giảm giá đặc biệt');
                     }
                 } catch (error) {
                     console.error('Error adding room inventory:', error);
-                    message.error('Đã xảy ra lỗi khi thêm giảm giá đặc biệt');
+                    messageApi.error('Đã xảy ra lỗi khi thêm giảm giá đặc biệt');
                 } finally {
                     LoadingModal.hideLoading();
                 }
@@ -85,7 +93,6 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         const record = listRoomInventory.find((item) => item.id === id);
         if (!record) return;
 
-        // Local-only rows have negative IDs
         if (record.id < 0) {
             const updated = listRoomInventory.filter((item) => item.id !== id);
             setListRoomInventory(updated);
@@ -93,7 +100,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             return;
         }
 
-        Modal.confirm({
+        modalApi.confirm({
             title: 'Xác nhận xóa',
             content: 'Bạn có chắc chắn muốn xóa giảm giá đặc biệt này?',
             okText: 'Xóa',
@@ -104,16 +111,16 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                 try {
                     const response = await roomInventoryAPI.delete(record.id);
                     if (response.success) {
-                        message.success('Xóa giảm giá đặc biệt thành công');
+                        messageApi.success('Xóa giảm giá đặc biệt thành công');
                         const updated = listRoomInventory.filter((item) => item.id !== id);
                         setListRoomInventory(updated);
                         onChange?.(updated);
                     } else {
-                        message.error(response.message || 'Không thể xóa giảm giá đặc biệt');
+                        messageApi.error(response.message || 'Không thể xóa giảm giá đặc biệt');
                     }
                 } catch (error) {
                     console.error('Error deleting room inventory:', error);
-                    message.error('Đã xảy ra lỗi khi xóa giảm giá đặc biệt');
+                    messageApi.error('Đã xảy ra lỗi khi xóa giảm giá đặc biệt');
                 } finally {
                     LoadingModal.hideLoading();
                 }
@@ -122,7 +129,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
     };
 
     const handleEdit = (id) => {
-        setEditingId(id); // Set the id of the row to edit
+        setEditingId(id);
     };
 
     const handleSave = (id) => {
@@ -130,22 +137,20 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         if (!record) return;
 
         if (!isValidRow(record)) {
-            message.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá và Số phòng đã đặt');
+            messageApi.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá và Số phòng đã đặt');
             return;
         }
 
         if (record.id < 0) {
-            // Local-only row
             setEditingId(null);
-            message.success('Lưu thay đổi thành công');
+            messageApi.success('Lưu thay đổi thành công');
             return;
         }
 
-        Modal.confirm({
+        modalApi.confirm({
             title: 'Xác nhận sửa',
             content: 'Bạn có chắc chắn muốn lưu thay đổi này?',
             okText: 'Lưu',
-            okType: 'primary',
             cancelText: 'Hủy',
             onOk: async () => {
                 LoadingModal.showLoading();
@@ -157,15 +162,16 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                         ...(roomTypeId && { roomTypeId: roomTypeId })
                     };
                     const response = await roomInventoryAPI.update(record.id, roomInventory);
+
                     if (response.success) {
-                        message.success('Cập nhật giảm giá đặc biệt thành công');
+                        messageApi.success('Cập nhật giảm giá đặc biệt thành công');
                         setEditingId(null);
                     } else {
-                        message.error(response.message || 'Không thể cập nhật giảm giá đặc biệt');
+                        messageApi.error(response.message || 'Không thể cập nhật giảm giá đặc biệt');
                     }
                 } catch (error) {
                     console.error('Error updating room inventory:', error);
-                    message.error('Đã xảy ra lỗi khi cập nhật giảm giá đặc biệt');
+                    messageApi.error('Đã xảy ra lỗi khi cập nhật giảm giá đặc biệt');
                 } finally {
                     LoadingModal.hideLoading();
                 }
@@ -174,7 +180,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
     };
 
     const handleCancel = () => {
-        setEditingId(null); // Exit edit mode without reverting
+        setEditingId(null);
     };
 
     const handleBulkDelete = async () => {
@@ -182,17 +188,17 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         try {
             const response = await roomInventoryAPI.deleteBulk(selectedRowKeys);
             if (response.success) {
-                message.success('Xóa thành công');
+                messageApi.success('Xóa thành công');
                 const updated = listRoomInventory.filter((item) => !selectedRowKeys.includes(item.id));
                 setListRoomInventory(updated);
                 onChange?.(updated);
                 setSelectedRowKeys([]);
             } else {
-                message.error(response.message || 'Không thể xóa');
+                messageApi.error(response.message || 'Không thể xóa');
             }
         } catch (error) {
             console.error('Error deleting room inventories:', error);
-            message.error('Đã xảy ra lỗi khi xóa');
+            messageApi.error('Đã xảy ra lỗi khi xóa');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -215,9 +221,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             key: 'date',
             align: 'center',
             render: (value, record) => {
-                if (!editable) {
-                    return <span>{value ? dayjs(value).format('DD/MM/YYYY') : ''}</span>;
-                }
+                if (!editable) return <span>{value ? dayjs(value).format('DD/MM/YYYY') : ''}</span>;
 
                 if (editingId === record.id) {
                     return (
@@ -225,7 +229,9 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                             getPopupContainer={(trigger) => trigger.parentNode}
                             value={value ? dayjs(value) : null}
                             format="DD/MM/YYYY"
-                            onChange={(date) => updateRoomInventory(record.id, 'date', date?.format('YYYY-MM-DD'))}
+                            onChange={(date) =>
+                                updateRoomInventory(record.id, 'date', date?.format('YYYY-MM-DD'))
+                            }
                         />
                     );
                 }
@@ -239,9 +245,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             key: 'basePrice',
             align: 'right',
             render: (value, record) => {
-                if (!editable) {
-                    return <span>{value != null ? Intl.NumberFormat('vi-VN').format(value) : ''}</span>;
-                }
+                if (!editable) return <span>{value != null ? Intl.NumberFormat('vi-VN').format(value) : ''}</span>;
 
                 if (editingId === record.id) {
                     return (
@@ -265,9 +269,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             key: 'bookedRooms',
             align: 'center',
             render: (value, record) => {
-                if (!editable) {
-                    return <span>{value != null ? value : 0}</span>;
-                }
+                if (!editable) return <span>{value != null ? value : 0}</span>;
 
                 if (editingId === record.id) {
                     return (
@@ -289,6 +291,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             align: 'center',
             render: (_, record) => {
                 const isEditing = editingId === record.id;
+
                 return (
                     <Space>
                         {isEditing ? (
@@ -323,11 +326,9 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
 
     const rowSelection = {
         selectedRowKeys,
-        onChange: (selectedKeys) => {
-            setSelectedRowKeys(selectedKeys);
-        },
-        getCheckboxProps: (record) => ({
-            disabled: editingId !== null // Disable checkbox when editing
+        onChange: (keys) => setSelectedRowKeys(keys),
+        getCheckboxProps: () => ({
+            disabled: editingId !== null
         })
     };
 
@@ -350,10 +351,11 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                     </Popconfirm>
                 </div>
             )}
+
             <Table
                 dataSource={dataSource}
                 columns={columns}
-                rowKey={(record) => record.id || record.key} // Use id, fallback to key for new row
+                rowKey={(record) => record.id || record.key}
                 rowSelection={rowSelection}
                 pagination={{
                     current: currentPage,

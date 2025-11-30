@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, notification } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -6,13 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import LoadingModal from '../../components/LoadingModal';
 import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
-import axiosIntance from '../../api/axiosInstance'; 
+import axiosIntance from '../../api/axiosInstance';
+import { useUI } from 'components/providers/UIProvider'; 
 
 const { TextArea } = Input;
 
 export default function Addnew() {
     const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
+    const { messageApi, modalApi } = useUI();
 
     const onAddnewDiscount = async (discount) => {
         LoadingModal.showLoading();
@@ -27,36 +29,16 @@ export default function Addnew() {
             
             if (res.success) {
                 const discountRes = res.discount;
-                notification.success({
-                    message: 'Thành công',
-                    description: 'Thêm mới mã giảm giá thành công',
-                    duration: 2
-                });
+                messageApi.success('Thêm mới mã giảm giá thành công');
                 setTimeout(() => {
                     navigate(`/admin/sale/discount/display/${discountRes.id}`);
-                }, 1500);
+                }, 1000);
             } else {
-                const errorData = res.data || [];
-                if (errorData.length > 0) {
-                    const listErrorMessage = errorData.map((e) => e.errorMessage);
-                    notification.error({
-                        message: 'Lỗi',
-                        description: `Lỗi khi thêm mới mã giảm giá: ${listErrorMessage.join(', ')}`
-                    });
-                } else {
-                    notification.error({
-                        message: 'Lỗi',
-                        description: res.message || 'Lỗi khi thêm mới mã giảm giá'
-                    });
-                }
+                messageApi.error(res.message || 'Không thể thêm mới mã giảm giá');
             }
         } catch (error) {
             console.error('Error adding new discount:', error);
-            const errorMsg = error.response?.data?.message || error.message || 'Đã xảy ra lỗi khi thêm mới mã giảm giá';
-            notification.error({
-                message: 'Lỗi',
-                description: errorMsg
-            });
+            messageApi.error('Đã xảy ra lỗi khi thêm mới mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }

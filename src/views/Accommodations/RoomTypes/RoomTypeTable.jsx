@@ -1,18 +1,20 @@
-import { Button, Space, Table, Tag, Modal, message } from 'antd';
+import { Button, Space, Table, Tag } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { render } from 'sass';
 import Utility from '../../../Utils/Utility';
 import Constants from '../../../Constants/Constants';
 import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
+import { useUI } from 'components/providers/UIProvider';
 
 const PAGE_SIZE = 5;
 
 export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTypeEditClick, onRoomTypeDeleteClick, viewOnly = false }) {
     const [page, setPage] = useState(1);
+    const { messageApi, modalApi } = useUI();
 
     const handleDelete = async (id) => {
-        Modal.confirm({
+        modalApi.confirm({
             title: 'Xác nhận xóa',
             content: 'Bạn có chắc chắn muốn xóa loại phòng này?',
             okText: 'Xóa',
@@ -22,16 +24,16 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
                 try {
                     const response = await roomTypeAPI.delete(id);
                     if (response.success) {
-                        message.success('Xóa loại phòng thành công');
+                        messageApi.success('Xóa loại phòng thành công');
                         if (onRoomTypeDeleteClick) {
                             onRoomTypeDeleteClick();
                         }
                     } else {
-                        message.error(response.message || 'Không thể xóa loại phòng');
+                        messageApi.error(response.message || 'Không thể xóa loại phòng');
                     }
                 } catch (error) {
                     console.error('Error deleting room type:', error);
-                    message.error('Đã xảy ra lỗi khi xóa loại phòng');
+                    messageApi.error('Đã xảy ra lỗi khi xóa loại phòng');
                 }
             }
         });
@@ -86,6 +88,27 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             )
         },
         {
+            title: 'Diện tích (m²)',
+            dataIndex: 'area',
+            key: 'area',
+            align: 'center',
+            render: (value) => (value ? `${Intl.NumberFormat('vi-VN').format(value)}` : '-')
+        },
+        {
+            title: 'Giờ nhận phòng',
+            dataIndex: 'checkinHour',
+            key: 'checkinHour',
+            align: 'center',
+            render: (value) => (value ? value.substring(0, 5) : '-')
+        },
+        {
+            title: 'Giờ trả phòng',
+            dataIndex: 'checkoutHour',
+            key: 'checkoutHour',
+            align: 'center',
+            render: (value) => (value ? value.substring(0, 5) : '-')
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'statusName',
             align: 'center',
@@ -117,11 +140,11 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             columns={columns}
             dataSource={listRoomType}
             rowKey="id"
-            pagination={{
-                pageSize: PAGE_SIZE,
-                onChange: (page) => {
-                    setPage(page);
-                },
+                pagination={{
+                    pageSize: PAGE_SIZE,
+                    onChange: (page) => {
+                        setPage(page);
+                    },
                 current: page
             }}
         />

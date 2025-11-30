@@ -26,6 +26,18 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
         }
     };
 
+    const getViewNames = (viewIds) => {
+        if (!viewIds) return '';
+        const ids = viewIds.split(',').map((id) => parseInt(id.trim()));
+        return ids
+            .map((id) => {
+                const view = Constants.RoomViewOptions.find((v) => v.value === id);
+                return view ? view.label : '';
+            })
+            .filter(Boolean)
+            .join(', ');
+    };
+
     return (
         <Modal
             title="Chi tiết loại phòng"
@@ -92,6 +104,29 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                                 <Col span={8}>
                                     <span>Trạng thái</span>
                                     <Input value={Utility.getLabelByValue(Constants.StatusOptions, roomTypeDisplay.status)} readOnly />
+                                </Col>
+                                <Col span={8}>
+                                    <span>Giờ nhận phòng</span>
+                                    <Input value={roomTypeDisplay.checkinHour} readOnly />
+                                </Col>
+                                <Col span={8}>
+                                    <span>Giờ trả phòng</span>
+                                    <Input value={roomTypeDisplay.checkoutHour} readOnly />
+                                </Col>
+                                <Col span={8}>
+                                    <span>Diện tích (m²)</span>
+                                    <Input
+                                        value={roomTypeDisplay.area ? `${Intl.NumberFormat('vi-VN').format(roomTypeDisplay.area)} m²` : ''}
+                                        readOnly
+                                    />
+                                </Col>
+                                <Col span={8}>
+                                    <span>Tầm nhìn</span>
+                                    <Input value={getViewNames(roomTypeDisplay.view)} readOnly />
+                                </Col>
+                                <Col span={24}>
+                                    <span>Quy định hủy phòng</span>
+                                    <div className="mt-4" dangerouslySetInnerHTML={{ __html: roomTypeDisplay.cancelPolicy }} />
                                 </Col>
                                 <Col span={24}>
                                     <span>Hình ảnh khác</span>

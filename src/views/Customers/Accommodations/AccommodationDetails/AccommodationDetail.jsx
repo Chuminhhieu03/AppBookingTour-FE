@@ -21,7 +21,7 @@ function AccommodationDetail() {
     const getAccommodationById = async () => {
         try {
             LoadingModal.showLoading();
-            const res = await accommodationAPI.getById(id);
+            const res = await accommodationAPI.getByIdForCustomer(id);
             setAccommodation(res.accommodation ?? {});
         } catch (error) {
             console.error('Error fetching accommodation details:', error);

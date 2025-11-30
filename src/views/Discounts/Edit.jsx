@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, notification } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
 import Utility from '../../Utils/Utility';
 import axiosIntance from '../../api/axiosInstance';
+import { useUI } from 'components/providers/UIProvider';
 
 const { TextArea } = Input;
 
@@ -15,6 +16,7 @@ export default function Edit() {
     const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
     const { id } = useParams();
+    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         setupEditForm();
@@ -32,10 +34,7 @@ export default function Edit() {
             setDiscount(discountRes);
         } catch (error) {
             console.error('Error loading discount data:', error);
-            notification.error({
-                message: 'Lỗi',
-                description: 'Không thể tải thông tin mã giảm giá'
-            });
+            messageApi.error('Không thể tải thông tin mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -53,36 +52,16 @@ export default function Edit() {
             
             if (res.success) {
                 const discountRes = res.discount ?? {};
-                notification.success({
-                    message: 'Thành công',
-                    description: 'Cập nhật mã giảm giá thành công',
-                    duration: 2
-                });
+                messageApi.success('Cập nhật mã giảm giá thành công');
                 setTimeout(() => {
                     navigate(`/admin/sale/discount/display/${discountRes.id}`);
-                }, 1500);
+                }, 1000);
             } else {
-                const errorData = res.data || [];
-                if (errorData.length > 0) {
-                    const listErrorMessage = errorData.map((e) => e.errorMessage);
-                    notification.error({
-                        message: 'Lỗi',
-                        description: `Lỗi khi chỉnh sửa mã giảm giá: ${listErrorMessage.join(', ')}`
-                    });
-                } else {
-                    notification.error({
-                        message: 'Lỗi',
-                        description: res.message || 'Lỗi khi chỉnh sửa mã giảm giá'
-                    });
-                }
+                messageApi.error(res.message || 'Không thể cập nhật mã giảm giá');
             }
         } catch (error) {
             console.error('Error editing discount:', error);
-            const errorMsg = error.response?.data?.message || error.message || 'Đã xảy ra lỗi khi chỉnh sửa mã giảm giá';
-            notification.error({
-                message: 'Lỗi',
-                description: errorMsg
-            });
+            messageApi.error('Đã xảy ra lỗi khi cập nhật mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }

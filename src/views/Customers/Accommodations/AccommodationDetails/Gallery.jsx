@@ -66,7 +66,7 @@ function Gallery({ images = [] }) {
                         className="img-fluid rounded w-100"
                         style={{
                             objectFit: 'cover',
-                            height: 140 * 4 + 9 * 3 // 4 ảnh + gap (gap-3 = 9px)
+                            height: 140 * 4 + 15 * 3 // 4 ảnh + gap (gap-3 = 9px)
                         }}
                         alt="Selected"
                     />

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { UserOutlined, BorderOutlined, CarOutlined, TeamOutlined, BorderOuterOutlined, EyeOutlined, CloseOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
+import Constants from '../../../../Constants/Constants';
+import { useNavigate } from 'react-router-dom';
 
 function RoomCard({ roomType }) {
     const [isHovered, setIsHovered] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedImageUrl, setSelectedImageUrl] = useState('');
+    const [isCancelPolicyModalVisible, setIsCancelPolicyModalVisible] = useState(false);
     const totalPeople = (roomType?.maxAdult || 0) + (roomType?.maxChildren || 0);
+    const navigate = useNavigate();
 
     // Parse amenityName string
     const amenities = roomType?.amenityName
@@ -18,6 +22,17 @@ function RoomCard({ roomType }) {
 
     // Format price
     const formattedPrice = roomType?.price ? new Intl.NumberFormat('vi-VN').format(roomType.price) : '0';
+
+    // Get view names from view IDs
+    const getViewNames = (viewIds) => {
+        if (!viewIds) return 'Không có thông tin';
+        const ids = viewIds.split(',').map(id => parseInt(id.trim()));
+        const viewNames = ids.map(id => {
+            const view = Constants.RoomViewOptions.find(v => v.value === id);
+            return view ? view.label : '';
+        }).filter(Boolean);
+        return viewNames.length > 0 ? viewNames.join(', ') : 'Không có thông tin';
+    };
 
     // Get list of images
     const roomImages = roomType?.listInfoImage || [];
@@ -91,49 +106,61 @@ function RoomCard({ roomType }) {
 
                     {/* RIGHT CONTENT */}
                     <div className="col-md-8">
-                    <h5 className="fw-bold">{roomType?.name}</h5>
+                        {/* Room Information Section */}
+                        <div style={{ borderBottom: '1px solid #ddd', paddingBottom: '16px', marginBottom: '16px' }}>
+                            <h5 className="fw-bold mb-3">{roomType?.name}</h5>
 
-                    <div className="text-danger fw-bold small">🎁 Siêu tiết kiệm</div>
-
-                    <div className="d-flex align-items-center gap-3 mt-2">
-                        <span>
-                            <TeamOutlined />{totalPeople} người
-                        </span>
-                        <span>
-                            <BorderOuterOutlined /> 32m²
-                        </span>
-                        <span style={{ fontSize: 18, marginRight: 6 }}>🛏️</span>
-                        <span>
-                           <EyeOutlined /> Cảnh thành phố
-                        </span>
-                    </div>
-
-                    <div className="row mt-3">
-                        {amenities.length > 0 ? (
-                            <>
-                                <div className="col-md-6">
-                                    {amenities.slice(0, Math.ceil(amenities.length / 2)).map((amenity, index) => (
-                                        <p key={index}>{amenity}</p>
-                                    ))}
-                                </div>
-                                <div className="col-md-6">
-                                    {amenities.slice(Math.ceil(amenities.length / 2)).map((amenity, index) => (
-                                        <p key={index}>{amenity}</p>
-                                    ))}
-                                </div>
-                            </>
-                        ) : (
-                            <div className="col-12">
-                                <p className="text-muted">Không có tiện ích</p>
+                            <div className="d-flex align-items-center gap-3">
+                                <span>
+                                    <TeamOutlined /> {totalPeople} người
+                                </span>
+                                <span>
+                                    <BorderOuterOutlined /> {roomType?.area ? `${roomType.area} m²` : '32m²'}
+                                </span>
+                                <span>
+                                    <EyeOutlined /> {getViewNames(roomType?.view)}
+                                </span>
                             </div>
-                        )}
-                    </div>
+                        </div>
 
-                    <div className="d-flex align-items-center mt-3">
-                        <div className="ms-auto text-danger fw-bold fs-5">{formattedPrice} ₫ / 1 Đêm</div>
-                        <button className="btn btn-danger ms-3 px-4">CHỌN PHÒNG</button>
+                        <div className="row">
+                            {/* Amenities - 2 columns */}
+                            <div className="col-md-4">
+                                {amenities.length > 0 ? (
+                                    amenities.slice(0, Math.ceil(amenities.length / 2)).map((amenity, index) => (
+                                        <p key={index} className="mb-1">{amenity}</p>
+                                    ))
+                                ) : (
+                                    <p className="text-muted">Không có tiện ích</p>
+                                )}
+                            </div>
+                            <div className="col-md-4">
+                                {amenities.length > 0 && amenities.slice(Math.ceil(amenities.length / 2)).map((amenity, index) => (
+                                    <p key={index} className="mb-1">{amenity}</p>
+                                ))}
+                            </div>
+
+                            {/* Price Information - 1 column */}
+                            <div className="col-md-4 d-flex flex-column align-items-center justify-content-center">
+                                <div className="fw-bold fs-6 mb-1">
+                                    <span className="text-danger">{formattedPrice} ₫</span>
+                                    <span className="text-dark"> / 1 Đêm</span>
+                                </div>
+                                <button className="btn btn-danger px-5 mb-1" onClick={() => navigate(`/roomtypes/preview/${roomType?.id}`)}>CHỌN PHÒNG</button>
+                                <span 
+                                    onClick={() => setIsCancelPolicyModalVisible(true)}
+                                    style={{ 
+                                        color: '#1890ff', 
+                                        cursor: 'pointer',
+                                        fontSize: '13px',
+                                        fontStyle: 'italic'
+                                    }}
+                                >
+                                    Quy định hủy phòng
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
         </div>
 
@@ -157,6 +184,25 @@ function RoomCard({ roomType }) {
                         objectFit: 'contain'
                     }}
                 />
+            </Modal>
+
+            {/* Cancel Policy Modal */}
+            <Modal
+                title="Quy định hủy phòng"
+                open={isCancelPolicyModalVisible}
+                onCancel={() => setIsCancelPolicyModalVisible(false)}
+                footer={[
+                    <button 
+                        key="close" 
+                        className="btn btn-primary"
+                        onClick={() => setIsCancelPolicyModalVisible(false)}
+                    >
+                        Đóng
+                    </button>
+                ]}
+                width="60%"
+            >
+                <div className="mt-4" dangerouslySetInnerHTML={{ __html: roomType?.cancelPolicy || 'Chưa có quy định hủy phòng' }} />
             </Modal>
         </>
     );

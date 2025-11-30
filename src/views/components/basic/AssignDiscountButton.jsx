@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Modal, Button, Input, Table, Space, Typography, Row, Col, notification } from 'antd';
+import { Modal, Button, Input, Table, Space, Typography, Row, Col, notification, message } from 'antd';
 import { SearchOutlined, ReloadOutlined, CloseOutlined, SendOutlined, CheckOutlined } from '@ant-design/icons';
 import LoadingModal from '../../../components/LoadingModal';
 import discountAPI from '../../../api/discount/discountAPI';
@@ -17,6 +17,10 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
     const [filter, setFilter] = useState(new DiscountFilter());
     const [currentPage, setCurrentPage] = useState(1);
     const [total, setTotal] = useState(0);
+
+    // Hooks for message and modal
+    const [messageApi, messageContext] = message.useMessage();
+    const [modal, modalContext] = Modal.useModal();
 
     const handleOpenModal = () => {
         setIsModalVisible(true);
@@ -50,26 +54,14 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
             };
             const res = await itemDiscountAPI.assignToItem(request);
             if (res.success) {
-                notification.success({
-                    message: 'Áp dụng thành công!',
-                    description: `Đã áp dụng ${selectedCoupons.length} mã giảm giá cho item.`,
-                    placement: 'topRight'
-                });
+                messageApi.success(`Áp dụng thành công! Đã áp dụng ${selectedCoupons.length} mã giảm giá cho item.`);
                 handleCancel();
             } else {
-                notification.error({
-                    message: 'Lỗi khi áp dụng mã giảm giá',
-                    description: res.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá.',
-                    placement: 'topRight'
-                });
+                messageApi.error(res.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá.');
             }
         } catch (error) {
             console.error('Error assigning discounts:', error);
-            notification.error({
-                message: 'Lỗi khi áp dụng mã giảm giá',
-                description: error.message || 'Có lỗi xảy ra khi kết nối đến server.',
-                placement: 'topRight'
-            });
+            messageApi.error(error.message || 'Có lỗi xảy ra khi kết nối đến server.');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -104,19 +96,11 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
                 setSelectedRowKeys(defaultCheckedIds);
                 setSelectedCoupons(list.filter((x) => x.checked));
             } else {
-                notification.error({
-                    message: 'Lỗi khi tải danh sách mã giảm giá',
-                    description: res.message || 'Không thể tải danh sách mã giảm giá.',
-                    placement: 'topRight'
-                });
+                messageApi.error(res.message || 'Không thể tải danh sách mã giảm giá.');
             }
         } catch (err) {
             console.error('Error fetching discount list:', err);
-            notification.error({
-                message: 'Lỗi hệ thống',
-                description: 'Có lỗi xảy ra khi kết nối đến server.',
-                placement: 'topRight'
-            });
+            messageApi.error('Có lỗi xảy ra khi kết nối đến server.');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -169,6 +153,10 @@ const AssignDiscountButton = ({ entityId, entityType }) => {
 
     return (
         <div>
+            {/* MUST INCLUDE */}
+            {messageContext}
+            {modalContext}
+
             <Button type="primary" icon={<SendOutlined />} onClick={handleOpenModal} shape="round">
                 Áp dụng mã giảm giá
             </Button>
