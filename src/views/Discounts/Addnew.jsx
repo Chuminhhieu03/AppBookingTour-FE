@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, message } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -6,15 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import LoadingModal from '../../components/LoadingModal';
 import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
-import axiosIntance from '../../api/axiosInstance';
-import { useUI } from 'components/providers/UIProvider'; 
+import axiosIntance from '../../api/axiosInstance'; 
 
 const { TextArea } = Input;
 
 export default function Addnew() {
     const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
-    const { messageApi, modalApi } = useUI();
 
     const onAddnewDiscount = async (discount) => {
         LoadingModal.showLoading();
@@ -29,16 +27,16 @@ export default function Addnew() {
             
             if (res.success) {
                 const discountRes = res.discount;
-                messageApi.success('Thêm mới mã giảm giá thành công');
+                message.success('Thêm mới mã giảm giá thành công');
                 setTimeout(() => {
                     navigate(`/admin/sale/discount/display/${discountRes.id}`);
                 }, 1000);
             } else {
-                messageApi.error(res.message || 'Không thể thêm mới mã giảm giá');
+                message.error(res.message || 'Không thể thêm mới mã giảm giá');
             }
         } catch (error) {
             console.error('Error adding new discount:', error);
-            messageApi.error('Đã xảy ra lỗi khi thêm mới mã giảm giá');
+            message.error('Đã xảy ra lỗi khi thêm mới mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }

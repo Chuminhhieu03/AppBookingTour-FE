@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, Select, Rate, Upload, Form, InputNumber } from 'antd';
+import { Col, Row, Button, Space, Input, Select, Rate, Upload, Form, InputNumber, message } from 'antd';
 import { CloseOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -13,7 +13,6 @@ import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
 import { MapContainer, TileLayer, Marker as LeafletMarker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useUI } from 'components/providers/UIProvider';
 
 // Create red marker icon for temporary position
 const redIcon = new L.Icon({
@@ -35,7 +34,6 @@ export default function Addnew() {
     const [coverImgFile, setCoverImgFile] = useState(null);
     const [regulation, setRegulation] = useState('');
     const [tempMarkerPosition, setTempMarkerPosition] = useState(null);
-    const { messageApi, modalApi } = useUI();
 
     // Component to handle map clicks
     const MapClickHandler = () => {
@@ -54,7 +52,7 @@ export default function Addnew() {
         const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         form.setFieldsValue({ Coordinates: coordsString });
         setTempMarkerPosition(null);
-        messageApi.success('Đã cập nhật tọa độ');
+        message.success('Đã cập nhật tọa độ');
     };
 
     const handleCancelCoordinates = () => {
@@ -110,18 +108,18 @@ export default function Addnew() {
 
             const res = await accommodationAPI.create(formData);
             if (res.success) {
-                messageApi.success('Thêm mới cơ sở lưu trú thành công');
+                message.success('Thêm mới cơ sở lưu trú thành công');
                 const accommodationRes = res.accommodation;
                 form.resetFields();
                 setCoverImgFile(null);
                 setListInfoImage([]);
                 window.location.href = `/admin/service/accommodation/display/${accommodationRes.id}`;
             } else {
-                messageApi.error(res.message || 'Thêm mới cơ sở lưu trú thất bại');
+                message.error(res.message || 'Thêm mới cơ sở lưu trú thất bại');
             }
         } catch (error) {
             console.error('Error adding new accommodation:', error);
-            messageApi.error('Đã xảy ra lỗi khi thêm mới cơ sở lưu trú');
+            message.error('Đã xảy ra lỗi khi thêm mới cơ sở lưu trú');
         } finally {
             LoadingModal.hideLoading();
         }

@@ -8,7 +8,6 @@ import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
 import Constants from '../../../Constants/Constants';
 import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI';
 import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
-import { useUI } from 'components/providers/UIProvider';
 
 const { TextArea } = Input;
 
@@ -19,7 +18,6 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
     const [listRoomView, setListRoomView] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
     const [cancelPolicy, setCancelPolicy] = useState('');
-    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         getListRoomTypeAmenity();
@@ -71,7 +69,7 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             });
             const res = await roomTypeAPI.create(formData);
             if (res.success) {
-                messageApi.success('Thêm mới loại phòng thành công');
+                message.success('Thêm mới loại phòng thành công');
                 onOk(true); // Signal success to parent
                 onCancel(); // Close the modal
                 form.resetFields();
@@ -79,11 +77,11 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                 setListInfoImage([]);
             } else {
                 console.error('Error adding new room type:', res.message);
-                messageApi.error(res.message || 'Thêm mới loại phòng thất bại');
+                message.error(res.message || 'Thêm mới loại phòng thất bại');
             }
         } catch (error) {
             console.error('Error adding new accommodation:', error);
-            messageApi.error('Đã xảy ra lỗi khi thêm mới loại phòng');
+            message.error('Đã xảy ra lỗi khi thêm mới loại phòng');
         } finally {
             LoadingModal.hideLoading();
         }

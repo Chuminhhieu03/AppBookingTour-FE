@@ -18,7 +18,6 @@ import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
 import { MapContainer, TileLayer, Marker as LeafletMarker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useUI } from 'components/providers/UIProvider';
 
 // Create red marker icon for temporary position
 const redIcon = new L.Icon({
@@ -48,7 +47,6 @@ export default function Edit() {
     const [isRoomTypeEditModalOpen, setIsRoomTypeEditModalOpen] = useState(false);
     const [selectedRoomTypeForEdit, setSelectedRoomTypeForEdit] = useState(null);
     const [tempMarkerPosition, setTempMarkerPosition] = useState(null);
-    const { messageApi, modalApi } = useUI();
 
     // Component to handle map clicks
     const MapClickHandler = () => {
@@ -68,7 +66,7 @@ export default function Edit() {
         form.setFieldsValue({ Coordinates: coordsString });
         setAccommodation({ ...accommodation, coordinates: coordsString });
         setTempMarkerPosition(null);
-        messageApi.success('Đã cập nhật tọa độ');
+        message.success('Đã cập nhật tọa độ');
     };
 
     const handleCancelCoordinates = () => {
@@ -158,16 +156,16 @@ export default function Edit() {
             });
             const res = await accommodationAPI.update(id, formData);
             if (res.success) {
-                messageApi.success('Cập nhật cơ sở lưu trú thành công');
+                message.success('Cập nhật cơ sở lưu trú thành công');
                 window.location.href = `/admin/service/accommodation/display/${id}`;
             } else {
                 const errorData = res.data || [];
                 const listErrorMessage = errorData?.map((e) => e.errorMessage);
-                messageApi.error(`Lỗi khi chỉnh sửa cơ sở lưu trú: ${listErrorMessage.join(', ')}`);
+                message.error(`Lỗi khi chỉnh sửa cơ sở lưu trú: ${listErrorMessage.join(', ')}`);
             }
         } catch (error) {
             console.error('Error editing accommodation:', error);
-            messageApi.error('Đã xảy ra lỗi khi cập nhật cơ sở lưu trú');
+            message.error('Đã xảy ra lỗi khi cập nhật cơ sở lưu trú');
         }
         LoadingModal.hideLoading();
     };

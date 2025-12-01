@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { DatePicker, Input, Select, Button } from 'antd';
-import { useUI } from 'components/providers/UIProvider';
+import { DatePicker, Input, Select, Button, message } from 'antd';
 import {
     SearchOutlined,
     EnvironmentOutlined,
@@ -23,7 +22,6 @@ const { Option } = Select;
 
 const HomePageSearchBtn = () => {
     const navigate = useNavigate();
-    const { messageApi } = useUI();
     const [activeTab, setActiveTab] = useState('tour');
     const [cities, setCities] = useState([]);
 
@@ -149,15 +147,15 @@ const HomePageSearchBtn = () => {
     const handleHotelSearch = () => {
         // Validate required fields
         if (!selectedCity) {
-            messageApi.error('Vui lòng chọn địa điểm');
+            message.error('Vui lòng chọn địa điểm');
             return;
         }
         if (!checkIn) {
-            messageApi.error('Vui lòng chọn ngày nhận phòng');
+            message.error('Vui lòng chọn ngày nhận phòng');
             return;
         }
         if (!checkOut) {
-            messageApi.error('Vui lòng chọn ngày trả phòng');
+            message.error('Vui lòng chọn ngày trả phòng');
             return;
         }
 

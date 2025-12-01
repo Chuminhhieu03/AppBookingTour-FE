@@ -10,7 +10,6 @@ import systemParameterAPI from '../../../api/systemParameters/systemParameterAPI
 import RoomInventoryTable from './RoomInventories/RoomInventoryTable';
 import roomInventoryAPI from '../../../api/accommodation/roomInventoryAPI';
 import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
-import { useUI } from 'components/providers/UIProvider';
 
 const { TextArea } = Input;
 
@@ -25,7 +24,6 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
     const [isDateRangeModalOpen, setIsDateRangeModalOpen] = useState(false);
     const [isSpecialDateModalOpen, setIsSpecialDateModalOpen] = useState(false);
     const [cancelPolicy, setCancelPolicy] = useState(roomType?.cancelPolicy || '');
-    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         getListRoomTypeAmenity();
@@ -106,7 +104,7 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const idToPut = roomTypeData.Id ?? roomTypeEdit.id;
             const res = await roomTypeAPI.update(idToPut, formData);
             if (res.success) {
-                messageApi.success('Cập nhật loại phòng thành công');
+                message.success('Cập nhật loại phòng thành công');
                 onOk(true);
                 onCancel();
                 form.resetFields();
@@ -115,11 +113,11 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                 setCoverImgFile(null);
             } else {
                 console.error('Error editing room type:', res.message);
-                messageApi.error(res.message || 'Cập nhật loại phòng thất bại');
+                message.error(res.message || 'Cập nhật loại phòng thất bại');
             }
         } catch (error) {
             console.error('Error editing room type:', error);
-            messageApi.error('Đã xảy ra lỗi khi cập nhật loại phòng');
+            message.error('Đã xảy ra lỗi khi cập nhật loại phòng');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -151,17 +149,17 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const response = await roomInventoryAPI.createBulk(requestBody);
 
             if (response.success) {
-                messageApi.success('Thêm khoảng ngày thành công');
+                message.success('Thêm khoảng ngày thành công');
                 setIsDateRangeModalOpen(false);
                 dateRangeForm.resetFields();
                 // Refresh room type data to update the table
                 await getRoomTypeById(roomTypeEdit.id);
             } else {
-                messageApi.error(response.message || 'Không thể thêm khoảng ngày');
+                message.error(response.message || 'Không thể thêm khoảng ngày');
             }
         } catch (error) {
             console.error('Error creating date range:', error);
-            messageApi.error('Đã xảy ra lỗi khi thêm khoảng ngày');
+            message.error('Đã xảy ra lỗi khi thêm khoảng ngày');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -190,17 +188,17 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             const response = await roomInventoryAPI.create(requestBody);
 
             if (response.success) {
-                messageApi.success('Thêm ngày đặc biệt thành công');
+                message.success('Thêm ngày đặc biệt thành công');
                 setIsSpecialDateModalOpen(false);
                 specialDateForm.resetFields();
                 // Refresh room type data to update the table
                 await getRoomTypeById(roomTypeEdit.id);
             } else {
-                messageApi.error(response.message || 'Không thể thêm ngày đặc biệt');
+                message.error(response.message || 'Không thể thêm ngày đặc biệt');
             }
         } catch (error) {
             console.error('Error creating special date:', error);
-            messageApi.error('Đã xảy ra lỗi khi thêm ngày đặc biệt');
+            message.error('Đã xảy ra lỗi khi thêm ngày đặc biệt');
         } finally {
             LoadingModal.hideLoading();
         }

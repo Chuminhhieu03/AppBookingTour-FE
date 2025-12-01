@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, message } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -8,7 +8,6 @@ import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
 import Utility from '../../Utils/Utility';
 import axiosIntance from '../../api/axiosInstance';
-import { useUI } from 'components/providers/UIProvider';
 
 const { TextArea } = Input;
 
@@ -16,7 +15,6 @@ export default function Edit() {
     const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
     const { id } = useParams();
-    const { messageApi, modalApi } = useUI();
 
     useEffect(() => {
         setupEditForm();
@@ -34,7 +32,7 @@ export default function Edit() {
             setDiscount(discountRes);
         } catch (error) {
             console.error('Error loading discount data:', error);
-            messageApi.error('Không thể tải thông tin mã giảm giá');
+            message.error('Không thể tải thông tin mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -52,16 +50,16 @@ export default function Edit() {
             
             if (res.success) {
                 const discountRes = res.discount ?? {};
-                messageApi.success('Cập nhật mã giảm giá thành công');
+                message.success('Cập nhật mã giảm giá thành công');
                 setTimeout(() => {
                     navigate(`/admin/sale/discount/display/${discountRes.id}`);
                 }, 1000);
             } else {
-                messageApi.error(res.message || 'Không thể cập nhật mã giảm giá');
+                message.error(res.message || 'Không thể cập nhật mã giảm giá');
             }
         } catch (error) {
             console.error('Error editing discount:', error);
-            messageApi.error('Đã xảy ra lỗi khi cập nhật mã giảm giá');
+            message.error('Đã xảy ra lỗi khi cập nhật mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }

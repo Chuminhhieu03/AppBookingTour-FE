@@ -1,20 +1,18 @@
-import { Button, Space, Table, Tag } from 'antd';
+import { Button, Space, Table, Tag, Modal, message } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { render } from 'sass';
 import Utility from '../../../Utils/Utility';
 import Constants from '../../../Constants/Constants';
 import roomTypeAPI from '../../../api/accommodation/roomTypeAPI';
-import { useUI } from 'components/providers/UIProvider';
 
 const PAGE_SIZE = 5;
 
 export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTypeEditClick, onRoomTypeDeleteClick, viewOnly = false }) {
     const [page, setPage] = useState(1);
-    const { messageApi, modalApi } = useUI();
 
     const handleDelete = async (id) => {
-        modalApi.confirm({
+        Modal.confirm({
             title: 'Xác nhận xóa',
             content: 'Bạn có chắc chắn muốn xóa loại phòng này?',
             okText: 'Xóa',
@@ -24,16 +22,16 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
                 try {
                     const response = await roomTypeAPI.delete(id);
                     if (response.success) {
-                        messageApi.success('Xóa loại phòng thành công');
+                        message.success('Xóa loại phòng thành công');
                         if (onRoomTypeDeleteClick) {
                             onRoomTypeDeleteClick();
                         }
                     } else {
-                        messageApi.error(response.message || 'Không thể xóa loại phòng');
+                        message.error(response.message || 'Không thể xóa loại phòng');
                     }
                 } catch (error) {
                     console.error('Error deleting room type:', error);
-                    messageApi.error('Đã xảy ra lỗi khi xóa loại phòng');
+                    message.error('Đã xảy ra lỗi khi xóa loại phòng');
                 }
             }
         });

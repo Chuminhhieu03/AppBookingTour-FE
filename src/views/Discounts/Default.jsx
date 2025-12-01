@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select } from 'antd';
+import { Table, Tag, Col, Row, Input, Flex, Button, Space, Select, Modal, message } from 'antd';
 import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import MainCard from 'components/MainCard';
@@ -10,7 +10,6 @@ import LoadingModal from '../../components/LoadingModal';
 import axiosIntance from '../../api/axiosInstance';
 import discountAPI from '../../api/discount/discountAPI';
 import Utility from '../../Utils/Utility';
-import { useUI } from 'components/providers/UIProvider';
 
 export default function Default() {
     const [query, setQuery] = React.useState(new SearchDiscountQuery());
@@ -19,7 +18,6 @@ export default function Default() {
     const [listStatus, setListStatus] = React.useState([]);
     const [total, setTotal] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
-    const { messageApi, modalApi } = useUI();
 
     const columns = [
         {
@@ -104,16 +102,16 @@ export default function Default() {
             if (response.data.success) {
                 setListStatus(response.data.listStatus);
             } else {
-                messageApi.error('Không thể tải danh sách trạng thái.');
+                message.error('Không thể tải danh sách trạng thái.');
             }
         } catch (error) {
             console.error('Error setting up default:', error);
-            messageApi.error('Đã xảy ra lỗi khi tải danh sách trạng thái.');
+            message.error('Đã xảy ra lỗi khi tải danh sách trạng thái.');
         }
     };
 
     const handleDelete = async (id) => {
-        modalApi.confirm({
+        Modal.confirm({
             title: 'Xác nhận xóa',
             content: 'Bạn có chắc chắn muốn xóa mã giảm giá này?',
             okText: 'Xóa',
@@ -123,14 +121,14 @@ export default function Default() {
                 try {
                     const response = await discountAPI.delete(id);
                     if (response.success) {
-                        messageApi.success('Xóa mã giảm giá thành công');
+                        message.success('Xóa mã giảm giá thành công');
                         searchData(currentPage - 1);
                     } else {
-                        messageApi.error(response.message || 'Không thể xóa mã giảm giá');
+                        message.error(response.message || 'Không thể xóa mã giảm giá');
                     }
                 } catch (error) {
                     console.error('Error deleting discount:', error);
-                    messageApi.error('Đã xảy ra lỗi khi xóa mã giảm giá');
+                    message.error('Đã xảy ra lỗi khi xóa mã giảm giá');
                 }
             }
         });
@@ -150,11 +148,11 @@ export default function Default() {
                 setTotal(res.meta?.totalCount ?? res.listDiscount?.length ?? 0);
                 setCurrentPage(pageIndex + 1);
             } else {
-                messageApi.error(res.message || 'Không thể tải danh sách mã giảm giá');
+                message.error(res.message || 'Không thể tải danh sách mã giảm giá');
             }
         } catch (error) {
             console.error('Error fetching discounts:', error);
-            messageApi.error('Đã xảy ra lỗi khi tải danh sách mã giảm giá');
+            message.error('Đã xảy ra lỗi khi tải danh sách mã giảm giá');
         } finally {
             LoadingModal.hideLoading();
         }
