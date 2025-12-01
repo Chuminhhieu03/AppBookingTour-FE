@@ -22,11 +22,11 @@ const BookingRoute = {
             element: <CustomerBooking bookingType="accommodation" />
         },
         {
-            path: 'booking-success',
+            path: 'booking/booking-success',
             element: <BookingSuccess />
         },
         {
-            path: 'booking-failed',
+            path: 'booking/booking-failed',
             element: <BookingFailed />
         }
     ]

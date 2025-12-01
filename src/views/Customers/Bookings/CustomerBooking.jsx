@@ -62,6 +62,7 @@ const CustomerBooking = ({ bookingType = 'combo' }) => {
             setLoading(false);
         }
     }; // Xử lý khi hoàn thành bước 2 (Thanh toán)
+
     const handleStep2Complete = async (paymentMethodId) => {
         setLoading(true);
         try {

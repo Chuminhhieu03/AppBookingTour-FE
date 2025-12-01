@@ -13,6 +13,12 @@ const tourAPI = {
         return response.data;
     },
 
+    // GET tour for booking by departure ID
+    getForBooking: async (departureId) => {
+        const response = await axiosInstance.get(`/tours/for-booking/${departureId}`);
+        return response.data;
+    },
+
     // Create tour
     create: async (data) => {
         const response = await axiosInstance.post('/tours', data, {
