@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Row, Col, DatePicker, InputNumber, Select, TimePicker } from 'antd';
 import dayjs from 'dayjs';
 import Constants from '../../../Constants/Constants';
+import Utility from '../../../utils/Utility';
 
 const TourDepartureModal = ({ open, onCancel, onSave, mode = 'create', initialData, tourInfo, guides = [] }) => {
     const [form] = Form.useForm();
@@ -20,12 +21,13 @@ const TourDepartureModal = ({ open, onCancel, onSave, mode = 'create', initialDa
                 };
                 form.setFieldsValue(defaultValues);
             } else if (initialData && (mode === 'edit' || mode === 'view')) {
+                // Convert UTC dates to local timezone before displaying
                 const formData = {
                     ...initialData,
-                    departureDate: initialData.departureDate ? dayjs(initialData.departureDate) : null,
-                    returnDate: initialData.returnDate ? dayjs(initialData.returnDate) : null,
-                    departureTime: initialData.departureDate ? dayjs(initialData.departureDate) : null,
-                    returnTime: initialData.returnDate ? dayjs(initialData.returnDate) : null
+                    departureDate: initialData.departureDate ? Utility.convertUtcToLocalTimestamp(initialData.departureDate) : null,
+                    returnDate: initialData.returnDate ? Utility.convertUtcToLocalTimestamp(initialData.returnDate) : null,
+                    departureTime: initialData.departureDate ? Utility.convertUtcToLocalTimestamp(initialData.departureDate) : null,
+                    returnTime: initialData.returnDate ? Utility.convertUtcToLocalTimestamp(initialData.returnDate) : null
                 };
                 form.setFieldsValue(formData);
             }
@@ -208,6 +210,25 @@ const TourDepartureModal = ({ open, onCancel, onSave, mode = 'create', initialDa
                     </Col>
                     <Col span={6}>
                         <Form.Item
+                            label="Phụ thu phòng đơn"
+                            name="singleRoomSurcharge"
+                            rules={[
+                                { required: true, message: 'Vui lòng nhập phụ thu phòng đơn!' },
+                                { type: 'number', min: 0, message: 'Giá phải lớn hơn 0!' }
+                            ]}
+                        >
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                                placeholder="Nhập phụ thu phòng đơn"
+                                addonAfter="VNĐ"
+                                readOnly={isViewMode}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
                             label="Số chỗ còn trống"
                             name="availableSlots"
                             rules={[
@@ -218,6 +239,9 @@ const TourDepartureModal = ({ open, onCancel, onSave, mode = 'create', initialDa
                             <InputNumber style={{ width: '100%' }} min={1} placeholder="Nhập số chỗ còn trống" readOnly={isViewMode} />
                         </Form.Item>
                     </Col>
+                </Row>
+
+                <Row gutter={[24, 24]}>
                     <Col span={6}>
                         <Form.Item label="Trạng thái" name="status" rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}>
                             <Select
@@ -234,9 +258,6 @@ const TourDepartureModal = ({ open, onCancel, onSave, mode = 'create', initialDa
                             </Select>
                         </Form.Item>
                     </Col>
-                </Row>
-
-                <Row gutter={[24, 24]}>
                     <Col span={6}>
                         <Form.Item label="Hướng dẫn viên phụ trách" name="guideId">
                             <Select

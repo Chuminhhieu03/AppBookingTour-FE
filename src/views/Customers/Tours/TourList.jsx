@@ -132,27 +132,18 @@ const TourList = () => {
 
         // Reset to page 1 when filter changes
         params.set('page', '1');
-        if (queryParams.pageSize !== 10) {
-            params.set('pageSize', queryParams.pageSize.toString());
-        }
 
         setSearchParams(params);
     };
 
     // Handle pagination change - update URL params
-    const handlePaginationChange = (page, pageSize) => {
+    const handlePaginationChange = (page) => {
         const params = new URLSearchParams(searchParams);
 
         if (page > 1) {
             params.set('page', page.toString());
         } else {
             params.delete('page');
-        }
-
-        if (pageSize !== 10) {
-            params.set('pageSize', pageSize.toString());
-        } else {
-            params.delete('pageSize');
         }
 
         setSearchParams(params);
@@ -233,16 +224,14 @@ const TourList = () => {
 
                             {/* Pagination */}
                             {tourData.tours && tourData.tours.length > 0 && (
-                                <div style={{ textAlign: 'center' }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                     <Pagination
                                         current={tourData.meta.page}
                                         total={tourData.meta.totalCount}
-                                        pageSize={tourData.meta.pageSize}
+                                        pageSize={10}
                                         onChange={handlePaginationChange}
-                                        showSizeChanger
                                         showQuickJumper
                                         showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} tours`}
-                                        pageSizeOptions={['10', '15', '20']}
                                     />
                                 </div>
                             )}

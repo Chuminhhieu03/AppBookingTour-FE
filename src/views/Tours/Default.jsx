@@ -94,7 +94,6 @@ export default function TourDefault() {
             };
 
             const response = await tourAPI.search(searchData);
-            console.log('API Response:', response);
 
             if (response?.data?.tours) {
                 const tourList = response.data.tours;

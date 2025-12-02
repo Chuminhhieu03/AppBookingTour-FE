@@ -1,4 +1,10 @@
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// Extend dayjs with plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default class Utility {
     static formatDate(dateString) {
@@ -15,6 +21,13 @@ export default class Utility {
 
     static convertStringToDate(dateString) {
         return dayjs(dateString + 'Z');
+    }
+
+    // Convert UTC timestamp to local timezone timestamp
+    static convertUtcToLocalTimestamp(utcDateString) {
+        if (!utcDateString) return null;
+        // Parse UTC date and convert to local timezone
+        return dayjs.utc(utcDateString).local();
     }
 
     // Format price to Vietnamese currency

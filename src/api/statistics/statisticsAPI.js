@@ -13,6 +13,15 @@ const statisticsAPI = {
         return response.data;
     },
 
+    // GET export item statistics by revenue
+    exportItemStatisticsByRevenue: async (params) => {
+        const response = await axiosInstance.get('/statistics/item-revenue/export-excel', {
+            params,
+            responseType: 'blob'
+        });
+        return response.data;
+    },
+
     // GET item revenue details
     getItemRevenueDetails: async (params) => {
         const response = await axiosInstance.get('/statistics/item-revenue-detail', { params });
@@ -22,6 +31,15 @@ const statisticsAPI = {
     // GET list item statistics by booking count
     getItemStatisticsByBookingCount: async (params) => {
         const response = await axiosInstance.get('/statistics/item-booking-count', { params });
+        return response.data;
+    },
+
+    // GET export item statistics by booking count
+    exportItemStatisticsByBookingCount: async (params) => {
+        const response = await axiosInstance.get('/statistics/item-booking-count/export-excel', {
+            params,
+            responseType: 'blob'
+        });
         return response.data;
     },
 

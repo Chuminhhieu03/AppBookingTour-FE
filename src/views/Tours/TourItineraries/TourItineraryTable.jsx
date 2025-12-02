@@ -117,7 +117,11 @@ const TourItineraryTable = ({ mode = 'local', tourId, dataSource = [], onDataCha
                     message.error(response.message || 'Thao tác thất bại');
                 }
             } catch (error) {
-                message.error('Đã xảy ra lỗi hệ thống');
+                if (error.response && error.response.data && error.response.data.message) {
+                    message.error(error.response.data.message);
+                } else {
+                    message.error('Đã xảy ra lỗi hệ thống.');
+                }
             } finally {
                 setLoading(false);
             }
