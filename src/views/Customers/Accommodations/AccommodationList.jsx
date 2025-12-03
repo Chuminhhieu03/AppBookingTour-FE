@@ -164,8 +164,11 @@ const AccommodationList = () => {
 
     // Handle view details
     const handleViewDetails = (accommodation) => {
-        console.log('View accommodation details:', accommodation.id);
-        navigate(`/accommodations/${accommodation.id}`);
+        // Get current query params
+        const currentParams = new URLSearchParams(searchParams);
+        currentParams.delete('page');
+        currentParams.delete('cityId');
+        navigate(`/accommodations/${accommodation.id}?${currentParams.toString()}`);
     };
 
     return (

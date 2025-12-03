@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserOutlined, BorderOutlined, CarOutlined, TeamOutlined, BorderOuterOutlined, EyeOutlined, CloseOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import Constants from '../../../../Constants/Constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function RoomCard({ roomType }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -11,6 +11,7 @@ function RoomCard({ roomType }) {
     const [isCancelPolicyModalVisible, setIsCancelPolicyModalVisible] = useState(false);
     const totalPeople = (roomType?.maxAdult || 0) + (roomType?.maxChildren || 0);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     // Parse amenityName string
     const amenities = roomType?.amenityName
@@ -146,7 +147,15 @@ function RoomCard({ roomType }) {
                                     <span className="text-danger">{formattedPrice} ₫</span>
                                     <span className="text-dark"> / 1 Đêm</span>
                                 </div>
-                                <button className="btn btn-danger px-5 mb-1" onClick={() => navigate(`/roomtypes/preview/${roomType?.id}`)}>CHỌN PHÒNG</button>
+                                <button 
+                                    className="btn btn-danger px-5 mb-1" 
+                                    onClick={() => {
+                                        const currentParams = new URLSearchParams(searchParams);
+                                        navigate(`/roomtypes/preview/${roomType?.id}?${currentParams.toString()}`);
+                                    }}
+                                >
+                                    CHỌN PHÒNG
+                                </button>
                                 <span 
                                     onClick={() => setIsCancelPolicyModalVisible(true)}
                                     style={{ 

@@ -11,21 +11,32 @@ import {
     MoneyCollectOutlined,
     TeamOutlined
 } from '@ant-design/icons';
+import { Modal } from 'antd';
 import LoadingModal from 'components/LoadingModal';
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Utility from 'src/Utils/Utility';
 import Constants from '../../../Constants/Constants';
 import { roomTypeAPI } from 'api/accommodation/roomTypeAPI';
+import dayjs from 'dayjs';
 
 export default function RoomTypePreview() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [isHotelExpanded, setIsHotelExpanded] = useState(true);
     const [isTaxExpanded, setIsTaxExpanded] = useState(true);
     const [timeLeft, setTimeLeft] = useState(15 * 60);
     const [roomType, setRoomType] = useState(null);
     const [accommodation, setAccommodation] = useState(null);
+    const [isTimeoutModalVisible, setIsTimeoutModalVisible] = useState(false);
+
+    // Get query params
+    const checkInDate = searchParams.get('checkInDate');
+    const checkOutDate = searchParams.get('checkOutDate');
+    const numOfAdult = parseInt(searchParams.get('numOfAdult')) || 1;
+    const numOfChild = parseInt(searchParams.get('numOfChild')) || 0;
+    const numOfRoom = parseInt(searchParams.get('numOfRoom')) || 1;
 
     useEffect(() => {
         LoadingModal.showLoading();
@@ -49,7 +60,7 @@ export default function RoomTypePreview() {
             setTimeLeft((prevTime) => {
                 if (prevTime <= 1) {
                     clearInterval(timer);
-                    navigate(`/accommodations/${id}`);
+                    setIsTimeoutModalVisible(true);
                     return 0;
                 }
                 return prevTime - 1;
@@ -57,7 +68,7 @@ export default function RoomTypePreview() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [id, navigate]);
+    }, []);
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -75,6 +86,10 @@ export default function RoomTypePreview() {
             })
             .filter(Boolean);
         return viewNames.length > 0 ? viewNames.join(', ') : 'Không có thông tin';
+    };
+
+    const handleGoBack = () => {
+        navigate(-1);
     };
 
     return (
@@ -102,13 +117,13 @@ export default function RoomTypePreview() {
                                 <EnvironmentOutlined /> {accommodation?.name}
                             </div>
                             <div className="d-flex align-items-center gap-2">
-                                <CalendarOutlined /> 07-12-2025 → 08-12-2025
+                                <CalendarOutlined /> {checkInDate ? dayjs(checkInDate).format('DD-MM-YYYY') : '07-12-2025'} → {checkOutDate ? dayjs(checkOutDate).format('DD-MM-YYYY') : '08-12-2025'}
                             </div>
                             <div className="d-flex align-items-center gap-2">
-                                <LayoutOutlined />1 phòng
+                                <LayoutOutlined />{numOfRoom} phòng
                             </div>
                             <div className="d-flex align-items-center gap-2">
-                                <TeamOutlined /> 1 người lớn
+                                <TeamOutlined /> {numOfAdult} người lớn{numOfChild > 0 && `, ${numOfChild} trẻ em`}
                             </div>
                         </div>
                     </div>
@@ -140,10 +155,10 @@ export default function RoomTypePreview() {
 
                                         <div className="mt-3 small">
                                             <div className="mb-2">
-                                                <FieldTimeOutlined /> Nhận phòng: 07-12-2025, 14:00
+                                                <FieldTimeOutlined /> Nhận phòng: {checkInDate ? dayjs(checkInDate).format('DD-MM-YYYY') : '07-12-2025'}, 14:00
                                             </div>
                                             <div>
-                                                <FieldTimeOutlined /> Trả phòng: 08-12-2025, 12:00
+                                                <FieldTimeOutlined /> Trả phòng: {checkOutDate ? dayjs(checkOutDate).format('DD-MM-YYYY') : '08-12-2025'}, 12:00
                                             </div>
                                         </div>
                                     </div>
@@ -174,9 +189,9 @@ export default function RoomTypePreview() {
                                                     fontWeight: 700
                                                 }}
                                             >
-                                                {Utility.formatPrice(roomType?.price || 0)}
+                                                {Utility.formatPrice((roomType?.price || 0) * numOfRoom * (checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1))}
                                             </div>
-                                            <div className="small text-secondary">{Utility.formatPrice(roomType?.price || 0)} ₫ × 1 Đêm × 1 Phòng</div>
+                                            <div className="small text-secondary">{Utility.formatPrice(roomType?.price || 0)} ₫ × {checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1} Đêm × {numOfRoom} Phòng</div>
                                         </div>
                                     </div>
                                 </div>
@@ -238,18 +253,18 @@ export default function RoomTypePreview() {
                                     }}
                                 >
                                     <div style={{ fontSize: 14, marginTop: '8px' }}>
-                                        {accommodation?.name} - 1 Đêm
+                                        {accommodation?.name} - {checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1} Đêm
                                     </div>
                                     <div style={{ fontSize: 14 }} className="text-secondary">
-                                        Chủ Nhật, 7/12/2025 – Thứ Hai, 8/12/2025
+                                        {checkInDate ? dayjs(checkInDate).format('dddd, D/M/YYYY') : 'Chủ Nhật, 7/12/2025'} – {checkOutDate ? dayjs(checkOutDate).format('dddd, D/M/YYYY') : 'Thứ Hai, 8/12/2025'}
                                     </div>
 
                                     <div style={{ fontSize: 14, marginTop: '8px' }}>{roomType?.name}</div>
 
                                     <div className="d-flex justify-content-between mt-2 pt-2 border-top">
-                                        <span style={{ fontSize: 14 }}>Giá (1 phòng x 1 đêm)</span>
+                                        <span style={{ fontSize: 14 }}>Giá ({numOfRoom} phòng x {checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1} đêm)</span>
                                         <span className="fw-bold" style={{ fontSize: 16 }}>
-                                            {Utility.formatPrice(roomType?.price || 0)}
+                                            {Utility.formatPrice((roomType?.price || 0) * numOfRoom * (checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1))}
                                         </span>
                                     </div>
                                 </div>
@@ -290,12 +305,12 @@ export default function RoomTypePreview() {
                                 >
                                     <div className="d-flex justify-content-between" style={{ fontSize: 14, marginTop: '8px' }}>
                                         <span>Thuế GTGT:</span>
-                                        <span className="fw-bold">{Utility.formatPrice(roomType?.price * roomType?.vat / 100) || 0}</span>
+                                        <span className="fw-bold">{Utility.formatPrice((roomType?.price || 0) * numOfRoom * (checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1) * (roomType?.vat || 0) / 100)}</span>
                                     </div>
 
                                     <div className="d-flex justify-content-between" style={{ fontSize: 14, marginTop: '8px' }}>
                                         <span>Phụ thu quản trị:</span>
-                                        <span className="fw-bold">{Utility.formatPrice(roomType?.price * roomType?.managementFee / 100) || 0}</span>
+                                        <span className="fw-bold">{Utility.formatPrice((roomType?.price || 0) * numOfRoom * (checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1) * (roomType?.managementFee || 0) / 100)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -313,7 +328,10 @@ export default function RoomTypePreview() {
                                     Tổng cộng:
                                 </span>
                                 <span className="fw-bold" style={{ color: '#d80000', fontSize: 24 }}>
-                                    1.438.342 ₫
+                                    {Utility.formatPrice(
+                                        (roomType?.price || 0) * numOfRoom * (checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 1) *
+                                        (1 + (roomType?.vat || 0) / 100 + (roomType?.managementFee || 0) / 100)
+                                    )}
                                 </span>
                             </div>
 
@@ -335,6 +353,25 @@ export default function RoomTypePreview() {
                     </div>
                 </div>
             </div>
+
+            {/* Timeout Modal */}
+            <Modal
+                title="Thông báo"
+                open={isTimeoutModalVisible}
+                onCancel={handleGoBack}
+                footer={[
+                    <button
+                        key="back"
+                        className="btn btn-primary"
+                        onClick={handleGoBack}
+                    >
+                        Quay lại
+                    </button>
+                ]}
+                closable={true}
+            >
+                <p>Thời gian giữ giá đã hết. Vui lòng quay lại và chọn lại phòng.</p>
+            </Modal>
         </div>
     );
 }
