@@ -130,7 +130,11 @@ const TourDepartureTable = ({ mode = 'local', tourId, dataSource = [], onDataCha
                     message.error(response.message || 'Thao tác thất bại');
                 }
             } catch (error) {
-                message.error('Đã xảy ra lỗi hệ thống');
+                if (error.response && error.response.data && error.response.data.message) {
+                    message.error(error.response.data.message);
+                } else {
+                    message.error('Đã xảy ra lỗi hệ thống.');
+                }
             } finally {
                 setLoading(false);
             }
@@ -156,14 +160,14 @@ const TourDepartureTable = ({ mode = 'local', tourId, dataSource = [], onDataCha
             dataIndex: 'departureDate',
             key: 'departureDate',
             align: 'center',
-            render: (date) => (date ? dayjs(date).format('DD/MM/YYYY') : '--')
+            render: (date) => (date ? Utility.convertUtcToLocalTimestamp(date).format('DD/MM/YYYY') : '--')
         },
         {
             title: 'Ngày về',
             dataIndex: 'returnDate',
             key: 'returnDate',
             align: 'center',
-            render: (date) => (date ? dayjs(date).format('DD/MM/YYYY') : '--')
+            render: (date) => (date ? Utility.convertUtcToLocalTimestamp(date).format('DD/MM/YYYY') : '--')
         },
         {
             title: 'Giá người lớn',

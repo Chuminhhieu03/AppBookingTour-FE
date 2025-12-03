@@ -24,7 +24,7 @@ export const createEmptyFilter = (type) => {
                 ...baseFilter,
                 cityId: null,
                 starRating: null,
-                accommodationType: null,
+                type: null,
                 checkInDate: null,
                 checkOutDate: null,
                 numOfAdult: 1,

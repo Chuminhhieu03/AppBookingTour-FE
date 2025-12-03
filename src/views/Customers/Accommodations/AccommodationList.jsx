@@ -129,33 +129,21 @@ const AccommodationList = () => {
 
     // Handle filter change - update URL params
     const handleFilterChange = (newFilter) => {
-        setInternalFilters(newFilter);
-
-        const params = buildUrlParams(newFilter);
-
-        // Reset to page 1 when filter changes
+        const mergedFilters = { ...internalFilters, ...newFilter };
+        setInternalFilters(mergedFilters);
+        const params = buildUrlParams(mergedFilters);
         params.set('page', '1');
-        if (queryParams.pageSize !== 10) {
-            params.set('pageSize', queryParams.pageSize.toString());
-        }
-
         setSearchParams(params);
     };
 
     // Handle pagination change - update URL params
-    const handlePaginationChange = (page, pageSize) => {
+    const handlePaginationChange = (page) => {
         const params = new URLSearchParams(searchParams);
 
         if (page > 1) {
             params.set('page', page.toString());
         } else {
             params.delete('page');
-        }
-
-        if (pageSize !== 10) {
-            params.set('pageSize', pageSize.toString());
-        } else {
-            params.delete('pageSize');
         }
 
         setSearchParams(params);
@@ -177,7 +165,7 @@ const AccommodationList = () => {
     // Handle view details
     const handleViewDetails = (accommodation) => {
         console.log('View accommodation details:', accommodation.id);
-       navigate(`/accommodations/${accommodation.id}`);
+        navigate(`/accommodations/${accommodation.id}`);
     };
 
     return (
@@ -221,10 +209,7 @@ const AccommodationList = () => {
                                 {accommodationData.accommodations && accommodationData.accommodations.length > 0
                                     ? accommodationData.accommodations.map((accommodation) => (
                                           <div key={accommodation.id} style={{ marginBottom: '16px' }}>
-                                              <ItemCard 
-                                                data={accommodation} 
-                                                type="accommodation" 
-                                                onViewDetails={handleViewDetails} />
+                                              <ItemCard data={accommodation} type="accommodation" onViewDetails={handleViewDetails} />
                                           </div>
                                       ))
                                     : !loading && (
@@ -242,16 +227,14 @@ const AccommodationList = () => {
 
                             {/* Pagination */}
                             {accommodationData.accommodations && accommodationData.accommodations.length > 0 && (
-                                <div style={{ textAlign: 'center' }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                     <Pagination
                                         current={accommodationData.meta.page}
                                         total={accommodationData.meta.totalCount}
-                                        pageSize={accommodationData.meta.pageSize}
+                                        pageSize={10}
                                         onChange={handlePaginationChange}
-                                        showSizeChanger
                                         showQuickJumper
                                         showTotal={(total, range) => `${range[0]}-${range[1]} của ${total} khách sạn`}
-                                        pageSizeOptions={['10', '15', '20']}
                                     />
                                 </div>
                             )}
