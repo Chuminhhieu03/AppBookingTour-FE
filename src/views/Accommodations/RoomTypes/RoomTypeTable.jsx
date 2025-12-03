@@ -86,6 +86,27 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             )
         },
         {
+            title: 'Diện tích (m²)',
+            dataIndex: 'area',
+            key: 'area',
+            align: 'center',
+            render: (value) => (value ? `${Intl.NumberFormat('vi-VN').format(value)}` : '-')
+        },
+        {
+            title: 'Giờ nhận phòng',
+            dataIndex: 'checkinHour',
+            key: 'checkinHour',
+            align: 'center',
+            render: (value) => (value ? value.substring(0, 5) : '-')
+        },
+        {
+            title: 'Giờ trả phòng',
+            dataIndex: 'checkoutHour',
+            key: 'checkoutHour',
+            align: 'center',
+            render: (value) => (value ? value.substring(0, 5) : '-')
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'statusName',
             align: 'center',
@@ -117,11 +138,11 @@ export default function RoomTypeTable({ listRoomType, onRoomTypeClick, onRoomTyp
             columns={columns}
             dataSource={listRoomType}
             rowKey="id"
-            pagination={{
-                pageSize: PAGE_SIZE,
-                onChange: (page) => {
-                    setPage(page);
-                },
+                pagination={{
+                    pageSize: PAGE_SIZE,
+                    onChange: (page) => {
+                        setPage(page);
+                    },
                 current: page
             }}
         />

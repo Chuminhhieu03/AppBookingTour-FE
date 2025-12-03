@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Radio, Space, message, Card, Row, Col, Typography } from 'antd';
-import { SaveOutlined, FileTextOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Select, Radio, Space, message, Card, Row, Col, Typography, Upload, Image } from 'antd';
+import { SaveOutlined, FileTextOutlined, ArrowLeftOutlined, PictureOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import MainCard from 'components/MainCard';
 import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
@@ -16,8 +16,10 @@ const BlogPostsAddnew = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState('');
-    const [cities, setCities] = useState([]); // ← Thêm state
-    const [loadingCities, setLoadingCities] = useState(true); // ← Loading state
+    const [cities, setCities] = useState([]);
+    const [loadingCities, setLoadingCities] = useState(true);
+    const [coverImageFile, setCoverImageFile] = useState(null);
+    const [coverImagePreview, setCoverImagePreview] = useState(null);
 
     // Fetch cities khi component mount
     useEffect(() => {
@@ -60,16 +62,22 @@ const BlogPostsAddnew = () => {
         };
 
         try {
-            const data = {
-                title: values.title,
-                slug: values.slug,
-                content: content,
-                cityId: values.city,
-                tags: values.tags,
-                status: statusMap[values.status]
-            };
+            const formData = new FormData();
+            formData.append('Title', values.title);
+            formData.append('Slug', values.slug);
+            if (values.description) {
+                formData.append('Description', values.description);
+            }
+            formData.append('Content', content);
+            formData.append('CityId', values.city);
+            formData.append('Tags', values.tags);
+            formData.append('Status', statusMap[values.status]);
 
-            const response = await blogAPI.create(data);
+            if (coverImageFile) {
+                formData.append('CoverImageFile', coverImageFile);
+            }
+
+            const response = await blogAPI.create(formData);
 
             if (response.success) {
                 message.success('Tạo bài viết thành công');
@@ -142,6 +150,19 @@ const BlogPostsAddnew = () => {
                                     <Input placeholder="vi-du-bai-viet-hay" />
                                 </Form.Item>
 
+                                <Form.Item
+                                    name="description"
+                                    label="Mô tả ngắn (SEO)"
+                                    rules={[{ max: 500, message: 'Mô tả không được quá 500 ký tự' }]}
+                                >
+                                    <Input.TextArea
+                                        placeholder="Nhập mô tả ngắn cho bài viết (hiển thị trong danh sách và kết quả tìm kiếm)"
+                                        rows={3}
+                                        showCount
+                                        maxLength={500}
+                                    />
+                                </Form.Item>
+
                                 <Form.Item label="Nội dung" required>
                                     <TiptapEditor
                                         content={content}
@@ -153,6 +174,61 @@ const BlogPostsAddnew = () => {
                             </Col>
 
                             <Col xs={24} md={8}>
+                                <Form.Item label="Cover Image">
+                                    <Upload
+                                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                        maxCount={1}
+                                        beforeUpload={(file) => {
+                                            const isValidType = [
+                                                'image/jpeg',
+                                                'image/jpg',
+                                                'image/png',
+                                                'image/gif',
+                                                'image/webp'
+                                            ].includes(file.type);
+                                            if (!isValidType) {
+                                                message.error('Chỉ hỗ trợ file JPG, PNG, GIF, WEBP!');
+                                                return Upload.LIST_IGNORE;
+                                            }
+                                            const isLt5M = file.size / 1024 / 1024 < 5;
+                                            if (!isLt5M) {
+                                                message.error('Kích thước ảnh phải nhỏ hơn 5MB!');
+                                                return Upload.LIST_IGNORE;
+                                            }
+                                            setCoverImageFile(file);
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => setCoverImagePreview(e.target.result);
+                                            reader.readAsDataURL(file);
+                                            return false;
+                                        }}
+                                        onRemove={() => {
+                                            setCoverImageFile(null);
+                                            setCoverImagePreview(null);
+                                        }}
+                                        fileList={coverImageFile ? [coverImageFile] : []}
+                                    >
+                                        <Button icon={<PictureOutlined />} block>
+                                            Chọn ảnh bìa (tùy chọn)
+                                        </Button>
+                                    </Upload>
+                                    {coverImagePreview && (
+                                        <div style={{ marginTop: 12, position: 'relative' }}>
+                                            <Image src={coverImagePreview} alt="preview" style={{ width: '100%', borderRadius: 8 }} />
+                                            <Button
+                                                type="primary"
+                                                danger
+                                                size="small"
+                                                icon={<DeleteOutlined />}
+                                                style={{ position: 'absolute', top: 8, right: 8 }}
+                                                onClick={() => {
+                                                    setCoverImageFile(null);
+                                                    setCoverImagePreview(null);
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                </Form.Item>
+
                                 <Form.Item name="city" label="Thành phố" rules={[{ required: true, message: 'Vui lòng chọn thành phố' }]}>
                                     <Select placeholder="Chọn thành phố" showSearch loading={loadingCities} optionFilterProp="children">
                                         {cities.map((city) => (

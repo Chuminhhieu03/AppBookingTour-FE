@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, InputNumber, Button, DatePicker, Space, Modal, message } from 'antd';
+import { Table, InputNumber, Button, DatePicker, Space, Modal, message, Popconfirm } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import LoadingModal from '../../../../components/LoadingModal';
@@ -7,39 +7,38 @@ import roomInventoryAPI from '../../../../api/accommodation/roomInventoryAPI';
 
 export default function RoomInventoryTable({ value = [], onChange, editable = true, roomTypeId }) {
     const [listRoomInventory, setListRoomInventory] = useState(Array.isArray(value) ? value : []);
-    const [editingId, setEditingId] = useState(null); // Track the id of the row being edited
-    const [newRow, setNewRow] = useState({
-        key: 'new',
-        date: null,
-        basePriceAdult: null,
-        basePriceChildren: null
-    });
+    const [editingId, setEditingId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     useEffect(() => {
         setListRoomInventory(Array.isArray(value) ? value : []);
     }, [value]);
 
-    // Utility to validate row data
+    // Validate row data
     const isValidRow = (row) => {
         return (
             row.date &&
             dayjs(row.date).isValid() &&
-            row.basePriceAdult != null &&
-            row.basePriceAdult >= 0 &&
-            row.basePriceChildren != null &&
-            row.basePriceChildren >= 0
+            row.basePrice != null &&
+            row.basePrice >= 0 &&
+            row.bookedRooms != null &&
+            row.bookedRooms >= 0
         );
     };
 
     const updateRoomInventory = (id, field, val) => {
-        const updated = listRoomInventory.map((item) => (item.id === id ? { ...item, [field]: val } : item));
+        const updated = listRoomInventory.map((item) =>
+            item.id === id ? { ...item, [field]: val } : item
+        );
         setListRoomInventory(updated);
         onChange?.(updated);
     };
 
     const handleAddRoomInventory = (newItem) => {
         if (!isValidRow(newItem)) {
-            message.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá người lớn, Giá trẻ em');
+            message.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá và Số phòng đã đặt');
             return;
         }
 
@@ -47,31 +46,32 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             title: 'Xác nhận thêm',
             content: 'Bạn có chắc chắn muốn thêm giảm giá đặc biệt này?',
             okText: 'Thêm',
-            okType: 'primary',
             cancelText: 'Hủy',
             onOk: async () => {
                 LoadingModal.showLoading();
                 try {
                     const roomInventory = {
                         date: newItem.date,
-                        basePriceAdult: newItem.basePriceAdult,
-                        basePriceChildren: newItem.basePriceChildren,
+                        basePrice: newItem.basePrice,
+                        bookedRooms: newItem.bookedRooms,
                         ...(roomTypeId && { RoomTypeId: roomTypeId })
                     };
+
                     const data = { RoomInventory: roomInventory };
                     const response = await roomInventoryAPI.create(data);
+
                     if (response.success) {
                         message.success('Thêm giảm giá đặc biệt thành công');
+
                         const item = {
-                            id: response.roomInventory?.id || -Date.now(), // Negative ID for local rows
+                            id: response.roomInventory?.id || -Date.now(),
                             date: newItem.date,
-                            basePriceAdult: newItem.basePriceAdult,
-                            basePriceChildren: newItem.basePriceChildren
+                            basePrice: newItem.basePrice,
+                            bookedRooms: newItem.bookedRooms
                         };
                         const updated = [...listRoomInventory, item];
                         setListRoomInventory(updated);
                         onChange?.(updated);
-                        setNewRow({ key: 'new', date: null, basePriceAdult: null, basePriceChildren: null });
                     } else {
                         message.error(response.message || 'Không thể thêm giảm giá đặc biệt');
                     }
@@ -89,7 +89,6 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         const record = listRoomInventory.find((item) => item.id === id);
         if (!record) return;
 
-        // Local-only rows have negative IDs
         if (record.id < 0) {
             const updated = listRoomInventory.filter((item) => item.id !== id);
             setListRoomInventory(updated);
@@ -126,7 +125,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
     };
 
     const handleEdit = (id) => {
-        setEditingId(id); // Set the id of the row to edit
+        setEditingId(id);
     };
 
     const handleSave = (id) => {
@@ -134,12 +133,11 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         if (!record) return;
 
         if (!isValidRow(record)) {
-            message.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá người lớn, Giá trẻ em');
+            message.error('Vui lòng nhập đầy đủ và hợp lệ các trường: Ngày, Giá và Số phòng đã đặt');
             return;
         }
 
         if (record.id < 0) {
-            // Local-only row
             setEditingId(null);
             message.success('Lưu thay đổi thành công');
             return;
@@ -149,18 +147,18 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             title: 'Xác nhận sửa',
             content: 'Bạn có chắc chắn muốn lưu thay đổi này?',
             okText: 'Lưu',
-            okType: 'primary',
             cancelText: 'Hủy',
             onOk: async () => {
                 LoadingModal.showLoading();
                 try {
                     const roomInventory = {
                         date: record.date,
-                        basePriceAdult: record.basePriceAdult,
-                        basePriceChildren: record.basePriceChildren,
+                        basePrice: record.basePrice,
+                        bookedRooms: record.bookedRooms,
                         ...(roomTypeId && { roomTypeId: roomTypeId })
                     };
                     const response = await roomInventoryAPI.update(record.id, roomInventory);
+
                     if (response.success) {
                         message.success('Cập nhật giảm giá đặc biệt thành công');
                         setEditingId(null);
@@ -178,7 +176,28 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
     };
 
     const handleCancel = () => {
-        setEditingId(null); // Exit edit mode without reverting
+        setEditingId(null);
+    };
+
+    const handleBulkDelete = async () => {
+        LoadingModal.showLoading();
+        try {
+            const response = await roomInventoryAPI.deleteBulk(selectedRowKeys);
+            if (response.success) {
+                message.success('Xóa thành công');
+                const updated = listRoomInventory.filter((item) => !selectedRowKeys.includes(item.id));
+                setListRoomInventory(updated);
+                onChange?.(updated);
+                setSelectedRowKeys([]);
+            } else {
+                message.error(response.message || 'Không thể xóa');
+            }
+        } catch (error) {
+            console.error('Error deleting room inventories:', error);
+            message.error('Đã xảy ra lỗi khi xóa');
+        } finally {
+            LoadingModal.hideLoading();
+        }
     };
 
     const columns = [
@@ -187,7 +206,10 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             key: 'index',
             width: 60,
             align: 'center',
-            render: (_, __, index) => index + 1
+            render: (_, record, index) => {
+                if (record.key === 'new') return '';
+                return (currentPage - 1) * pageSize + index + 1;
+            }
         },
         {
             title: 'Ngày',
@@ -195,24 +217,17 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             key: 'date',
             align: 'center',
             render: (value, record) => {
-                if (!editable || record.key === 'new') {
-                    return record.key === 'new' ? (
-                        <DatePicker
-                            value={newRow.date ? dayjs(newRow.date) : null}
-                            format="DD/MM/YYYY"
-                            onChange={(date) => setNewRow({ ...newRow, date: date?.format('YYYY-MM-DD') })}
-                        />
-                    ) : (
-                        <span>{value ? dayjs(value).format('DD/MM/YYYY') : ''}</span>
-                    );
-                }
+                if (!editable) return <span>{value ? dayjs(value).format('DD/MM/YYYY') : ''}</span>;
 
                 if (editingId === record.id) {
                     return (
                         <DatePicker
+                            getPopupContainer={(trigger) => trigger.parentNode}
                             value={value ? dayjs(value) : null}
                             format="DD/MM/YYYY"
-                            onChange={(date) => updateRoomInventory(record.id, 'date', date?.format('YYYY-MM-DD'))}
+                            onChange={(date) =>
+                                updateRoomInventory(record.id, 'date', date?.format('YYYY-MM-DD'))
+                            }
                         />
                     );
                 }
@@ -221,25 +236,12 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             }
         },
         {
-            title: 'Giá người lớn (VND)',
-            dataIndex: 'basePriceAdult',
-            key: 'basePriceAdult',
+            title: 'Giá (VND)',
+            dataIndex: 'basePrice',
+            key: 'basePrice',
             align: 'right',
             render: (value, record) => {
-                if (!editable || record.key === 'new') {
-                    return record.key === 'new' ? (
-                        <InputNumber
-                            min={0}
-                            value={newRow.basePriceAdult}
-                            className="w-100"
-                            formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(val) => val?.replace(/,/g, '')}
-                            onChange={(val) => setNewRow({ ...newRow, basePriceAdult: val })}
-                        />
-                    ) : (
-                        <span>{value != null ? Intl.NumberFormat('vi-VN').format(value) : ''}</span>
-                    );
-                }
+                if (!editable) return <span>{value != null ? Intl.NumberFormat('vi-VN').format(value) : ''}</span>;
 
                 if (editingId === record.id) {
                     return (
@@ -249,7 +251,7 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                             className="w-100"
                             formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             parser={(val) => val?.replace(/,/g, '')}
-                            onChange={(val) => updateRoomInventory(record.id, 'basePriceAdult', val)}
+                            onChange={(val) => updateRoomInventory(record.id, 'basePrice', val)}
                         />
                     );
                 }
@@ -258,25 +260,12 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             }
         },
         {
-            title: 'Giá trẻ em (VND)',
-            dataIndex: 'basePriceChildren',
-            key: 'basePriceChildren',
-            align: 'right',
+            title: 'Số phòng đã đặt',
+            dataIndex: 'bookedRooms',
+            key: 'bookedRooms',
+            align: 'center',
             render: (value, record) => {
-                if (!editable || record.key === 'new') {
-                    return record.key === 'new' ? (
-                        <InputNumber
-                            min={0}
-                            value={newRow.basePriceChildren}
-                            className="w-100"
-                            formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(val) => val?.replace(/,/g, '')}
-                            onChange={(val) => setNewRow({ ...newRow, basePriceChildren: val })}
-                        />
-                    ) : (
-                        <span>{value != null ? Intl.NumberFormat('vi-VN').format(value) : ''}</span>
-                    );
-                }
+                if (!editable) return <span>{value != null ? value : 0}</span>;
 
                 if (editingId === record.id) {
                     return (
@@ -284,14 +273,12 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
                             min={0}
                             value={value}
                             className="w-100"
-                            formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(val) => val?.replace(/,/g, '')}
-                            onChange={(val) => updateRoomInventory(record.id, 'basePriceChildren', val)}
+                            onChange={(val) => updateRoomInventory(record.id, 'bookedRooms', val)}
                         />
                     );
                 }
 
-                return <span>{value != null ? Intl.NumberFormat('vi-VN').format(value) : ''}</span>;
+                return <span>{value != null ? value : 0}</span>;
             }
         },
         editable && {
@@ -299,20 +286,8 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
             key: 'action',
             align: 'center',
             render: (_, record) => {
-                if (record.key === 'new') {
-                    const disabled = !isValidRow(newRow);
-                    return (
-                        <Button
-                            icon={<PlusOutlined />}
-                            type="dashed"
-                            block
-                            disabled={disabled}
-                            onClick={() => handleAddRoomInventory(newRow)}
-                        />
-                    );
-                }
-
                 const isEditing = editingId === record.id;
+
                 return (
                     <Space>
                         {isEditing ? (
@@ -343,16 +318,53 @@ export default function RoomInventoryTable({ value = [], onChange, editable = tr
         }
     ].filter(Boolean);
 
-    const dataSource = editable ? [...listRoomInventory, newRow] : listRoomInventory;
+    const dataSource = listRoomInventory;
+
+    const rowSelection = {
+        selectedRowKeys,
+        onChange: (keys) => setSelectedRowKeys(keys),
+        getCheckboxProps: () => ({
+            disabled: editingId !== null
+        })
+    };
 
     return (
-        <div style={{ marginTop: '20px' }}>
-            <span>Danh sách giảm giá đặc biệt</span>
+        <div>
+            {editable && selectedRowKeys.length > 0 && (
+                <div style={{ marginBottom: 16, textAlign: 'right' }}>
+                    <Popconfirm
+                        title="Xác nhận xóa"
+                        description={`Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} mục đã chọn?`}
+                        onConfirm={handleBulkDelete}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        okButtonProps={{ danger: true }}
+                        getPopupContainer={(trigger) => trigger.parentNode}
+                    >
+                        <Button danger icon={<DeleteOutlined />} disabled={editingId !== null}>
+                            Xóa {selectedRowKeys.length} mục đã chọn
+                        </Button>
+                    </Popconfirm>
+                </div>
+            )}
+
             <Table
                 dataSource={dataSource}
                 columns={columns}
-                rowKey={(record) => record.id || record.key} // Use id, fallback to key for new row
-                pagination={false}
+                rowKey={(record) => record.id || record.key}
+                rowSelection={rowSelection}
+                pagination={{
+                    current: currentPage,
+                    pageSize: pageSize,
+                    total: dataSource.length,
+                    showSizeChanger: true,
+                    showTotal: (total) => `Tổng ${total} mục`,
+                    pageSizeOptions: ['10', '20', '50', '100'],
+                    onChange: (page, size) => {
+                        setCurrentPage(page);
+                        setPageSize(size);
+                    }
+                }}
                 bordered
                 size="small"
             />

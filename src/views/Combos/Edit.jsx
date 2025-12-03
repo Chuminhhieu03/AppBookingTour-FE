@@ -17,9 +17,33 @@ import {
     Upload,
     DatePicker,
     Divider,
-    Spin
+    Spin,
+    Alert
 } from 'antd';
-import { PlusOutlined, MinusCircleOutlined, ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
+import {
+    PlusOutlined,
+    MinusCircleOutlined,
+    ArrowLeftOutlined,
+    SaveOutlined,
+    EnvironmentOutlined,
+    CoffeeOutlined,
+    TeamOutlined,
+    ClockCircleOutlined,
+    CarOutlined,
+    GiftOutlined,
+    HomeOutlined,
+    ShopOutlined,
+    StarOutlined,
+    HeartOutlined,
+    PhoneOutlined,
+    SafetyOutlined,
+    ThunderboltOutlined,
+    TrophyOutlined,
+    RocketOutlined,
+    SmileOutlined,
+    CustomerServiceOutlined,
+    InfoCircleOutlined
+} from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
 import comboAPI from 'api/combo/comboAPI';
@@ -49,6 +73,90 @@ const CombosEdit = () => {
     const [deletedGalleryImages, setDeletedGalleryImages] = useState([]);
     const [originalCoverUrl, setOriginalCoverUrl] = useState(null);
     const [originalGalleryUrls, setOriginalGalleryUrls] = useState([]);
+    const [additionalInfoItems, setAdditionalInfoItems] = useState([
+        { icon: 'EnvironmentOutlined', title: 'Điểm tham quan', content: '', color: '#04a9f5' },
+        { icon: 'CoffeeOutlined', title: 'Ẩm thực', content: '', color: '#fd7e14' },
+        { icon: 'TeamOutlined', title: 'Đối tượng thích hợp', content: '', color: '#52c41a' },
+        { icon: 'ClockCircleOutlined', title: 'Thời gian lý tưởng', content: '', color: '#9c27b0' },
+        { icon: 'CarOutlined', title: 'Phương tiện', content: '', color: '#ff9800' },
+        { icon: 'GiftOutlined', title: 'Khuyến mãi', content: '', color: '#e91e63' }
+    ]);
+
+    const [importantInfoSections, setImportantInfoSections] = useState([
+        {
+            title: 'Điều kiện thanh toán',
+            items: [
+                'Đặt cọc 30% giá tour khi đăng ký',
+                'Thanh toán 70% còn lại trước 7 ngày khởi hành',
+                'Thanh toán qua chuyển khoản hoặc tiền mặt'
+            ]
+        },
+        {
+            title: 'Điều kiện hủy tour',
+            items: [
+                'Hủy trước 15 ngày: Hoàn lại 70% tiền cọc',
+                'Hủy trước 7-14 ngày: Hoàn lại 50% tiền cọc',
+                'Hủy trước 3-6 ngày: Hoàn lại 30% tiền cọc',
+                'Hủy trong vòng 2 ngày: Không hoàn tiền'
+            ]
+        },
+        {
+            title: 'Giấy tờ cần mang theo',
+            items: [
+                'CMND/CCCD hoặc hộ chiếu còn hạn',
+                'Giấy khai sinh (đối với trẻ em dưới 14 tuổi)',
+                'Sổ hộ khẩu (nếu có yêu cầu)',
+                'Vé máy bay và voucher khách sạn (công ty sẽ cung cấp)'
+            ]
+        },
+        {
+            title: 'Hành lý',
+            items: [
+                'Hành lý xách tay: Tối đa 7kg',
+                'Hành lý ký gửi: Tối đa 20kg (tùy hãng bay)',
+                'Mang theo thuốc cá nhân, đồ dùng cá nhân',
+                'Quần áo phù hợp với thời tiết điểm đến'
+            ]
+        },
+        {
+            title: 'Lưu ý quan trọng',
+            items: [
+                'Vui lòng có mặt trước giờ khởi hành 30 phút',
+                'Giữ gìn vệ sinh chung, không xả rác bừa bãi',
+                'Không mang theo các vật dụng cấm theo quy định',
+                'Tuân thủ nội quy, hướng dẫn của HDV'
+            ]
+        },
+        {
+            title: 'Chính sách trẻ em',
+            items: [
+                'Trẻ em dưới 2 tuổi: 10% giá tour (không ghế ngồi riêng)',
+                'Trẻ em từ 2-5 tuổi: 50% giá tour (ngủ chung giường người lớn)',
+                'Trẻ em từ 6-11 tuổi: 75% giá tour (có ghế ngồi riêng)',
+                'Trẻ em từ 12 tuổi trở lên: 100% giá tour như người lớn'
+            ]
+        }
+    ]);
+
+    const iconOptions = [
+        { value: 'EnvironmentOutlined', label: 'Điểm tham quan', icon: <EnvironmentOutlined /> },
+        { value: 'CoffeeOutlined', label: 'Ẩm thực', icon: <CoffeeOutlined /> },
+        { value: 'TeamOutlined', label: 'Nhóm người', icon: <TeamOutlined /> },
+        { value: 'ClockCircleOutlined', label: 'Thời gian', icon: <ClockCircleOutlined /> },
+        { value: 'CarOutlined', label: 'Phương tiện', icon: <CarOutlined /> },
+        { value: 'GiftOutlined', label: 'Khuyến mãi', icon: <GiftOutlined /> },
+        { value: 'HomeOutlined', label: 'Khách sạn', icon: <HomeOutlined /> },
+        { value: 'ShopOutlined', label: 'Mua sắm', icon: <ShopOutlined /> },
+        { value: 'StarOutlined', label: 'Đánh giá', icon: <StarOutlined /> },
+        { value: 'HeartOutlined', label: 'Yêu thích', icon: <HeartOutlined /> },
+        { value: 'PhoneOutlined', label: 'Liên hệ', icon: <PhoneOutlined /> },
+        { value: 'SafetyOutlined', label: 'An toàn', icon: <SafetyOutlined /> },
+        { value: 'ThunderboltOutlined', label: 'Nhanh chóng', icon: <ThunderboltOutlined /> },
+        { value: 'TrophyOutlined', label: 'Giải thưởng', icon: <TrophyOutlined /> },
+        { value: 'RocketOutlined', label: 'Khám phá', icon: <RocketOutlined /> },
+        { value: 'SmileOutlined', label: 'Hài lòng', icon: <SmileOutlined /> },
+        { value: 'CustomerServiceOutlined', label: 'Hỗ trợ', icon: <CustomerServiceOutlined /> }
+    ];
 
     // TẠO MAP FIELD VỚI TAB KEY
     const fieldToTabMap = {
@@ -66,7 +174,9 @@ const CombosEdit = () => {
         includes: '3',
         excludes: '3',
         termsConditions: '3',
-        schedules: '4'
+        schedules: '4',
+        additionalInfo: '5',
+        importantInfo: '6'
     };
 
     // ⭐ KHÁC BIỆT: Fetch cities VÀ combo data khi component mount
@@ -142,6 +252,30 @@ const CombosEdit = () => {
                 form.setFieldsValue(formValues);
                 setDescription(combo.description || '');
 
+                // Parse additionalInfo
+                if (combo.additionalInfo) {
+                    try {
+                        const parsed = JSON.parse(combo.additionalInfo);
+                        if (parsed.items && Array.isArray(parsed.items)) {
+                            setAdditionalInfoItems(parsed.items);
+                        }
+                    } catch (error) {
+                        console.error('Failed to parse additionalInfo:', error);
+                    }
+                }
+
+                // Parse importantInfo
+                if (combo.importantInfo) {
+                    try {
+                        const parsed = JSON.parse(combo.importantInfo);
+                        if (parsed && Array.isArray(parsed.sections)) {
+                            setImportantInfoSections(parsed.sections);
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse importantInfo:', e);
+                    }
+                }
+
                 // ⭐ Sử dụng comboImageCoverUrl (thay vì comboImageCover)
                 if (combo.comboImageCoverUrl) {
                     setOriginalCoverUrl(combo.comboImageCoverUrl); // ⭐ Lưu URL gốc
@@ -168,12 +302,12 @@ const CombosEdit = () => {
                 }
             } else {
                 message.error('Không thể tải thông tin combo');
-                navigate('/admin/combos');
+                navigate('/admin/service/combo');
             }
         } catch (error) {
             console.error('Error fetching combo:', error);
             message.error('Đã xảy ra lỗi khi tải thông tin combo');
-            navigate('/admin/combos');
+            navigate('/admin/service/combo');
         } finally {
             setLoadingData(false);
         }
@@ -243,6 +377,22 @@ const CombosEdit = () => {
     const handleSubmit = async (values) => {
         setLoading(true);
         try {
+            // Serialize additionalInfo to JSON string
+            let additionalInfoJson = null;
+            if (additionalInfoItems.length > 0) {
+                const validItems = additionalInfoItems.filter((item) => item.title && item.content);
+                if (validItems.length > 0) {
+                    additionalInfoJson = JSON.stringify({ items: validItems });
+                }
+            }
+
+            // Serialize importantInfo to JSON string
+            let importantInfoJson = null;
+            const validSections = importantInfoSections.filter((section) => section.title && section.items && section.items.length > 0);
+            if (validSections.length > 0) {
+                importantInfoJson = JSON.stringify({ sections: validSections });
+            }
+
             // Prepare data theo API format (giống Addnew)
             const data = {
                 code: values.code,
@@ -262,11 +412,13 @@ const CombosEdit = () => {
                 excludes: values.excludes || '',
                 termsConditions: values.termsConditions || '',
                 isActive: values.isActive !== undefined ? values.isActive : true,
+                additionalInfo: additionalInfoJson,
+                importantInfo: importantInfoJson,
                 schedules:
                     values.schedules?.map((schedule) => ({
                         id: schedule.id || null,
-                        departureDate: schedule.departureDate.toISOString(),
-                        returnDate: schedule.returnDate.toISOString(),
+                        departureDate: schedule.departureDate.add(7, 'hour').toISOString(),
+                        returnDate: schedule.returnDate.add(7, 'hour').toISOString(),
                         availableSlots: schedule.availableSlots,
                         basePriceAdult: schedule.basePriceAdult || values.basePriceAdult,
                         basePriceChildren: schedule.basePriceChildren || values.basePriceChildren,
@@ -277,8 +429,6 @@ const CombosEdit = () => {
             const response = await comboAPI.update(id, data);
 
             if (response.success) {
-                // ⭐ XỬ LÝ XÓA ẢNH CŨ TRƯỚC
-                // 1. Xóa ảnh bìa cũ nếu user đã xóa
                 if (deletedCoverImage && originalCoverUrl) {
                     try {
                         await comboAPI.deleteCoverImage(id);
@@ -318,7 +468,7 @@ const CombosEdit = () => {
                 }
 
                 message.success('Cập nhật combo thành công');
-                navigate('/admin/combos');
+                navigate('/admin/service/combo');
             } else {
                 message.error(response.message || 'Không thể cập nhật combo');
             }
@@ -791,6 +941,276 @@ const CombosEdit = () => {
                 </div>
             ),
             forceRender: true
+        },
+        {
+            key: '5',
+            label: 'Thông tin chuyến đi',
+            children: (
+                <div>
+                    <Alert
+                        message="Quản lý thông tin hiển thị trên trang chi tiết combo"
+                        description="Tối đa 10 items. Thông tin này sẽ hiển thị dưới dạng grid 3 cột cho khách hàng."
+                        type="info"
+                        showIcon
+                        style={{ marginBottom: 16 }}
+                    />
+
+                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                        {additionalInfoItems.map((item, index) => (
+                            <Card
+                                key={index}
+                                size="small"
+                                title={`Item ${index + 1}`}
+                                extra={
+                                    additionalInfoItems.length > 1 && (
+                                        <Button
+                                            type="text"
+                                            danger
+                                            icon={<MinusCircleOutlined />}
+                                            onClick={() => {
+                                                setAdditionalInfoItems(additionalInfoItems.filter((_, i) => i !== index));
+                                            }}
+                                        >
+                                            Xóa
+                                        </Button>
+                                    )
+                                }
+                            >
+                                <Row gutter={16}>
+                                    <Col xs={24} md={6}>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <strong>Icon:</strong>
+                                        </div>
+                                        <Select
+                                            value={item.icon}
+                                            onChange={(value) => {
+                                                const newItems = [...additionalInfoItems];
+                                                newItems[index].icon = value;
+                                                setAdditionalInfoItems(newItems);
+                                            }}
+                                            style={{ width: '100%' }}
+                                        >
+                                            {iconOptions.map((opt) => (
+                                                <Select.Option key={opt.value} value={opt.value}>
+                                                    <Space>
+                                                        {opt.icon}
+                                                        {opt.label}
+                                                    </Space>
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Col>
+
+                                    <Col xs={24} md={6}>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <strong>Tiêu đề:</strong>
+                                        </div>
+                                        <Input
+                                            value={item.title}
+                                            onChange={(e) => {
+                                                const newItems = [...additionalInfoItems];
+                                                newItems[index].title = e.target.value;
+                                                setAdditionalInfoItems(newItems);
+                                            }}
+                                            placeholder="VD: Điểm tham quan"
+                                            maxLength={100}
+                                        />
+                                    </Col>
+
+                                    <Col xs={24} md={9}>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <strong>Nội dung:</strong>
+                                        </div>
+                                        <Input.TextArea
+                                            value={item.content}
+                                            onChange={(e) => {
+                                                const newItems = [...additionalInfoItems];
+                                                newItems[index].content = e.target.value;
+                                                setAdditionalInfoItems(newItems);
+                                            }}
+                                            placeholder="VD: Sapa, Bản Cát Cát, Fansipan..."
+                                            rows={2}
+                                            maxLength={500}
+                                            showCount
+                                        />
+                                    </Col>
+
+                                    <Col xs={24} md={3}>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <strong>Màu:</strong>
+                                        </div>
+                                        <Input
+                                            type="color"
+                                            value={item.color}
+                                            onChange={(e) => {
+                                                const newItems = [...additionalInfoItems];
+                                                newItems[index].color = e.target.value;
+                                                setAdditionalInfoItems(newItems);
+                                            }}
+                                            style={{ width: '100%', height: 40 }}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Card>
+                        ))}
+
+                        {additionalInfoItems.length < 10 && (
+                            <Button
+                                type="dashed"
+                                onClick={() => {
+                                    setAdditionalInfoItems([
+                                        ...additionalInfoItems,
+                                        { icon: 'InfoCircleOutlined', title: '', content: '', color: '#04a9f5' }
+                                    ]);
+                                }}
+                                block
+                                icon={<PlusOutlined />}
+                            >
+                                Thêm thông tin
+                            </Button>
+                        )}
+                    </Space>
+                </div>
+            ),
+            forceRender: true
+        },
+        {
+            key: '6',
+            label: 'Thông tin quan trọng',
+            children: (
+                <div>
+                    <Alert
+                        message="Quản lý các thông tin quan trọng về tour"
+                        description="Cấu hình các section như điều kiện thanh toán, hủy tour, giấy tờ cần thiết, hành lý, lưu ý và chính sách. Mỗi section có thể có nhiều items."
+                        type="info"
+                        showIcon
+                        style={{ marginBottom: 16 }}
+                    />
+
+                    <Space direction="vertical" style={{ width: '100%' }} size="large">
+                        {importantInfoSections.map((section, sectionIndex) => (
+                            <Card
+                                key={sectionIndex}
+                                title={`Section ${sectionIndex + 1}`}
+                                extra={
+                                    <Button
+                                        danger
+                                        size="small"
+                                        icon={<MinusCircleOutlined />}
+                                        onClick={() => {
+                                            if (importantInfoSections.length === 1) {
+                                                message.warning('Phải có ít nhất 1 section!');
+                                                return;
+                                            }
+                                            setImportantInfoSections((prev) => prev.filter((_, i) => i !== sectionIndex));
+                                        }}
+                                        disabled={importantInfoSections.length === 1}
+                                    >
+                                        Xóa section
+                                    </Button>
+                                }
+                                style={{ border: '1px solid #d9d9d9' }}
+                            >
+                                <Row gutter={16}>
+                                    <Col span={24} style={{ marginBottom: 16 }}>
+                                        <label style={{ fontWeight: 500, display: 'block', marginBottom: 8 }}>
+                                            Tiêu đề section <span style={{ color: 'red' }}>*</span>
+                                        </label>
+                                        <Input
+                                            placeholder="VD: Điều kiện thanh toán, Hành lý, Chính sách trẻ em..."
+                                            value={section.title}
+                                            onChange={(e) => {
+                                                const newSections = [...importantInfoSections];
+                                                newSections[sectionIndex].title = e.target.value;
+                                                setImportantInfoSections(newSections);
+                                            }}
+                                            maxLength={200}
+                                            showCount
+                                        />
+                                    </Col>
+
+                                    <Col span={24}>
+                                        <label style={{ fontWeight: 500, display: 'block', marginBottom: 8 }}>
+                                            Danh sách items <span style={{ color: 'red' }}>*</span>
+                                        </label>
+                                        <Space direction="vertical" style={{ width: '100%' }} size="small">
+                                            {section.items.map((item, itemIndex) => (
+                                                <Space.Compact key={itemIndex} style={{ width: '100%' }}>
+                                                    <Input
+                                                        placeholder="Nhập nội dung item..."
+                                                        value={item}
+                                                        onChange={(e) => {
+                                                            const newSections = [...importantInfoSections];
+                                                            newSections[sectionIndex].items[itemIndex] = e.target.value;
+                                                            setImportantInfoSections(newSections);
+                                                        }}
+                                                        maxLength={500}
+                                                        style={{ width: '100%' }}
+                                                    />
+                                                    <Button
+                                                        danger
+                                                        icon={<MinusCircleOutlined />}
+                                                        onClick={() => {
+                                                            if (section.items.length === 1) {
+                                                                message.warning('Section phải có ít nhất 1 item!');
+                                                                return;
+                                                            }
+                                                            const newSections = [...importantInfoSections];
+                                                            newSections[sectionIndex].items = newSections[sectionIndex].items.filter(
+                                                                (_, i) => i !== itemIndex
+                                                            );
+                                                            setImportantInfoSections(newSections);
+                                                        }}
+                                                        disabled={section.items.length === 1}
+                                                    >
+                                                        Xóa
+                                                    </Button>
+                                                </Space.Compact>
+                                            ))}
+
+                                            <Button
+                                                type="dashed"
+                                                icon={<PlusOutlined />}
+                                                onClick={() => {
+                                                    if (section.items.length >= 20) {
+                                                        message.warning('Mỗi section tối đa 20 items!');
+                                                        return;
+                                                    }
+                                                    const newSections = [...importantInfoSections];
+                                                    newSections[sectionIndex].items.push('');
+                                                    setImportantInfoSections(newSections);
+                                                }}
+                                                disabled={section.items.length >= 20}
+                                                style={{ width: '100%' }}
+                                            >
+                                                Thêm item
+                                            </Button>
+                                        </Space>
+                                    </Col>
+                                </Row>
+                            </Card>
+                        ))}
+
+                        <Button
+                            type="dashed"
+                            icon={<PlusOutlined />}
+                            onClick={() => {
+                                if (importantInfoSections.length >= 15) {
+                                    message.warning('Tối đa 15 sections!');
+                                    return;
+                                }
+                                setImportantInfoSections([...importantInfoSections, { title: '', items: [''] }]);
+                            }}
+                            disabled={importantInfoSections.length >= 15}
+                            block
+                            style={{ height: 48 }}
+                        >
+                            Thêm section mới
+                        </Button>
+                    </Space>
+                </div>
+            ),
+            forceRender: true
         }
     ];
 
@@ -814,7 +1234,7 @@ const CombosEdit = () => {
                         <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />} size="large">
                             Cập nhật Combo
                         </Button>
-                        <Button onClick={() => navigate('/admin/combos')} icon={<ArrowLeftOutlined />} size="large">
+                        <Button onClick={() => navigate('/admin/service/combo')} icon={<ArrowLeftOutlined />} size="large">
                             Hủy
                         </Button>
                     </Space>

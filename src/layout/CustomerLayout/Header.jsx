@@ -15,7 +15,8 @@ import {
     LoginOutlined,
     LogoutOutlined,
     SettingOutlined,
-    RocketOutlined
+    RocketOutlined,
+    ReadOutlined
 } from '@ant-design/icons';
 import { logoutAsync } from 'features/auth/authSlice';
 import LogoWhite from 'assets/images/logo-white.svg';
@@ -76,9 +77,9 @@ const Header = () => {
             label: <Link to="/combos">Combos</Link>
         },
         {
-            key: 'accommodations',
-            icon: <ShopOutlined />,
-            label: <Link to="/accommodations">Khách sạn</Link>
+            key: 'blogs',
+            icon: <ReadOutlined />,
+            label: <Link to="/blog-posts">Blog</Link>
         },
         {
             key: 'about',

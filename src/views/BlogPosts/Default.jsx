@@ -137,15 +137,49 @@ const BlogPostsDefault = () => {
             align: 'center'
         },
         {
+            title: 'Cover',
+            dataIndex: 'coverImage',
+            key: 'coverImage',
+            width: 100,
+            align: 'center',
+            render: (coverImage) =>
+                coverImage ? (
+                    <img src={coverImage} alt="cover" style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 4 }} />
+                ) : (
+                    <div
+                        style={{
+                            width: 60,
+                            height: 40,
+                            background: '#f0f0f0',
+                            borderRadius: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: 12,
+                            color: '#999'
+                        }}
+                    >
+                        No Image
+                    </div>
+                )
+        },
+        {
             title: 'Tiêu đề',
             dataIndex: 'title',
             key: 'title',
             width: 300,
             ellipsis: true,
             render: (text, record) => (
-                <Button type="link" onClick={() => navigate(`/admin/blog/display/${record.id}`)}>
-                    {text}
-                </Button>
+                <div>
+                    <Button type="link" onClick={() => navigate(`/admin/blog/display/${record.id}`)} style={{ padding: 0, height: 'auto' }}>
+                        {text}
+                    </Button>
+                    {record.description && (
+                        <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
+                            {record.description.length > 80 ? `${record.description.substring(0, 80)}...` : record.description}
+                        </div>
+                    )}
+                </div>
             )
         },
         {

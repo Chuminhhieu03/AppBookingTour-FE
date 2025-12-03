@@ -10,7 +10,7 @@ const combo = {
             title: 'Combo Tours',
             type: 'item',
             icon: <i className="ph ph-article" />,
-            url: '/admin/combos'
+            url: '/admin/service/combo'
         }
     ]
 };

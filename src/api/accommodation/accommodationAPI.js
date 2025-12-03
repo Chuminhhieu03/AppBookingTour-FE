@@ -15,8 +15,18 @@ const accommodationAPI = {
         return response.data;
     },
 
+    searchAccommodationsForCustomer: async (query) => {
+        const response = await axiosInstance.post('/Accommodation/search-for-customer', query);
+        return response.data;
+    },
+
     getById: async (id) => {
         const response = await axiosInstance.get(`/Accommodation/${id}`);
+        return response.data;
+    },
+
+    getByIdForCustomer: async (id) => {
+        const response = await axiosInstance.get(`/Accommodation/customer/${id}`);
         return response.data;
     },
 

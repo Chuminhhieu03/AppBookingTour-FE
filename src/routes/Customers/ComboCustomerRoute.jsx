@@ -5,10 +5,11 @@ import Loadable from 'components/Loadable';
 import ProtectedRoute from 'components/auth/ProtectedRoute';
 import CustomerLayout from 'layout/CustomerLayout/CustomerLayout';
 
-// render - bootstrap table pages
-const AccommodationCustomerDefault = Loadable(lazy(() => import('views/Customers/Accommodations/Default')));
+// render - combo pages
+const ComboList = Loadable(lazy(() => import('views/Customers/Combos/ComboList')));
+const ComboDetail = Loadable(lazy(() => import('views/Customers/Combos/ComboDetail')));
 
-const AccommodationCustomerRoutes = {
+const ComboCustomerRoute = {
     path: '/',
     children: [
         {
@@ -20,17 +21,16 @@ const AccommodationCustomerRoutes = {
             ),
             children: [
                 {
-                    path: 'accommodations',
-                    children: [
-                        {
-                            path: 'default',
-                            element: <AccommodationCustomerDefault />
-                        }
-                    ]
+                    path: 'combos',
+                    element: <ComboList />
+                },
+                {
+                    path: 'combos/:id',
+                    element: <ComboDetail />
                 }
             ]
         }
     ]
 };
 
-export default AccommodationCustomerRoutes;
+export default ComboCustomerRoute;

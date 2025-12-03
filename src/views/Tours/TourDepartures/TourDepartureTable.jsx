@@ -1,80 +1,150 @@
-import { Table, Button, Space, Card, Tag, message, Modal } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import tourDepartureAPI from '../../../api/tour/tourDepartureAPI';
-import LoadingModal from '../../../components/LoadingModal';
-import Constants from 'Constants/Constants';
-import Utility from 'utils/Utility';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Table, Button, Space, message, Tag, Popconfirm } from 'antd';
+import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import TourDepartureModal from './TourDepartureModal';
+import { tourDepartureAPI } from '../../../api/tour/tourDepartureAPI';
+import Constants from '../../../Constants/Constants';
+import Utility from '../../../utils/Utility';
 
-export default function TourDepartureTable({ tourId, isEditMode = false, title = 'Danh sách lịch khởi hành', tourData = null }) {
-    const navigate = useNavigate();
-    const [departures, setDepartures] = useState([]);
+const TourDepartureTable = ({ mode = 'local', tourId, dataSource = [], onDataChange, tourInfo = {}, guides = [], readOnly = false }) => {
     const [loading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
 
-    useEffect(() => {
-        if (tourId) {
-            fetchDepartures();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tourId]);
+    const [modalConfig, setModalConfig] = useState({
+        visible: false,
+        mode: 'create',
+        selectedRecord: null
+    });
 
-    const fetchDepartures = async () => {
+    // --- LOGIC 1: FETCH DATA (API Mode) ---
+    const fetchData = useCallback(async () => {
+        if (!tourId || mode === 'local') return;
+
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await tourDepartureAPI.getByTourId(tourId);
             if (response.success) {
-                setDepartures(response.data || []);
+                setData(response.data || []);
+            } else {
+                message.error(response.message || 'Không thể tải dữ liệu');
             }
         } catch (error) {
-            console.error('Error fetching departures:', error);
+            console.error('Error:', error);
+            message.error('Lỗi khi tải dữ liệu');
         } finally {
             setLoading(false);
         }
+    }, [tourId, mode]);
+
+    // --- LOGIC 2: SYNC DATA ---
+    useEffect(() => {
+        if (mode === 'api') fetchData();
+    }, [fetchData, mode]);
+
+    useEffect(() => {
+        if (mode === 'local') {
+            const sortedData = (dataSource || []).sort((a, b) => {
+                if (!a.departureDate || !b.departureDate) return 0;
+                return new Date(a.departureDate) - new Date(b.departureDate);
+            });
+            setData(sortedData);
+        }
+    }, [mode, dataSource]);
+
+    // --- HELPER HANDLERS ---
+    const toggleModal = (visible, mode = 'create', record = null) => {
+        setModalConfig({ visible, mode, selectedRecord: record });
     };
 
-    const handleDelete = (departureId) => {
-        Modal.confirm({
-            title: 'Xác nhận xóa',
-            content: 'Bạn có chắc chắn muốn xóa lịch khởi hành này?',
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            onOk: async () => {
-                try {
-                    LoadingModal.showLoading();
-                    const response = await tourDepartureAPI.delete(departureId);
-                    if (response.success) {
-                        message.success('Xóa lịch khởi hành thành công!');
-                        fetchDepartures(); // Refresh the list
-                    } else {
-                        message.error('Xóa lịch khởi hành thất bại!');
-                    }
-                } catch (error) {
-                    console.error('Error deleting departure:', error);
-                    message.error('Đã xảy ra lỗi khi xóa lịch khởi hành.');
-                } finally {
-                    LoadingModal.hideLoading();
+    const updateLocalData = (newData) => {
+        // Sắp xếp dữ liệu theo departureDate trước khi cập nhật
+        const sortedData = newData.sort((a, b) => {
+            if (!a.departureDate || !b.departureDate) return 0;
+            return new Date(a.departureDate) - new Date(b.departureDate);
+        });
+        setData(sortedData);
+        onDataChange?.(sortedData);
+    };
+
+    const handleAdd = () => {
+        // Validate Tour Info
+        if (!tourInfo?.durationDays || !tourInfo?.durationNights) {
+            message.warning('Vui lòng nhập số ngày và số đêm lưu trú trước!');
+            tourInfo?.onNavigateToBasicTab?.(); // Optional chaining cho an toàn
+            return;
+        }
+        toggleModal(true, 'create');
+    };
+
+    const handleDelete = async (record, index) => {
+        if (mode === 'local') {
+            const newData = data.filter((_, idx) => idx !== index);
+            updateLocalData(newData);
+        } else {
+            setLoading(true);
+            try {
+                const response = await tourDepartureAPI.delete(record.id);
+                if (response.success) {
+                    message.success('Xóa thành công!');
+                    fetchData();
+                } else {
+                    message.error(response.message || 'Không thể xóa');
                 }
+            } catch (error) {
+                message.error('Lỗi hệ thống khi xóa');
+            } finally {
+                setLoading(false);
             }
-        });
+        }
     };
 
-    const handleEdit = (record) => {
-        navigate(`/admin/service/tour/${tourId}/departure/edit/${record.id}`);
+    const handleModalSave = async (formData) => {
+        const { mode: currentMode, selectedRecord } = modalConfig;
+
+        if (mode === 'local') {
+            let newData = [...data];
+            if (currentMode === 'create') {
+                // Tạo ID giả lập để tránh lỗi key
+                newData.push({ ...formData, id: Date.now() });
+            } else {
+                const targetIndex = data.indexOf(selectedRecord);
+                if (targetIndex > -1) newData[targetIndex] = { ...selectedRecord, ...formData };
+            }
+            updateLocalData(newData);
+            toggleModal(false);
+        } else {
+            setLoading(true);
+            try {
+                const apiCall =
+                    currentMode === 'create'
+                        ? tourDepartureAPI.create(formData, tourId)
+                        : tourDepartureAPI.update(selectedRecord.id, formData);
+
+                const response = await apiCall;
+                if (response.success) {
+                    message.success(currentMode === 'create' ? 'Thêm mới thành công!' : 'Cập nhật thành công!');
+                    fetchData();
+                    toggleModal(false);
+                } else {
+                    message.error(response.message || 'Thao tác thất bại');
+                }
+            } catch (error) {
+                if (error.response && error.response.data && error.response.data.message) {
+                    message.error(error.response.data.message);
+                } else {
+                    message.error('Đã xảy ra lỗi hệ thống.');
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
     };
 
-    const handleAdd = (tourData = null) => {
-        navigate(`/admin/service/tour/${tourId}/departure/addnew`, {
-            state: tourData
-                ? {
-                      duration: tourData.durationDays,
-                      priceAdult: tourData.basePriceAdult,
-                      priceChildren: tourData.basePriceChild,
-                      maxParticipants: tourData.maxParticipants
-                  }
-                : null
-        });
+    // --- RENDER HELPERS ---
+    const getStatusTag = (status) => {
+        const option = Constants.TourDepartureStatusOptions.find((o) => o.value === status);
+        return <Tag color={Utility.getTagColor('tourDepartureStatus', status)}>{option?.label || 'N/A'}</Tag>;
     };
 
     const columns = [
@@ -82,104 +152,122 @@ export default function TourDepartureTable({ tourId, isEditMode = false, title =
             title: 'STT',
             key: 'index',
             width: 60,
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (_, __, index) => <div style={{ textAlign: 'center' }}>{index + 1}</div>
+            align: 'center',
+            render: (_, __, index) => index + 1
         },
         {
-            title: 'Ngày khởi hành',
+            title: 'Ngày đi',
             dataIndex: 'departureDate',
             key: 'departureDate',
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (date) => <div style={{ textAlign: 'center' }}>{new Date(date).toLocaleDateString('vi-VN')}</div>
+            align: 'center',
+            render: (date) => (date ? Utility.convertUtcToLocalTimestamp(date).format('DD/MM/YYYY') : '--')
         },
         {
-            title: 'Ngày kết thúc',
+            title: 'Ngày về',
             dataIndex: 'returnDate',
             key: 'returnDate',
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (date) => <div style={{ textAlign: 'center' }}>{new Date(date).toLocaleDateString('vi-VN')}</div>
+            align: 'center',
+            render: (date) => (date ? Utility.convertUtcToLocalTimestamp(date).format('DD/MM/YYYY') : '--')
         },
         {
             title: 'Giá người lớn',
             dataIndex: 'priceAdult',
             key: 'priceAdult',
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (price) => <div style={{ textAlign: 'right' }}>{price?.toLocaleString('vi-VN') + ' VND'}</div>
+            align: 'center',
+            render: (price) => Utility.formatPrice(price || 0)
         },
         {
-            title: 'Số chỗ còn lại',
+            title: 'Giá trẻ em',
+            dataIndex: 'priceChildren',
+            key: 'priceChildren',
+            align: 'center',
+            render: (price) => Utility.formatPrice(price || 0)
+        },
+        {
+            title: 'Chỗ còn lại',
             dataIndex: 'availableSlots',
             key: 'availableSlots',
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (slots) => <div style={{ textAlign: 'center' }}>{slots}</div>
+            align: 'center'
         },
         {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
-            onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-            render: (status) => (
-                <div style={{ textAlign: 'center' }}>
-                    <Tag color={Utility.getTagColor('tourDepartureStatus', status)}>
-                        {Utility.getLabelByValue(Constants.TourDepartureStatusOptions, status)}
-                    </Tag>
-                </div>
+            align: 'center',
+            render: getStatusTag
+        },
+        {
+            title: 'Hành động',
+            key: 'action',
+            align: 'center',
+            width: 150,
+            fixed: 'right',
+            render: (_, record, index) => (
+                <Space size="small">
+                    <Button
+                        type="primary"
+                        ghost
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => toggleModal(true, 'view', record)}
+                        title="Xem chi tiết"
+                    />
+                    {!readOnly && (
+                        <>
+                            <Button
+                                type="default"
+                                size="small"
+                                icon={<EditOutlined />}
+                                onClick={() => toggleModal(true, 'edit', record)}
+                                title="Chỉnh sửa"
+                            />
+                            <Popconfirm
+                                title="Bạn có chắc muốn xóa lịch khởi hành này?"
+                                onConfirm={() => handleDelete(record, index)}
+                                okText="Có"
+                                cancelText="Không"
+                            >
+                                <Button type="primary" danger size="small" icon={<DeleteOutlined />} title="Xóa" />
+                            </Popconfirm>
+                        </>
+                    )}
+                </Space>
             )
         }
     ];
 
-    // Always add action column - show different buttons based on mode
-    columns.push({
-        title: 'Hành động',
-        key: 'action',
-        width: 150,
-        align: 'center',
-        fixed: 'right',
-        onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-        render: (_, record) => (
-            <Space size="small">
-                <Button
-                    type="primary"
-                    ghost
-                    size="small"
-                    icon={<EyeOutlined />}
-                    onClick={() => navigate(`/admin/service/tour/${tourId}/departure/display/${record.id}`)}
-                />
-                {isEditMode && (
-                    <>
-                        <Button type="default" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-                        <Button type="primary" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} />
-                    </>
-                )}
-            </Space>
-        )
-    });
-
     return (
-        <Card
-            title={title}
-            size="small"
-            extra={
-                isEditMode && (
-                    <Button type="primary" icon={<PlusOutlined />} size="small" onClick={() => handleAdd(tourData)}>
+        <div>
+            {!readOnly && (
+                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
                         Thêm lịch khởi hành
                     </Button>
-                )
-            }
-        >
+                </div>
+            )}
+
             <Table
                 columns={columns}
-                dataSource={departures}
-                rowKey="id"
+                dataSource={data}
                 loading={loading}
+                rowKey={(record, index) => record.id || index}
                 pagination={false}
-                size="small"
+                size="middle"
                 bordered
-                scroll={{ x: 900 }}
-                locale={{
-                    emptyText: 'Chưa có lịch khởi hành nào'
-                }}
+                locale={{ emptyText: 'Chưa có lịch khởi hành nào' }}
             />
-        </Card>
+
+            <TourDepartureModal
+                open={modalConfig.visible}
+                mode={modalConfig.mode}
+                initialData={modalConfig.selectedRecord}
+                tourInfo={tourInfo}
+                guides={guides}
+                onSave={handleModalSave}
+                onCancel={() => toggleModal(false)}
+            />
+        </div>
     );
-}
+};
+
+export default TourDepartureTable;

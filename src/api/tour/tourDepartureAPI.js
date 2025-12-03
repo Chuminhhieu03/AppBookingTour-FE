@@ -14,8 +14,8 @@ const tourDepartureAPI = {
     },
 
     // Create tour departure
-    create: async (data) => {
-        const response = await axiosInstance.post('/tour-departures', data);
+    create: async (data, tourId) => {
+        const response = await axiosInstance.post(`/tour-departures/${tourId}`, data);
         return response.data;
     },
 
@@ -28,6 +28,12 @@ const tourDepartureAPI = {
     // Delete tour departure
     delete: async (id) => {
         const response = await axiosInstance.delete(`/tour-departures/${id}`);
+        return response.data;
+    },
+
+    // Get list tour departures for guide
+    getListForGuide: async (guideId) => {
+        const response = await axiosInstance.get(`/tour-departures/get-list-for-guide/${guideId}`);
         return response.data;
     }
 };

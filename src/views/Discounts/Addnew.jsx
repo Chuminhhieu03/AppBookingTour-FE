@@ -1,47 +1,45 @@
-import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select } from 'antd';
+import { Col, Row, Button, Space, Input, InputNumber, DatePicker, Select, message } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoadingModal from '../../components/LoadingModal';
 import discountAPI from '../../api/discount/discountAPI';
 import Constants from '../../Constants/Constants';
+import axiosIntance from '../../api/axiosInstance'; 
 
 const { TextArea } = Input;
 
 export default function Addnew() {
+    const navigate = useNavigate();
     const [discount, setDiscount] = useState({});
-
-    useEffect(() => {
-        setupAddnewForm();
-    }, []);
-
-    const setupAddnewForm = async () => {
-        const response = await axiosIntance.post('/Discount/setup-addnew', {});
-        const res = response.data;
-        setListStatus(res.listStatus);
-        setListServiceType(res.listServiceType);
-    };
 
     const onAddnewDiscount = async (discount) => {
         LoadingModal.showLoading();
         try {
             const request = {};
             request.Discount = { ...discount };
+            request.Discount.Status = Number(discount.Status);
             request.Discount.StartEffectedDtg = discount.StartEffectedDtg?.toDate().toISOString();
             request.Discount.EndEffectedDtg = discount.EndEffectedDtg?.toDate().toISOString();
+            request.Discount.MaximumDiscount = discount.MaximumDiscount;
             const res = await discountAPI.create(request);
-            const discountRes = res.discount;
+            
             if (res.success) {
-                window.location.href = `/admin/sale/discount/display/${discountRes.id}`;
+                const discountRes = res.discount;
+                message.success('Thêm mới mã giảm giá thành công');
+                setTimeout(() => {
+                    navigate(`/admin/sale/discount/display/${discountRes.id}`);
+                }, 1000);
             } else {
-                const errorData = res.data || [];
-                const listErrorMessage = errorData?.map((e) => e.errorMessage);
-                alert(`Lỗi khi thêm mới mã giảm giá:\n${listErrorMessage.join('\n')}`);
+                message.error(res.message || 'Không thể thêm mới mã giảm giá');
             }
         } catch (error) {
             console.error('Error adding new discount:', error);
+            message.error('Đã xảy ra lỗi khi thêm mới mã giảm giá');
+        } finally {
+            LoadingModal.hideLoading();
         }
-        LoadingModal.hideLoading();
     };
 
     return (
@@ -85,6 +83,17 @@ export default function Addnew() {
                                 max={100}
                                 className="w-100"
                                 onChange={(val) => setDiscount({ ...discount, DiscountPercent: val })}
+                            />
+                        </Col>
+                        <Col span={8}>
+                            <span>Số tiền giảm tối đa (VND)</span>
+                            <InputNumber
+                                value={discount.MaximumDiscount}
+                                min={0}
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value?.replace(/,/g, '')}
+                                onChange={(val) => setDiscount({ ...discount, MaximumDiscount: val })}
                             />
                         </Col>
                         <Col span={8}>

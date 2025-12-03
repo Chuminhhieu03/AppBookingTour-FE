@@ -61,6 +61,15 @@ export default function Display() {
                             <InputNumber value={discount.discountPercent} className="w-100" readOnly />
                         </Col>
                         <Col span={8}>
+                            <span>Số tiền giảm tối đa (VND)</span>
+                            <InputNumber
+                                value={discount.maximumDiscount}
+                                className="w-100"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                readOnly
+                            />
+                        </Col>
+                        <Col span={8}>
                             <span>Ngày hiệu lực</span>
                             <Input value={Utility.formatDate(discount.startEffectedDtg)} className="w-100" readOnly />
                         </Col>

@@ -10,6 +10,7 @@ import discount from './Sale';
 import service from './Service';
 import blog from './Blog';
 import statistics from './Statistics';
+import assignedTour from './AssignedTour';
 
 const drawerItems = {
     // items: [navigation, uiComponents, formComponents, tableComponents, chartsMaps, pages, other, discount, service, blog, statistics]

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { APP_DEFAULT_PATH } from 'config';
+import { APP_DEFAULT_PATH } from '../config';
 import DrawerItem from '../layout/AdminLayout/Drawer/DrawerItems/DrawerItem';
 
 export default function Breadcrumbs() {

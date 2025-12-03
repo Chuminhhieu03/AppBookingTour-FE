@@ -1,4 +1,4 @@
-import { Col, Row, Button, Space, Input, Select, Rate, Upload, Form, InputNumber } from 'antd';
+import { Col, Row, Button, Space, Input, Select, Rate, Upload, Form, InputNumber, message } from 'antd';
 import { CloseOutlined, CheckOutlined, PlusOutlined } from '@ant-design/icons';
 import MainCard from 'components/MainCard';
 import { useEffect, useState } from 'react';
@@ -9,6 +9,20 @@ import accommodationAPI from '../../api/accommodation/accommodationAPI';
 import cityAPI from '../../api/city/cityAPI';
 import systemParameterAPI from '../../api/systemParameters/systemParameterAPI';
 import Constants from '../../Constants/Constants';
+import TiptapEditor from 'components/TiptapEditor/TiptapEditor';
+import { MapContainer, TileLayer, Marker as LeafletMarker, Popup, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Create red marker icon for temporary position
+const redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
 
 const { TextArea } = Input;
 
@@ -18,6 +32,32 @@ export default function Addnew() {
     const [listAmenity, setListAmenity] = useState([]);
     const [listInfoImage, setListInfoImage] = useState([]);
     const [coverImgFile, setCoverImgFile] = useState(null);
+    const [regulation, setRegulation] = useState('');
+    const [tempMarkerPosition, setTempMarkerPosition] = useState(null);
+
+    // Component to handle map clicks
+    const MapClickHandler = () => {
+        useMapEvents({
+            click: (e) => {
+                const { lat, lng } = e.latlng;
+                setTempMarkerPosition([lat, lng]);
+            }
+        });
+        return null;
+    };
+
+    const handleConfirmCoordinates = () => {
+        if (!tempMarkerPosition) return;
+        const [lat, lng] = tempMarkerPosition;
+        const coordsString = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        form.setFieldsValue({ Coordinates: coordsString });
+        setTempMarkerPosition(null);
+        message.success('Đã cập nhật tọa độ');
+    };
+
+    const handleCancelCoordinates = () => {
+        setTempMarkerPosition(null);
+    };
 
     useEffect(() => {
         getListAccommodationAmenity();
@@ -55,8 +95,9 @@ export default function Addnew() {
             formData.append('Name', accommodationRequest.Name ?? accommodationRequest.name);
             formData.append('Address', accommodationRequest.Address ?? accommodationRequest.address ?? '');
             formData.append('StarRating', accommodationRequest.StarRating ?? accommodationRequest.starRating ?? 0);
+            formData.append('Coordinates', accommodationRequest.Coordinates ?? accommodationRequest.coordinates ?? '');
             formData.append('Description', accommodationRequest.Description ?? accommodationRequest.description ?? '');
-            formData.append('Regulation', accommodationRequest.Regulation ?? accommodationRequest.regulation ?? '');
+            formData.append('Regulation', regulation);
             formData.append('Amenities', amenities ?? '');
             formData.append('IsActive', accommodationRequest.IsActive);
             // cover image file from local state
@@ -66,13 +107,19 @@ export default function Addnew() {
             });
 
             const res = await accommodationAPI.create(formData);
-            const accommodationRes = res.accommodation;
-            form.resetFields();
-            setCoverImgFile(null);
-            setListInfoImage([]);
-            window.location.href = `/admin/service/accommodation/display/${accommodationRes.id}`;
+            if (res.success) {
+                message.success('Thêm mới cơ sở lưu trú thành công');
+                const accommodationRes = res.accommodation;
+                form.resetFields();
+                setCoverImgFile(null);
+                setListInfoImage([]);
+                window.location.href = `/admin/service/accommodation/display/${accommodationRes.id}`;
+            } else {
+                message.error(res.message || 'Thêm mới cơ sở lưu trú thất bại');
+            }
         } catch (error) {
             console.error('Error adding new accommodation:', error);
+            message.error('Đã xảy ra lỗi khi thêm mới cơ sở lưu trú');
         } finally {
             LoadingModal.hideLoading();
         }
@@ -154,8 +201,19 @@ export default function Addnew() {
                                 </Form.Item>
                             </Col>
 
+                            <Col span={8}>
+                                <Form.Item name="Coordinates" label="Tọa độ">
+                                    <Input placeholder="Ví dụ: 21.0285, 105.8542" readOnly />
+                                </Form.Item>
+                            </Col>
+
                             <Col span={8} className="d-flex align-items-center gap-2">
-                                <Form.Item name="StarRating" label="Hạng sao" className="w-100">
+                                <Form.Item
+                                    name="StarRating"
+                                    label="Hạng sao"
+                                    className="w-100"
+                                    rules={[{ required: true, message: 'Vui lòng chọn hạng sao' }]}
+                                >
                                     <Rate />
                                 </Form.Item>
                             </Col>
@@ -172,15 +230,67 @@ export default function Addnew() {
                             </Col>
 
                             <Col span={24}>
-                                <Form.Item name="Regulation" label="Quy định">
-                                    <TextArea />
-                                </Form.Item>
+                                <span>Quy định</span>
+                                <div style={{ marginTop: 8 }}>
+                                    <TiptapEditor content={regulation} onChange={setRegulation} minHeight={100} />
+                                </div>
                             </Col>
 
                             <Col span={24}>
                                 <Form.Item name="Description" label="Mô tả">
                                     <TextArea allowClear className="w-100" />
                                 </Form.Item>
+                            </Col>
+                            <Col span={24}>
+                                <span>Vị trí</span>
+                                <div style={{ height: '500px', width: '100%', marginTop: '8px' }}>
+                                    {(() => {
+                                        const coords = form
+                                            .getFieldValue('Coordinates')
+                                            ?.split(',')
+                                            .map((c) => parseFloat(c.trim()));
+                                        const center =
+                                            coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])
+                                                ? coords
+                                                : [20.981804, 105.791978];
+                                        return (
+                                            <MapContainer
+                                                center={center}
+                                                zoom={13}
+                                                scrollWheelZoom={false}
+                                                style={{ height: '100%', width: '100%' }}
+                                            >
+                                                <TileLayer
+                                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                />
+                                                <MapClickHandler />
+                                                {coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1]) && (
+                                                    <LeafletMarker position={center}>
+                                                        <Popup>Vị trí đã chọn</Popup>
+                                                    </LeafletMarker>
+                                                )}
+                                                {tempMarkerPosition && (
+                                                    <LeafletMarker position={tempMarkerPosition} icon={redIcon}>
+                                                        <Popup>
+                                                            <div style={{ textAlign: 'center' }}>
+                                                                <p style={{ marginBottom: '10px' }}>Xác nhận địa chỉ mới?</p>
+                                                                <Space>
+                                                                    <Button type="primary" size="small" onClick={handleConfirmCoordinates}>
+                                                                        Đồng ý
+                                                                    </Button>
+                                                                    <Button size="small" onClick={handleCancelCoordinates}>
+                                                                        Hủy
+                                                                    </Button>
+                                                                </Space>
+                                                            </div>
+                                                        </Popup>
+                                                    </LeafletMarker>
+                                                )}
+                                            </MapContainer>
+                                        );
+                                    })()}
+                                </div>
                             </Col>
                         </Row>
                     </Form>

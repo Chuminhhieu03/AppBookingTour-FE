@@ -9,7 +9,8 @@ export default class Constants {
 
     static FeatureCode = {
         AccommodationAmenity: 'AccommodationAmenity',
-        RoomTypeAmenity: 'RoomTypeAmenity'
+        RoomTypeAmenity: 'RoomTypeAmenity',
+        RoomView: 'RoomView'
     };
 
     static AccommodationType = {
@@ -36,9 +37,29 @@ export default class Constants {
         Premium: 3
     };
 
+    static ServiceType = {
+        Accomodation: 1,
+        Tour: 2,
+        Combo: 3
+    };
+
     static VehicleType = {
         Car: 1,
         Plane: 2
+    };
+
+    static Gender = {
+        Male: 1,
+        Female: 2,
+        Other: 3
+    };
+
+    static RoomView = {
+        Sea: 1,
+        Mountain: 2,
+        Lake: 3,
+        Garden: 4,
+        City: 5
     };
 
     // Options cho bộ lọc và các thành phần giao diện
@@ -87,4 +108,28 @@ export default class Constants {
         { value: this.VehicleType.Car, label: 'Xe ô tô' },
         { value: this.VehicleType.Plane, label: 'Máy bay' }
     ];
+
+    static GenderOptions = [
+        { value: this.Gender.Male, label: 'Nam' },
+        { value: this.Gender.Female, label: 'Nữ' },
+        { value: this.Gender.Other, label: 'Khác' }
+    ];
+
+    static RoomViewOptions = [
+        { value: this.RoomView.Sea, label: 'Biển' },
+        { value: this.RoomView.Mountain, label: 'Núi' },
+        { value: this.RoomView.Lake, label: 'Hồ' },
+        { value: this.RoomView.Garden, label: 'Vườn' },
+        { value: this.RoomView.City, label: 'Thành phố' }
+    ];
+
+    public static readonly DEFAULT_LIST_ITEM_PAGE_SIZE: number = 10;
+    // Guest and Room Limits
+    static GuestLimits = {
+        MIN_ADULTS: 1,
+        MAX_GUESTS: 10,
+        MIN_CHILDREN: 0,
+        MIN_ROOMS: 1,
+        MAX_ROOMS: 10
+    };
 }

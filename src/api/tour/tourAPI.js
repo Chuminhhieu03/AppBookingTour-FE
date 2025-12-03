@@ -7,6 +7,12 @@ const tourAPI = {
         return response.data;
     },
 
+    // Search tours for customers with filters
+    searchToursForCustomer: async (query) => {
+        const response = await axiosInstance.post('/tours/search-for-customer', query);
+        return response.data;
+    },
+
     // Get by ID
     getById: async (id) => {
         const response = await axiosInstance.get(`/tours/${id}`);
@@ -42,6 +48,11 @@ const tourAPI = {
     // Delete tour
     delete: async (id) => {
         const response = await axiosInstance.delete(`/tours/${id}`);
+        return response.data;
+    },
+
+    getFeaturedTours: async (count = 4) => {
+        const response = await axiosInstance.get(`/tours/featured?count=${count}`);
         return response.data;
     }
 };
