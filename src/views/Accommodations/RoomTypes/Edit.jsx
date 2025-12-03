@@ -69,7 +69,9 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             Area: rt.area,
             View: viewArr,
             CancelPolicy: rt.cancelPolicy,
-            CoverImageUrl: rt.coverImageUrl
+            CoverImageUrl: rt.coverImageUrl,
+            VAT: rt.vat,
+            ManagementFee: rt.managementFee
         });
     }, [roomType, form]);
 
@@ -91,6 +93,8 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
             formData.append('Area', roomTypeData.Area ?? roomTypeEdit.area ?? 0);
             formData.append('View', views || roomTypeEdit.view || '');
             formData.append('CancelPolicy', cancelPolicy || roomTypeEdit.cancelPolicy || '');
+            formData.append('VAT', roomTypeData.VAT ?? roomTypeEdit.vat ?? 0);
+            formData.append('ManagementFee', roomTypeData.ManagementFee ?? roomTypeEdit.managementFee ?? 0);
             formData.append('AccommodationId', accommodationId);
             formData.append('Amenities', amenities);
             formData.append('CoverImageUrl', roomTypeData.CoverImageUrl ?? roomTypeEdit.coverImageUrl ?? '');
@@ -395,6 +399,40 @@ export default function EditRoomType({ isOpen, onOk, onCancel, roomType, accommo
                                                 placeholder="Chọn tầm nhìn"
                                                 getPopupContainer={(trigger) => trigger.parentNode}
                                                 options={Constants.RoomViewOptions}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={8}>
+                                        <Form.Item
+                                            name="VAT"
+                                            label="Thuế VAT (%)"
+                                            rules={[
+                                                { type: 'number', min: 0, max: 100, message: 'VAT phải từ 0 đến 100' }
+                                            ]}
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                max={100}
+                                                className="w-100"
+                                                placeholder="Nhập thuế VAT"
+                                            />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={8}>
+                                        <Form.Item
+                                            name="ManagementFee"
+                                            label="Phụ thu quản trị (%)"
+                                            rules={[
+                                                { type: 'number', min: 0, max: 100, message: 'Phụ thu quản trị phải từ 0 đến 100' }
+                                            ]}
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                max={100}
+                                                className="w-100"
+                                                placeholder="Nhập phụ thu quản trị"
                                             />
                                         </Form.Item>
                                     </Col>

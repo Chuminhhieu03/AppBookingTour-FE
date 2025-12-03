@@ -25,6 +25,16 @@ const HomePageSearchBtn = () => {
     const [activeTab, setActiveTab] = useState('tour');
     const [cities, setCities] = useState([]);
 
+    // Tour search state
+    const [tourDestinationCity, setTourDestinationCity] = useState(null);
+    const [tourDepartureDate, setTourDepartureDate] = useState(null);
+    const [tourPriceRange, setTourPriceRange] = useState(null);
+
+    // Combo search state
+    const [comboDepartureCity, setComboDepartureCity] = useState(null);
+    const [comboDestinationCity, setComboDestinationCity] = useState(null);
+    const [comboDepartureDate, setComboDepartureDate] = useState(null);
+
     const tabs = [
         { key: 'tour', label: 'Tour trọn gói', icon: <GiftOutlined /> },
         { key: 'hotel', label: 'Khách sạn', icon: <HomeOutlined /> },
@@ -44,18 +54,74 @@ const HomePageSearchBtn = () => {
         fetchCities();
     }, []);
 
+    const handleTourSearch = () => {
+        // Validate required fields
+        if (!tourDestinationCity) {
+            message.error('Vui lòng chọn địa điểm');
+            return;
+        }
+
+        // Build query parameters
+        const params = new URLSearchParams({
+            page: '1',
+            destinationCityId: tourDestinationCity.toString()
+        });
+
+        // Add optional parameters
+        if (tourDepartureDate) {
+            params.append('departureDate', tourDepartureDate.format('YYYY-MM-DD'));
+        }
+
+        // Add price range based on selection
+        if (tourPriceRange) {
+            switch (tourPriceRange) {
+                case '1': // Dưới 5 triệu
+                    params.append('priceFrom', '0');
+                    params.append('priceTo', '5000000');
+                    break;
+                case '2': // 5-10 triệu
+                    params.append('priceFrom', '5000000');
+                    params.append('priceTo', '10000000');
+                    break;
+                case '3': // 10-20 triệu
+                    params.append('priceFrom', '10000000');
+                    params.append('priceTo', '20000000');
+                    break;
+                case '4': // Trên 20 triệu
+                    params.append('priceFrom', '20000000');
+                    params.append('priceTo', '999999999');
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        navigate(`/tours?${params.toString()}`);
+    };
+
     const renderTourSearch = () => (
         <div className="row g-3 align-items-end">
             <div className="col-md-5" style={{ borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
                     Bạn muốn đi đâu? <span className="text-danger">*</span>
                 </label>
-                <Input
+                <Select
                     size="large"
-                    placeholder="Khám phá cuộc phiêu lưu tiếp theo của bạn — tìm kiếm bất kỳ điểm đến nào bạn"
-                    prefix={<EnvironmentOutlined className="text-muted" />}
                     bordered={false}
-                />
+                    placeholder="Chọn địa điểm"
+                    suffixIcon={<EnvironmentOutlined className="text-muted" />}
+                    className="w-100"
+                    showSearch
+                    value={tourDestinationCity}
+                    onChange={(val) => setTourDestinationCity(val)}
+                    filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+                >
+                    {cities.map((city) => (
+                        <Option key={city.id} value={city.id}>
+                            {city.name}
+                        </Option>
+                    ))}
+                </Select>
             </div>
             <div className="col-md-3" style={{ borderRight: '1px solid #e8e8e8', paddingRight: 20 }}>
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
@@ -68,13 +134,23 @@ const HomePageSearchBtn = () => {
                     format="ddd, DD [thg] MM, YYYY"
                     suffixIcon={<CalendarOutlined />}
                     bordered={false}
+                    value={tourDepartureDate}
+                    onChange={(date) => setTourDepartureDate(date)}
                 />
             </div>
             <div className="col-md-3">
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
                     Ngân sách
                 </label>
-                <Select size="large" bordered={false} placeholder="Chọn mức giá" className="w-100" suffixIcon={<DollarOutlined />}>
+                <Select
+                    size="large"
+                    bordered={false}
+                    placeholder="Chọn mức giá"
+                    className="w-100"
+                    suffixIcon={<DollarOutlined />}
+                    value={tourPriceRange}
+                    onChange={(value) => setTourPriceRange(value)}
+                >
                     <Option value="1">Dưới 5 triệu</Option>
                     <Option value="2">5-10 triệu</Option>
                     <Option value="3">10-20 triệu</Option>
@@ -82,7 +158,14 @@ const HomePageSearchBtn = () => {
                 </Select>
             </div>
             <div className="col-md-1">
-                <Button type="primary" size="large" icon={<SearchOutlined />} className="w-100" style={{ backgroundColor: '#1890ff' }} />
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<SearchOutlined />}
+                    className="w-100"
+                    style={{ backgroundColor: '#1890ff' }}
+                    onClick={() => handleTourSearch()}
+                />
             </div>
         </div>
     );
@@ -169,8 +252,36 @@ const HomePageSearchBtn = () => {
             page: '1',
             cityId: selectedCity.toString()
         });
-        
+
         navigate(`/accommodations?${params.toString()}`);
+    };
+
+    const handleComboSearch = () => {
+        // Validate required fields
+        if (!comboDepartureCity) {
+            message.error('Vui lòng chọn thành phố đi');
+            return;
+        }
+        if (!comboDestinationCity) {
+            message.error('Vui lòng chọn thành phố đến');
+            return;
+        }
+
+        // Build query parameters
+        const params = new URLSearchParams({
+            page: '1',
+            departureCityId: comboDepartureCity.toString(),
+            destinationCityId: comboDestinationCity.toString(),
+            numOfAdult: adults.toString(),
+            numOfChild: children.toString()
+        });
+
+        // Add optional departure date
+        if (comboDepartureDate) {
+            params.append('departureDate', comboDepartureDate.format('YYYY-MM-DD'));
+        }
+
+        navigate(`/combos?${params.toString()}`);
     };
 
     const renderHotelSearch = () => (
@@ -434,7 +545,7 @@ const HomePageSearchBtn = () => {
         <div className="row g-3 align-items-end">
             <div className="col-md-3">
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                    Từ (thành phố)
+                    Từ (thành phố) <span className="text-danger">*</span>
                 </label>
                 <Select
                     size="large"
@@ -443,6 +554,8 @@ const HomePageSearchBtn = () => {
                     suffixIcon={<EnvironmentOutlined className="text-muted" />}
                     className="w-100"
                     showSearch
+                    value={comboDepartureCity}
+                    onChange={(value) => setComboDepartureCity(value)}
                     filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
                 >
                     {cities.map((city) => (
@@ -455,7 +568,7 @@ const HomePageSearchBtn = () => {
 
             <div className="col-md-3">
                 <label className="form-label fw-semibold" style={{ marginLeft: 8, marginBottom: 6 }}>
-                    Đến
+                    Đến <span className="text-danger">*</span>
                 </label>
                 <Select
                     size="large"
@@ -464,6 +577,8 @@ const HomePageSearchBtn = () => {
                     suffixIcon={<EnvironmentOutlined className="text-muted" />}
                     className="w-100"
                     showSearch
+                    value={comboDestinationCity}
+                    onChange={(value) => setComboDestinationCity(value)}
                     filterOption={(input, option) => (option?.children ?? '').toLowerCase().includes(input.toLowerCase())}
                 >
                     {cities.map((city) => (
@@ -484,6 +599,8 @@ const HomePageSearchBtn = () => {
                     className="w-100"
                     format="DD/MM/YYYY"
                     bordered={false}
+                    value={comboDepartureDate}
+                    onChange={(date) => setComboDepartureDate(date)}
                 />
             </div>
 
@@ -611,7 +728,14 @@ const HomePageSearchBtn = () => {
             </div>
 
             <div className="col-md-1">
-                <Button type="primary" size="large" icon={<SearchOutlined />} className="w-100" style={{ backgroundColor: '#1890ff' }} />
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<SearchOutlined />}
+                    className="w-100"
+                    style={{ backgroundColor: '#1890ff' }}
+                    onClick={handleComboSearch}
+                />
             </div>
         </div>
     );

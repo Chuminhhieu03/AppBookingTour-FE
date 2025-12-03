@@ -94,7 +94,7 @@ const normalizeItemData = (data, type) => {
                 location1: data.cityName,
                 location2: data.address,
                 extra: {
-                    amenities: data.amenities || [],
+                    amenities: data.amenitiesName.split(',') || [],
                     totalAvailableRooms: data.totalAvailableRooms || 0,
                     starRating: data.starRating,
                     type: data.type
@@ -165,7 +165,7 @@ const HotelMeta = ({ data, commonData }) => {
                     <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '6px' }}>Tiện ích:</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                         {visibleAmenities.map((amenity, index) => (
-                            <Tag key={index} color="blue" size="small" icon={getAmenityIcon(amenity)}>
+                            <Tag key={index} color="blue" size="small">
                                 {amenity}
                             </Tag>
                         ))}

@@ -1,3 +1,4 @@
+import { get } from 'react-hook-form';
 import axiosInstance from '../axiosInstance';
 
 const roomTypeAPI = {
@@ -26,6 +27,11 @@ const roomTypeAPI = {
 
     delete: async (id) => {
         const response = await axiosInstance.delete(`/RoomType/${id}`);
+        return response.data;
+    },
+
+    getPreviewById: async (id) => {
+        const response = await axiosInstance.get(`/RoomType/preview/${id}`);
         return response.data;
     }
 };

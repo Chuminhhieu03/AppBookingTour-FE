@@ -60,6 +60,8 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
             formData.append('Area', roomTypeRequest.Area || 0);
             formData.append('View', views);
             formData.append('CancelPolicy', cancelPolicy || '');
+            formData.append('VAT', roomTypeRequest.VAT || 0);
+            formData.append('ManagementFee', roomTypeRequest.ManagementFee || 0);
             // cover image file comes from local state
             if (coverImgFile) formData.append('CoverImgFile', coverImgFile);
             formData.append('Amenities', amenities);
@@ -270,6 +272,40 @@ export default function AddNewRoomType({ isOpen, onOk, onCancel, accommodationId
                                 placeholder="Chọn tầm nhìn"
                                 getPopupContainer={(trigger) => trigger.parentNode}
                                 options={listRoomView}
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item
+                            name="VAT"
+                            label="Thuế VAT (%)"
+                            rules={[
+                                { type: 'number', min: 0, max: 100, message: 'VAT phải từ 0 đến 100' }
+                            ]}
+                        >
+                            <InputNumber
+                                min={0}
+                                max={100}
+                                className="w-100"
+                                placeholder="Nhập thuế VAT"
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={8}>
+                        <Form.Item
+                            name="ManagementFee"
+                            label="Phụ thu quản trị (%)"
+                            rules={[
+                                { type: 'number', min: 0, max: 100, message: 'Phụ thu quản trị phải từ 0 đến 100' }
+                            ]}
+                        >
+                            <InputNumber
+                                min={0}
+                                max={100}
+                                className="w-100"
+                                placeholder="Nhập phụ thu quản trị"
                             />
                         </Form.Item>
                     </Col>

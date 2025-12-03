@@ -124,6 +124,14 @@ export default function RoomTypeDisplay({ isOpen, onCancel, roomType }) {
                                     <span>Tầm nhìn</span>
                                     <Input value={getViewNames(roomTypeDisplay.view)} readOnly />
                                 </Col>
+                                <Col span={8}>
+                                    <span>Thuế VAT (%)</span>
+                                    <Input value={roomTypeDisplay.vat ?? ''} readOnly />
+                                </Col>
+                                <Col span={8}>
+                                    <span>Phụ thu quản trị (%)</span>
+                                    <Input value={roomTypeDisplay.managementFee ?? ''} readOnly />
+                                </Col>
                                 <Col span={24}>
                                     <span>Quy định hủy phòng</span>
                                     <div className="mt-4" dangerouslySetInnerHTML={{ __html: roomTypeDisplay.cancelPolicy }} />
