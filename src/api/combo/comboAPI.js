@@ -53,6 +53,12 @@ const comboAPI = {
         return response.data;
     },
 
+    // GET combo for booking by schedule ID
+    getForBooking: async (scheduleId) => {
+        const response = await axiosInstance.get(`/combos/for-booking/${scheduleId}`);
+        return response.data;
+    },
+
     // POST apply discount code
     applyDiscount: async (data) => {
         const response = await axiosInstance.post('/bookings/apply-discount', data);

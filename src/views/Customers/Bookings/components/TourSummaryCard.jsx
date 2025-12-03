@@ -1,10 +1,12 @@
 import { Card, Row, Col, Input, Button, Divider } from 'antd';
-import { EnvironmentOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, CalendarOutlined, HomeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const TourSummaryCard = ({
-    comboData,
+    bookingType = 'combo',
+    itemData,
     scheduleData,
+    additionalData,
     numAdults = 0,
     numChildren = 0,
     numSingleRooms = 0,
@@ -16,11 +18,36 @@ const TourSummaryCard = ({
     onApplyDiscount,
     applyingDiscount = false
 }) => {
-    if (!comboData || !scheduleData) return null;
+    if (!itemData || !scheduleData) return null;
 
-    const priceAdult = scheduleData.basePriceAdult || 0;
-    const priceChild = scheduleData.basePriceChildren || 0;
-    const singleRoomSupplement = scheduleData.singleRoomSupplement || 0;
+    // Get prices based on bookingType
+    let priceAdult = 0;
+    let priceChild = 0;
+    let singleRoomSupplement = 0;
+
+    if (bookingType === 'combo') {
+        priceAdult = scheduleData.basePriceAdult || 0;
+        priceChild = scheduleData.basePriceChildren || 0;
+        singleRoomSupplement = scheduleData.singleRoomSupplement || 0;
+    } else if (bookingType === 'tour') {
+        priceAdult = scheduleData.priceAdult || 0;
+        priceChild = scheduleData.priceChildren || 0;
+        singleRoomSupplement = scheduleData.singleRoomSurcharge || 0;
+    } else if (bookingType === 'accommodation') {
+        // For accommodation, use first night's price for display
+        if (additionalData?.roomInventories?.length > 0) {
+            priceAdult = additionalData.roomInventories[0].basePriceAdult || 0;
+            priceChild = additionalData.roomInventories[0].basePriceChildren || 0;
+        }
+    }
+
+    // Get image URL based on bookingType
+    const imageUrl =
+        bookingType === 'combo' ? itemData.comboImageCoverUrl : bookingType === 'tour' ? itemData.imageMainUrl : itemData.coverImgUrl;
+
+    // Get title
+    const title = itemData.name;
+    const code = itemData.code;
 
     // Đảm bảo tất cả giá trị là số
     const safeTotalAmount = Number(totalAmount) || 0;
@@ -34,26 +61,46 @@ const TourSummaryCard = ({
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 'bold', color: '#1890ff' }}>PHIẾU XÁC NHẬN BOOKING</h3>
             </div>
 
-            {/* Tour info with image on left */}
+            {/* Item info with image on left */}
             <div style={{ display: 'flex', gap: 16, marginBottom: 20, padding: 16, background: '#f5f5f5', borderRadius: 8 }}>
-                {comboData.comboImageCoverUrl && (
+                {imageUrl && (
                     <img
-                        src={comboData.comboImageCoverUrl}
-                        alt={comboData.name}
+                        src={imageUrl}
+                        alt={title}
                         style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }}
                     />
                 )}
                 <div style={{ flex: 1 }}>
-                    <h4 style={{ margin: 0, fontWeight: 'bold', fontSize: 16, lineHeight: 1.4 }}>{comboData.name}</h4>
+                    <h4 style={{ margin: 0, fontWeight: 'bold', fontSize: 16, lineHeight: 1.4 }}>{title}</h4>
                     <p style={{ margin: '8px 0 0 0', fontSize: 12, color: '#666' }}>
-                        <strong>Mã tour:</strong> {comboData.code}
+                        <strong>{bookingType === 'combo' ? 'Mã combo:' : bookingType === 'tour' ? 'Mã tour:' : 'Mã khách sạn:'}</strong>{' '}
+                        {code}
                     </p>
-                    {comboData.fromCityName && comboData.toCityName && (
+                    {bookingType === 'combo' && itemData.fromCityName && itemData.toCityName && (
                         <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 4 }}>
                             <EnvironmentOutlined />
                             <span>
-                                {comboData.fromCityName} → {comboData.toCityName}
+                                {itemData.fromCityName} → {itemData.toCityName}
                             </span>
+                        </p>
+                    )}
+                    {bookingType === 'tour' && itemData.departureCityName && itemData.destinationCityName && (
+                        <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <EnvironmentOutlined />
+                            <span>
+                                {itemData.departureCityName} → {itemData.destinationCityName}
+                            </span>
+                        </p>
+                    )}
+                    {bookingType === 'accommodation' && itemData.address && (
+                        <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#1890ff', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <EnvironmentOutlined />
+                            <span>{itemData.address}</span>
+                        </p>
+                    )}
+                    {bookingType === 'accommodation' && scheduleData.name && (
+                        <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#666' }}>
+                            <HomeOutlined /> <strong>Loại phòng:</strong> {scheduleData.name}
                         </p>
                     )}
                 </div>
@@ -61,23 +108,55 @@ const TourSummaryCard = ({
 
             <Divider style={{ margin: '16px 0' }} />
 
-            {/* Thông tin lịch khởi hành */}
+            {/* Thông tin lịch khởi hành/nhận phòng */}
             <div style={{ marginBottom: 16 }}>
-                <h4 style={{ margin: '0 0 12px 0', fontWeight: 'bold', fontSize: 14 }}>Thông tin chuyến đi</h4>
+                <h4 style={{ margin: '0 0 12px 0', fontWeight: 'bold', fontSize: 14 }}>
+                    {bookingType === 'accommodation' ? 'Thông tin đặt phòng' : 'Thông tin chuyến đi'}
+                </h4>
                 <Row gutter={[8, 8]} style={{ fontSize: 13 }}>
-                    <Col span={10}>
-                        <strong>Ngày đi:</strong>
-                    </Col>
-                    <Col span={14} style={{ textAlign: 'right' }}>
-                        {dayjs(scheduleData.departureDate).format('DD/MM/YYYY')}
-                    </Col>
-
-                    <Col span={10}>
-                        <strong>Ngày về:</strong>
-                    </Col>
-                    <Col span={14} style={{ textAlign: 'right' }}>
-                        {dayjs(scheduleData.returnDate).format('DD/MM/YYYY')}
-                    </Col>
+                    {bookingType === 'accommodation' ? (
+                        <>
+                            {additionalData?.roomInventories && additionalData.roomInventories.length > 0 && (
+                                <>
+                                    <Col span={10}>
+                                        <strong>Ngày nhận:</strong>
+                                    </Col>
+                                    <Col span={14} style={{ textAlign: 'right' }}>
+                                        {dayjs(additionalData.roomInventories[0].date).format('DD/MM/YYYY')}
+                                    </Col>
+                                    <Col span={10}>
+                                        <strong>Ngày trả:</strong>
+                                    </Col>
+                                    <Col span={14} style={{ textAlign: 'right' }}>
+                                        {dayjs(additionalData.roomInventories[additionalData.roomInventories.length - 1].date)
+                                            .add(1, 'day')
+                                            .format('DD/MM/YYYY')}
+                                    </Col>
+                                    <Col span={10}>
+                                        <strong>Số đêm:</strong>
+                                    </Col>
+                                    <Col span={14} style={{ textAlign: 'right' }}>
+                                        {additionalData.numberOfNights} đêm
+                                    </Col>
+                                </>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Col span={10}>
+                                <strong>Ngày đi:</strong>
+                            </Col>
+                            <Col span={14} style={{ textAlign: 'right' }}>
+                                {dayjs(scheduleData.departureDate || scheduleData.date).format('DD/MM/YYYY')}
+                            </Col>
+                            <Col span={10}>
+                                <strong>Ngày về:</strong>
+                            </Col>
+                            <Col span={14} style={{ textAlign: 'right' }}>
+                                {dayjs(scheduleData.returnDate).format('DD/MM/YYYY')}
+                            </Col>
+                        </>
+                    )}
                 </Row>
             </div>
 
@@ -87,32 +166,77 @@ const TourSummaryCard = ({
             <div style={{ marginBottom: 16 }}>
                 <h4 style={{ margin: '0 0 12px 0', fontWeight: 'bold', fontSize: 14 }}>Chi tiết giá</h4>
                 <Row gutter={[8, 8]} style={{ fontSize: 13 }}>
-                    <Col span={14}>
-                        <strong>Người lớn:</strong>
-                    </Col>
-                    <Col span={10} style={{ textAlign: 'right' }}>
-                        {numAdults} x {priceAdult.toLocaleString('vi-VN')} đ
-                    </Col>
-
-                    {numChildren > 0 && (
+                    {bookingType === 'accommodation' && additionalData?.roomInventories ? (
                         <>
-                            <Col span={14}>
-                                <strong>Trẻ em:</strong>
-                            </Col>
-                            <Col span={10} style={{ textAlign: 'right' }}>
-                                {numChildren} x {priceChild.toLocaleString('vi-VN')} đ
-                            </Col>
+                            {/* Accommodation: Show price breakdown by nights */}
+                            {additionalData.roomInventories.map((inv, index) => (
+                                <Col span={24} key={index}>
+                                    <div
+                                        style={{
+                                            background: '#fafafa',
+                                            padding: '8px 12px',
+                                            borderRadius: 4,
+                                            marginBottom: index < additionalData.roomInventories.length - 1 ? 8 : 0
+                                        }}
+                                    >
+                                        <div style={{ marginBottom: 4, fontWeight: 'bold', color: '#1890ff' }}>
+                                            <CalendarOutlined /> {dayjs(inv.date).format('DD/MM/YYYY')}
+                                        </div>
+                                        {numAdults > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>
+                                                    Người lớn: {numAdults} x {inv.basePriceAdult.toLocaleString('vi-VN')} đ
+                                                </span>
+                                                <span style={{ fontWeight: 'bold' }}>
+                                                    {(numAdults * inv.basePriceAdult).toLocaleString('vi-VN')} đ
+                                                </span>
+                                            </div>
+                                        )}
+                                        {numChildren > 0 && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <span>
+                                                    Trẻ em: {numChildren} x {inv.basePriceChildren.toLocaleString('vi-VN')} đ
+                                                </span>
+                                                <span style={{ fontWeight: 'bold' }}>
+                                                    {(numChildren * inv.basePriceChildren).toLocaleString('vi-VN')} đ
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </Col>
+                            ))}
                         </>
-                    )}
-
-                    {numSingleRooms > 0 && (
+                    ) : (
                         <>
+                            {/* Combo/Tour: Show simple price */}
                             <Col span={14}>
-                                <strong>Phụ phí phòng đơn:</strong>
+                                <strong>Người lớn:</strong>
                             </Col>
                             <Col span={10} style={{ textAlign: 'right' }}>
-                                {numSingleRooms} x {singleRoomSupplement.toLocaleString('vi-VN')} đ
+                                {numAdults} x {priceAdult.toLocaleString('vi-VN')} đ
                             </Col>
+
+                            {numChildren > 0 && (
+                                <>
+                                    <Col span={14}>
+                                        <strong>Trẻ em:</strong>
+                                    </Col>
+                                    <Col span={10} style={{ textAlign: 'right' }}>
+                                        {numChildren} x {priceChild.toLocaleString('vi-VN')} đ
+                                    </Col>
+                                </>
+                            )}
+
+                            {numSingleRooms > 0 && bookingType !== 'accommodation' && (
+                                <>
+                                    <Col span={14}>
+                                        <strong>Phụ phí phòng đơn:</strong>
+                                    </Col>
+                                    <Col span={10} style={{ textAlign: 'right' }}>
+                                        {numSingleRooms} x {singleRoomSupplement.toLocaleString('vi-VN')} đ
+                                    </Col>
+                                </>
+                            )}
                         </>
                     )}
                 </Row>

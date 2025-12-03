@@ -42,6 +42,14 @@ const accommodationAPI = {
     delete: async (id) => {
         const response = await axiosInstance.delete(`/Accommodation/${id}`);
         return response.data;
+    },
+
+    // POST accommodation for booking with room inventory IDs
+    getForBooking: async (roomInventoryIds) => {
+        const response = await axiosInstance.post('/accommodation/for-booking', {
+            roomInventoryIds
+        });
+        return response.data;
     }
 };
 
