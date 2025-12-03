@@ -77,11 +77,6 @@ const Header = () => {
             label: <Link to="/combos">Combos</Link>
         },
         {
-            key: 'accommodations',
-            icon: <ShopOutlined />,
-            label: <Link to="/accommodations">Khách sạn</Link>
-        },
-        {
             key: 'blogs',
             icon: <ReadOutlined />,
             label: <Link to="/blog-posts">Blog</Link>
